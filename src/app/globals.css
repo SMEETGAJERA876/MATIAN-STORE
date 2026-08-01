@@ -41,3 +41,8 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
 }
 
+/* Gallery image fade-in on switch */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}

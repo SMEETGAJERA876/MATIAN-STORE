@@ -99,7 +99,7 @@ export default function Navbar() {
             </Link>
           </div>
         </div>
-      </div>      {/* Main Navbar Header (Desktop Height 64px Sweet Spot) */}
+      </div>      {/* Main Navbar Header (Desktop Height 84px - Largest Spacious View) */}
       <nav
         className={`transition-all duration-300 ${
           scrolled
@@ -107,32 +107,32 @@ export default function Navbar() {
             : "bg-white border-b border-slate-100"
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4 lg:py-4 h-14 sm:h-16 lg:h-[64px]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 lg:py-5 h-16 sm:h-20 lg:h-[84px]">
           
-          {/* Brand Logo (42px Max-Height Fitting 40px-50px Spec) */}
+          {/* Large Brand Logo (50px Max-Height Fitting Spacious 70-90px Nav Spec) */}
           <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
             <img
               src="/images/matrin-logo-clean.webp"
               alt="MATRIN"
-              className="h-8 sm:h-9 lg:h-[42px] max-h-[42px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
+              className="h-9 sm:h-11 lg:h-[50px] max-h-[52px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
             />
           </Link>
 
-          {/* Desktop Navigation Links (15px Font-Size Spec) */}
-          <div className="hidden items-center gap-5 lg:gap-7 lg:flex">
+          {/* Desktop Navigation Links (16px Bold Font Size Spec) */}
+          <div className="hidden items-center gap-6 lg:gap-8 lg:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isDropdownActive = activeDropdown === link.name;
               return (
                 <div
                   key={link.name}
-                  className="relative group py-3"
+                  className="relative group py-4"
                   onMouseEnter={() => link.hasDropdown && setActiveDropdown(link.name)}
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   <Link
                     href={link.href}
-                    className={`text-sm sm:text-[15px] lg:text-[15px] font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${
+                    className={`text-base sm:text-base lg:text-[16px] font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${
                       isActive
                         ? "text-[#1E40AF]"
                         : "text-slate-800 hover:text-[#1E40AF]"
@@ -141,7 +141,7 @@ export default function Navbar() {
                     <span>{link.name}</span>
                     {link.hasDropdown && (
                       <ChevronDown
-                        size={14}
+                        size={15}
                         className={`text-slate-400 transition-transform duration-200 ${
                           isDropdownActive ? "rotate-180 text-[#1E40AF]" : ""
                         }`}
@@ -164,7 +164,7 @@ export default function Navbar() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.98 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full left-0 w-[520px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
+                          className="absolute top-full left-0 w-[540px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
                         >
                           {/* Left Column: Categories List */}
                           <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
@@ -202,7 +202,7 @@ export default function Navbar() {
                                 onClick={() => setActiveDropdown(null)}
                                 className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
                               >
-                                <div className="h-10 w-10 shrink-0">
+                                <div className="h-11 w-11 shrink-0">
                                   <ProductImage
                                     src={product.image}
                                     alt={product.name}
@@ -237,13 +237,13 @@ export default function Navbar() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-44 lg:w-56 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-9 py-1.5 pl-8.5 pr-3 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
+                className="w-48 lg:w-60 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-10 py-2 pl-9 pr-4 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
               />
-              <Search size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
+              <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
 
               {/* Autocomplete Dropdown */}
               {searchQuery.trim() && (
-                <div className="absolute top-11 right-0 w-80 rounded-2xl bg-white p-3 shadow-2xl border border-slate-100 z-50 space-y-2">
+                <div className="absolute top-12 right-0 w-84 rounded-2xl bg-white p-3 shadow-2xl border border-slate-100 z-50 space-y-2">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">
                     Matches ({searchResults.length})
                   </div>
@@ -253,20 +253,20 @@ export default function Navbar() {
                         key={item.id}
                         href={`/products/${item.id}`}
                         onClick={() => setSearchQuery("")}
-                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
+                        className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-slate-50 transition"
                       >
-                        <div className="h-10 w-10 shrink-0">
+                        <div className="h-11 w-11 shrink-0">
                           <ProductImage
                             src={item.image}
                             alt={item.name}
                             fitMode="contain"
                             paddingClassName="p-1"
-                            roundedClassName="rounded-lg"
+                            roundedClassName="rounded-xl"
                           />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                           <div className="text-xs font-extrabold text-slate-900 truncate">{item.name}</div>
-                          <div className="text-[10px] text-slate-500 font-semibold">{item.category} • ₹{item.price}</div>
+                          <div className="text-[11px] text-slate-500 font-semibold">{item.category} • ₹{item.price}</div>
                         </div>
                       </Link>
                     ))
@@ -282,21 +282,21 @@ export default function Navbar() {
             {/* Account Link */}
             <Link
               href="/login"
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
             >
               {user ? (
-                <div className="flex items-center gap-1.5 rounded-full bg-blue-50 py-1 px-3 border border-blue-200">
-                  <span className="h-5 w-5 rounded-full bg-[#1E40AF] text-white text-[10px] font-bold flex items-center justify-center">
+                <div className="flex items-center gap-2 rounded-full bg-blue-50 py-1.5 px-3 border border-blue-200">
+                  <span className="h-5.5 w-5.5 rounded-full bg-[#1E40AF] text-white text-[10px] font-bold flex items-center justify-center">
                     {user.name.charAt(0)}
                   </span>
-                  <span className="text-xs font-bold text-[#1E40AF] max-w-[90px] truncate">
+                  <span className="text-xs font-bold text-[#1E40AF] max-w-[100px] truncate">
                     {user.name.split(" ")[0]}
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-[#1E40AF] transition">
-                  <User size={19} />
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-[#1E40AF] transition">
+                  <User size={21} />
                   <span className="hidden sm:inline">Sign In</span>
                 </div>
               )}
@@ -305,10 +305,10 @@ export default function Navbar() {
             {/* Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
-              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <Heart size={21} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
@@ -317,10 +317,10 @@ export default function Navbar() {
             {/* Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={21} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>

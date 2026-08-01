@@ -105,35 +105,26 @@ export default function ProductDetailsPage() {
           <div className="lg:col-span-5 space-y-4">
             
             <div className="flex gap-4">
-              {/* Vertical Thumbnail List on far left (Matching Image 3) */}
+              {/* Vertical Thumbnail List — uses plain <img> to avoid click interception */}
               <div className="flex flex-col gap-3 shrink-0">
-                {gallery.slice(0, 4).map((img, idx) => (
+                {gallery.map((img, idx) => (
                   <button
+                    type="button"
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`h-16 w-16 rounded-2xl transition overflow-hidden shadow-2xs ${
+                    className={`h-16 w-16 rounded-2xl transition-all duration-200 overflow-hidden bg-[#F4F6FB] border cursor-pointer ${
                       activeImageIndex === idx
-                        ? "ring-2 ring-[#1E40AF] opacity-100"
-                        : "opacity-75 hover:opacity-100"
+                        ? "ring-2 ring-[#1E40AF] border-[#1E40AF] opacity-100 scale-105"
+                        : "border-slate-100 opacity-70 hover:opacity-100 hover:border-slate-300"
                     }`}
                   >
-                    <ProductImage
+                    <img
                       src={img}
                       alt={`Thumbnail ${idx + 1}`}
-                      fitMode="contain"
-                      paddingClassName="p-1"
-                      roundedClassName="rounded-2xl"
+                      className="h-full w-full object-contain p-1.5 rounded-2xl"
                     />
                   </button>
                 ))}
-                {gallery.length > 4 && (
-                  <button
-                    onClick={() => setActiveImageIndex(4)}
-                    className="h-16 w-16 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-center text-xs font-extrabold text-[#1E40AF] hover:bg-slate-100 shadow-2xs"
-                  >
-                    +{gallery.length - 4}
-                  </button>
-                )}
               </div>
 
               {/* Hero Main Image Box */}
@@ -141,6 +132,7 @@ export default function ProductDetailsPage() {
                 
                 {/* Prev & Next Arrows */}
                 <button
+                  type="button"
                   onClick={handlePrevImage}
                   className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:bg-white hover:scale-105 transition"
                   aria-label="Previous Image"
@@ -148,6 +140,7 @@ export default function ProductDetailsPage() {
                   <ChevronLeft size={20} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleNextImage}
                   className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:bg-white hover:scale-105 transition"
                   aria-label="Next Image"
@@ -155,14 +148,15 @@ export default function ProductDetailsPage() {
                   <ChevronRight size={20} />
                 </button>
 
-                <ProductImage
-                  key={activeImageIndex}
-                  src={gallery[activeImageIndex] || product.image}
-                  alt={product.name}
-                  fitMode="contain"
-                  paddingClassName="p-4"
-                  roundedClassName="rounded-3xl"
-                />
+                {/* Main product image — direct img for instant src switching */}
+                <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-[#F4F6FB] p-4 flex items-center justify-center border border-slate-100/80">
+                  <img
+                    key={activeImageIndex}
+                    src={gallery[activeImageIndex] || product.image}
+                    alt={product.name}
+                    className="h-full w-full object-contain rounded-3xl animate-[fadeIn_0.2s_ease-in-out]"
+                  />
+                </div>
               </div>
             </div>
 
