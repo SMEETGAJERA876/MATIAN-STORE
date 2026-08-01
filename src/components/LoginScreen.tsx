@@ -39,6 +39,13 @@ export default function LoginScreen() {
   const hasNumber = /[0-9]/.test(password);
   const isPasswordValid = hasMinLength && hasLetter && hasNumber;
 
+  const handleSocialComingSoon = (provider: string) => {
+    toast(`${provider} login coming soon — please use email login for now.`, {
+      icon: "🚀",
+      duration: 4000,
+    });
+  };
+
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
@@ -400,14 +407,17 @@ export default function LoginScreen() {
                 </span>
               </div>
 
-              {/* Social Buttons Row (Google, Facebook, Apple matching Image 2) */}
+              {/* Social Buttons Row (Google, Facebook, Apple) */}
               <div className="grid grid-cols-3 gap-3">
                 {/* Google */}
                 <button
                   type="button"
-                  onClick={quickUserLogin}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  onClick={() => handleSocialComingSoon("Google")}
+                  className="relative flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 opacity-80 hover:opacity-100 hover:bg-slate-50 transition shadow-2xs group"
                 >
+                  <span className="absolute -top-1.5 -right-1 text-[8px] font-extrabold uppercase bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded-full border border-slate-200 shadow-2xs group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition">
+                    Soon
+                  </span>
                   <svg className="h-4 w-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                     <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.29v3.14C3.26 21.3 7.35 24 12 24z"/>
@@ -420,9 +430,12 @@ export default function LoginScreen() {
                 {/* Facebook */}
                 <button
                   type="button"
-                  onClick={quickUserLogin}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  onClick={() => handleSocialComingSoon("Facebook")}
+                  className="relative flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 opacity-80 hover:opacity-100 hover:bg-slate-50 transition shadow-2xs group"
                 >
+                  <span className="absolute -top-1.5 -right-1 text-[8px] font-extrabold uppercase bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded-full border border-slate-200 shadow-2xs group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition">
+                    Soon
+                  </span>
                   <svg className="h-4 w-4 fill-[#1877F2]" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
@@ -432,9 +445,12 @@ export default function LoginScreen() {
                 {/* Apple */}
                 <button
                   type="button"
-                  onClick={quickUserLogin}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  onClick={() => handleSocialComingSoon("Apple")}
+                  className="relative flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-slate-700 opacity-80 hover:opacity-100 hover:bg-slate-50 transition shadow-2xs group"
                 >
+                  <span className="absolute -top-1.5 -right-1 text-[8px] font-extrabold uppercase bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded-full border border-slate-200 shadow-2xs group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition">
+                    Soon
+                  </span>
                   <svg className="h-4 w-4 fill-slate-900" viewBox="0 0 24 24">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.32c.67-.82 1.12-1.96.99-3.1-.97.04-2.14.65-2.83 1.46-.62.72-1.16 1.88-1.01 3 .01 0 .04.01.07.01 1.09 0 2.19-.55 2.78-1.37z"/>
                   </svg>
