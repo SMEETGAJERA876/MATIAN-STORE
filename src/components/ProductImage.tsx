@@ -1,3 +1,5 @@
+// NOTE: Login page hero lineup image (/images/matrin-hero-lineup.png) shows the target studio photography lineup style — individual product shots (/images/products/*.webp) match this cohesive studio aesthetic.
+
 "use client";
 
 import { useState } from "react";
