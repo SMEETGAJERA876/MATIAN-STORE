@@ -83,9 +83,9 @@ export default function Footer() {
           </div>
 
           {/* Quick Links Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+          <div className="space-y-4">
+            <h4 className="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-300 flex items-center gap-2 pb-1.5 border-b border-cyan-400/20">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/80 shrink-0"></span>
               <span>Quick Links</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -99,9 +99,9 @@ export default function Footer() {
           </div>
 
           {/* Categories Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+          <div className="space-y-4">
+            <h4 className="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-300 flex items-center gap-2 pb-1.5 border-b border-cyan-400/20">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/80 shrink-0"></span>
               <span>Categories</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -115,9 +115,9 @@ export default function Footer() {
           </div>
 
           {/* Customer Support Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+          <div className="space-y-4">
+            <h4 className="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-300 flex items-center gap-2 pb-1.5 border-b border-cyan-400/20">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/80 shrink-0"></span>
               <span>Customer Support</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -131,13 +131,13 @@ export default function Footer() {
           </div>
 
           {/* Contact Us Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+          <div className="space-y-4">
+            <h4 className="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-300 flex items-center gap-2 pb-1.5 border-b border-cyan-400/20">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/80 shrink-0"></span>
               <span>Contact Us</span>
             </h4>
             <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
-              <div className="font-bold text-white">+91 98765 43210</div>
+              <div className="font-bold text-white text-sm">+91 98765 43210</div>
               <div>support@matrin.com</div>
               <div>Matrin House, Clean City, Mumbai, Maharashtra - 400001</div>
               <div className="text-[11px] text-slate-400">Mon - Sat: 9:00 AM - 6:00 PM</div>
