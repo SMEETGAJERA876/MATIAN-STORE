@@ -242,7 +242,7 @@ export default function AuthModal() {
                         <input
                           type="email"
                           required
-                          placeholder="admin@matrin.com or your email"
+                          placeholder="your@email.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-xs text-slate-800 placeholder:text-slate-400 focus:border-[#0A2E4E] focus:outline-hidden"
@@ -302,7 +302,7 @@ export default function AuthModal() {
                         <input
                           type="email"
                           required
-                          placeholder="name@example.com"
+                          placeholder="your@email.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-xs text-slate-800 placeholder:text-slate-400 focus:border-[#0A2E4E] focus:outline-hidden"
@@ -337,31 +337,33 @@ export default function AuthModal() {
                 )}
 
                 {/* Quick Testing Login Shortcuts */}
-                <div className="mt-6 border-t border-[#EFEAE4] pt-4 space-y-2">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">
-                    Preset Login Credentials
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 text-left">
-                    <button
-                      type="button"
-                      onClick={quickAdminLogin}
-                      className="p-2 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 text-[10px] hover:bg-amber-100 transition"
-                    >
-                      <span className="font-bold block">👑 Admin</span>
-                      <span>Username: <strong>admin</strong></span><br/>
-                      <span>Pass: <strong>ADMIN!@#$</strong></span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={quickUserLogin}
-                      className="p-2 rounded-xl bg-blue-50 text-blue-900 border border-blue-200 text-[10px] hover:bg-blue-100 transition"
-                    >
-                      <span className="font-bold block">👤 Customer</span>
-                      <span>Username: <strong>user</strong></span><br/>
-                      <span>Pass: <strong>USER!@#$</strong></span>
-                    </button>
+                {process.env.NODE_ENV === "development" && (
+                  <div className="mt-6 border-t border-[#EFEAE4] pt-4 space-y-2">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">
+                      Preset Login Credentials
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-left">
+                      <button
+                        type="button"
+                        onClick={quickAdminLogin}
+                        className="p-2 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 text-[10px] hover:bg-amber-100 transition"
+                      >
+                        <span className="font-bold block">👑 Admin</span>
+                        <span>Username: <strong>admin</strong></span><br/>
+                        <span>Pass: <strong>ADMIN!@#$</strong></span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={quickUserLogin}
+                        className="p-2 rounded-xl bg-blue-50 text-blue-900 border border-blue-200 text-[10px] hover:bg-blue-100 transition"
+                      >
+                        <span className="font-bold block">👤 Customer</span>
+                        <span>Username: <strong>user</strong></span><br/>
+                        <span>Pass: <strong>USER!@#$</strong></span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </>
             )}
           </div>

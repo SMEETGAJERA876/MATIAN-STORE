@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return true;
       } else {
-        toast.error("Incorrect Admin Password! Try: ADMIN!@#$");
+        toast.error("Incorrect Admin Password.");
         return false;
       }
     }
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return true;
       } else {
-        toast.error("Incorrect User Password! Try: USER!@#$");
+        toast.error("Incorrect Password.");
         return false;
       }
     }

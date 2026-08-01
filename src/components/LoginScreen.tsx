@@ -175,34 +175,36 @@ export default function LoginScreen() {
               </div>
 
               {/* Preset 1-Click Credentials Box */}
-              <div className="rounded-2xl bg-blue-50/60 p-3.5 border border-blue-100 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold text-[#1E40AF]">
-                  <span className="flex items-center gap-1.5">
-                    <Key size={14} className="text-amber-600" /> Demo Accounts
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">Click for 1-Click Login</span>
-                </div>
+              {process.env.NODE_ENV === "development" && (
+                <div className="rounded-2xl bg-blue-50/60 p-3.5 border border-blue-100 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#1E40AF]">
+                    <span className="flex items-center gap-1.5">
+                      <Key size={14} className="text-amber-600" /> Demo Accounts
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">Click for 1-Click Login</span>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-0.5">
-                  <button
-                    type="button"
-                    onClick={quickAdminLogin}
-                    className="p-2 rounded-xl bg-white border border-amber-200 text-left hover:bg-amber-50 transition"
-                  >
-                    <span className="font-bold text-amber-950 text-xs block">👑 Admin</span>
-                    <span className="text-[10px] text-slate-500 font-mono">user: admin</span>
-                  </button>
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={quickAdminLogin}
+                      className="p-2 rounded-xl bg-white border border-amber-200 text-left hover:bg-amber-50 transition"
+                    >
+                      <span className="font-bold text-amber-950 text-xs block">👑 Admin</span>
+                      <span className="text-[10px] text-slate-500 font-mono">user: admin</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={quickUserLogin}
-                    className="p-2 rounded-xl bg-white border border-blue-200 text-left hover:bg-blue-50 transition"
-                  >
-                    <span className="font-bold text-blue-950 text-xs block">👤 Customer</span>
-                    <span className="text-[10px] text-slate-500 font-mono">user: user</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={quickUserLogin}
+                      className="p-2 rounded-xl bg-white border border-blue-200 text-left hover:bg-blue-50 transition"
+                    >
+                      <span className="font-bold text-blue-950 text-xs block">👤 Customer</span>
+                      <span className="text-[10px] text-slate-500 font-mono">user: user</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Login / Register Form */}
               {mode === "login" ? (
