@@ -12,7 +12,7 @@ export default function Home() {
       <Hero />
       <TrustBadges />
       <PromotionalBanner />
-      <ProductGrid />
+      <ProductGrid isTeaser={true} />
       <WhyChooseUs />
       <CustomerReviews />
       <FAQSection />

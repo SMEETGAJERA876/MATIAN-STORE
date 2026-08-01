@@ -181,8 +181,9 @@ export default function AboutPage() {
             {/* Card 1 */}
             <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
               <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                {/* TODO: Replace with real MATRIN product/lifestyle photography before launch. */}
                 <img
-                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=400"
+                  src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&q=80&w=400"
                   alt="Safe & Tested"
                   className="h-full w-full object-cover"
                 />
@@ -201,8 +202,9 @@ export default function AboutPage() {
             {/* Card 2 */}
             <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
               <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                {/* TODO: Replace with real MATRIN product/lifestyle photography before launch. */}
                 <img
-                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=400"
+                  src="https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=400"
                   alt="Eco-Friendly"
                   className="h-full w-full object-cover"
                 />
@@ -221,8 +223,9 @@ export default function AboutPage() {
             {/* Card 3 */}
             <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
               <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                {/* TODO: Replace with real MATRIN product/lifestyle photography before launch. */}
                 <img
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=400"
+                  src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=400"
                   alt="Better Living"
                   className="h-full w-full object-cover"
                 />

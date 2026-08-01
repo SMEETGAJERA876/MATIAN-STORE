@@ -34,7 +34,7 @@ export default function ProductsPage() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mt-8">
-        <ProductGrid />
+        <ProductGrid title="Explore Our Complete Range" badge="FULL CATALOG" />
         <PromotionalBanner />
       </div>
     </main>

@@ -10,7 +10,17 @@ import { ArrowRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function ProductGrid() {
+interface ProductGridProps {
+  isTeaser?: boolean;
+  title?: string;
+  badge?: string;
+}
+
+export default function ProductGrid({
+  isTeaser = false,
+  title,
+  badge,
+}: ProductGridProps) {
   const { products } = useProductStore();
   const searchParams = useSearchParams();
   const initialQuery = searchParams ? searchParams.get("search") || "" : "";
@@ -42,60 +52,88 @@ export default function ProductGrid() {
         if (sortBy === "rating") return b.rating - a.rating;
         return (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0);
       });
-  }, [search, category, sortBy]);
+  }, [products, search, category, sortBy]);
+
+  // Teaser mode displays a curated 4-product preview
+  const displayedProducts = isTeaser
+    ? filteredAndSortedProducts.slice(0, 4)
+    : filteredAndSortedProducts;
+
+  const sectionBadge = badge || (isTeaser ? "OUR BESTSELLERS" : "FULL CATALOG");
+  const sectionTitle = title || (isTeaser ? "Shop Our Most Loved Products" : "Our Products");
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16" id="products-grid">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 lg:py-16" id="products-grid">
       
-      {/* Editorial Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+      {/* Section Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-            OUR BESTSELLERS
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block">
+            {sectionBadge}
           </span>
-          <h2 className="mt-1 font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#0A2E4E]">
-            Shop Our Most Loved Products
+          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B2545] tracking-tight">
+            {sectionTitle}
           </h2>
         </div>
 
-        <Link
-          href="/products"
-          className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#0A2E4E] hover:text-[#13426B]"
-        >
-          <span>VIEW ALL PRODUCTS</span>
-          <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-        </Link>
+        {isTeaser && (
+          <Link
+            href="/products"
+            className="group inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] hover:text-[#1a3899] transition"
+          >
+            <span>VIEW ALL PRODUCTS ({products.length})</span>
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+          </Link>
+        )}
       </div>
 
-      {/* Search Input Bar */}
-      <div className="mb-8">
-        <SearchBar search={search} setSearch={setSearch} />
-      </div>
+      {/* Filter and Search Bar (Only shown on full catalog mode) */}
+      {!isTeaser && (
+        <>
+          <div className="mb-6">
+            <SearchBar search={search} setSearch={setSearch} />
+          </div>
 
-      {/* Category Pills & Sorting Bar */}
-      <CategoryFilter
-        selectedCategory={category}
-        onSelectCategory={setCategory}
-        sortBy={sortBy}
-        onSelectSort={setSortBy}
-      />
+          <CategoryFilter
+            selectedCategory={category}
+            onSelectCategory={setCategory}
+            sortBy={sortBy}
+            onSelectSort={setSortBy}
+          />
+        </>
+      )}
 
       {/* Product Cards Grid */}
-      {filteredAndSortedProducts.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredAndSortedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+      {displayedProducts.length > 0 ? (
+        <>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {displayedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {/* Teaser Mode Bottom CTA Link Button */}
+          {isTeaser && (
+            <div className="mt-10 text-center">
+              <Link
+                href="/products"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 hover:bg-[#1a3899] transition"
+              >
+                <span>View Full Catalog ({products.length} Products)</span>
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          )}
+        </>
       ) : (
-        <div className="rounded-3xl border border-dashed border-[#EFEAE4] bg-[#F5F1EB] p-12 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FAF7F2] text-slate-500">
+        <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-12 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-500 shadow-2xs border border-slate-200/60">
             <RefreshCw size={24} />
           </div>
-          <h3 className="mt-4 font-serif text-2xl font-normal text-[#0A2E4E]">
+          <h3 className="mt-4 text-xl font-bold text-[#0B2545]">
             No products found matching &ldquo;{search}&rdquo;
           </h3>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-xs text-slate-500 font-medium">
             Try clearing your search term or selecting a different category filter.
           </p>
           <button
@@ -103,7 +141,7 @@ export default function ProductGrid() {
               setSearch("");
               setCategory("All");
             }}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#0A2E4E] px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#13426B]"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-[#1a3899] transition"
           >
             Reset Filters
           </button>
