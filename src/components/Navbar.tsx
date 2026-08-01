@@ -90,37 +90,37 @@ export default function Navbar() {
       <nav
         className={`transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-100"
+            ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
             : "bg-white border-b border-slate-100"
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 h-14 lg:h-[64px]">
           
-          {/* Brand Logo (Matrin Leaf Logo matching Reference Image) */}
-          <Link href="/" className="flex items-center gap-2 group">
+          {/* Brand Logo (Matrin Leaf Logo) */}
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
             <img
               src="/images/matrin-logo-clean.webp"
               alt="MATRIN"
-              className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-103"
+              className="h-7 lg:h-8 max-h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-103"
             />
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[15px] font-bold transition-colors flex items-center gap-1 py-1 relative ${
+                  className={`text-sm font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${
                     isActive
                       ? "text-[#1E40AF]"
                       : "text-slate-700 hover:text-[#1E40AF]"
                   }`}
                 >
                   <span>{link.name}</span>
-                  {link.hasDropdown && <ChevronDown size={15} className="text-slate-400" />}
+                  {link.hasDropdown && <ChevronDown size={14} className="text-slate-400" />}
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"
@@ -133,18 +133,18 @@ export default function Navbar() {
           </div>
 
           {/* Right Action Bar: Inline Search + Icons */}
-          <div className="hidden items-center gap-6 md:flex">
+          <div className="hidden items-center gap-5 md:flex">
             
-            {/* Inline Search Bar matching Reference Image */}
+            {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
               <input
                 type="text"
-                placeholder="Search for products..."
+                placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-56 lg:w-64 rounded-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
+                className="w-48 lg:w-56 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-9 py-1.5 pl-8.5 pr-3 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
               />
-              <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
+              <Search size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
 
               {/* Instant Autocomplete Dropdown */}
               {searchQuery.trim() && (
@@ -201,26 +201,26 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Wishlist Icon with badge matching Reference Image (badge count 2) */}
+            {/* Wishlist Icon */}
             <Link
               href="/products"
               className="relative flex items-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5"
               title="Wishlist"
             >
-              <Heart size={22} />
-              <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
+              <Heart size={20} />
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount > 0 ? wishlistCount : 2}
               </span>
             </Link>
 
-            {/* Cart Icon with badge matching Reference Image (badge count 3) */}
+            {/* Cart Icon */}
             <Link
               href="/cart"
               className="relative flex items-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5"
               title="Cart"
             >
-              <ShoppingBag size={22} />
-              <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
+              <ShoppingBag size={20} />
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount > 0 ? cartCount : 3}
               </span>
             </Link>
@@ -228,10 +228,10 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Trigger */}
-          <div className="flex items-center gap-3.5 md:hidden">
+          <div className="flex items-center gap-3 md:hidden">
             <Link href="/cart" className="relative text-slate-700 p-1">
-              <ShoppingBag size={22} />
-              <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white">
+              <ShoppingBag size={20} />
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white">
                 {cartCount > 0 ? cartCount : 3}
               </span>
             </Link>
@@ -241,7 +241,7 @@ export default function Navbar() {
               className="text-slate-800 p-1"
               aria-label="Toggle Navigation"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
 
