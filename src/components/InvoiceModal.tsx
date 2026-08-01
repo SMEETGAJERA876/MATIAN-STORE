@@ -150,15 +150,16 @@ export default function InvoiceModal({
                     <th className="py-3 px-4 rounded-l-xl">#</th>
                     <th className="py-3 px-4">Item & Description</th>
                     <th className="py-3 px-4 text-center">Qty</th>
-                    <th className="py-3 px-4 text-right">Unit Price</th>
-                    <th className="py-3 px-4 text-right">GST (18%)</th>
-                    <th className="py-3 px-4 text-right rounded-r-xl">Total Amount</th>
+                    <th className="py-3 px-4 text-right">Unit Price (Incl. GST)</th>
+                    <th className="py-3 px-4 text-right">GST (18% Included)</th>
+                    <th className="py-3 px-4 text-right rounded-r-xl">Total (Incl. GST)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {invoice.items.map((item, idx) => {
                     const linePrice = item.product.price * item.quantity;
-                    const gst = Math.round(linePrice * 0.18);
+                    // GST included portion inside item price: linePrice * (18 / 118)
+                    const gstIncluded = Math.round((linePrice * 18) / 118);
                     return (
                       <tr key={idx} className="hover:bg-slate-50">
                         <td className="py-3.5 px-4 font-bold text-slate-400">{idx + 1}</td>
@@ -168,7 +169,7 @@ export default function InvoiceModal({
                         </td>
                         <td className="py-3.5 px-4 text-center font-bold text-slate-700">{item.quantity}</td>
                         <td className="py-3.5 px-4 text-right font-medium">₹{item.product.price}</td>
-                        <td className="py-3.5 px-4 text-right text-slate-500">₹{gst}</td>
+                        <td className="py-3.5 px-4 text-right text-slate-500 font-mono">₹{gstIncluded}</td>
                         <td className="py-3.5 px-4 text-right font-bold text-slate-900">₹{linePrice}</td>
                       </tr>
                     );
@@ -178,49 +179,64 @@ export default function InvoiceModal({
             </div>
 
             {/* Total Calculations */}
-            <div className="flex flex-col sm:flex-row justify-between items-start pt-4 border-t border-slate-200 gap-6">
-              <div className="max-w-xs text-xs text-slate-500 space-y-1">
-                <span className="font-bold text-[#0A2E4E] block uppercase tracking-wider text-[10px]">TERMS & CONDITIONS</span>
-                <p>1. Returns accepted within policy guidelines.</p>
-                <p>2. This is a computer generated tax invoice and requires no physical signature.</p>
-              </div>
+            {(() => {
+              const netSubtotal = invoice.subtotal - invoice.discountAmount;
+              const cgstIncluded = (netSubtotal * 9) / 118;
+              const sgstIncluded = (netSubtotal * 9) / 118;
+              const grandTotal = netSubtotal + invoice.shippingFee;
 
-              <div className="w-full sm:w-72 space-y-2 text-xs">
-                <div className="flex justify-between text-slate-600">
-                  <span>Subtotal:</span>
-                  <span className="font-bold text-slate-800">₹{invoice.subtotal}</span>
-                </div>
-
-                {invoice.discountAmount > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-bold">
-                    <span>Coupon Discount ({invoice.appliedCoupon}):</span>
-                    <span>-₹{invoice.discountAmount}</span>
+              return (
+                <div className="flex flex-col sm:flex-row justify-between items-start pt-4 border-t border-slate-200 gap-6">
+                  <div className="max-w-xs text-xs text-slate-500 space-y-1">
+                    <span className="font-bold text-[#0A2E4E] block uppercase tracking-wider text-[10px]">TERMS & CONDITIONS</span>
+                    <p>1. Prices listed are inclusive of 18% GST (CGST 9% + SGST 9%).</p>
+                    <p>2. Returns accepted within policy guidelines.</p>
+                    <p>3. This is a computer generated tax invoice requiring no physical signature.</p>
                   </div>
-                )}
 
-                <div className="flex justify-between text-slate-600">
-                  <span>CGST (9%):</span>
-                  <span>₹{Math.round(invoice.taxAmount / 2)}</span>
-                </div>
+                  <div className="w-full sm:w-80 space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-700 font-bold">
+                      <span>Item Total (incl. GST):</span>
+                      <span>₹{invoice.subtotal}</span>
+                    </div>
 
-                <div className="flex justify-between text-slate-600">
-                  <span>SGST (9%):</span>
-                  <span>₹{Math.round(invoice.taxAmount / 2)}</span>
-                </div>
+                    {invoice.discountAmount > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>Coupon Discount ({invoice.appliedCoupon}):</span>
+                        <span>-₹{invoice.discountAmount}</span>
+                      </div>
+                    )}
 
-                <div className="flex justify-between text-slate-600">
-                  <span>Delivery Charges:</span>
-                  <span className="font-bold text-slate-800">
-                    {invoice.shippingFee === 0 ? "FREE" : `₹${invoice.shippingFee}`}
-                  </span>
-                </div>
+                    {/* Informational Tax Breakdown (Included, not added on top) */}
+                    <div className="pl-3 py-1.5 space-y-1 bg-slate-50 rounded-lg border-l-2 border-[#1E40AF]">
+                      <div className="flex justify-between text-[11px] text-slate-600">
+                        <span>Of which CGST (9%):</span>
+                        <span className="font-mono text-slate-700">₹{cgstIncluded.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-[11px] text-slate-600">
+                        <span>Of which SGST (9%):</span>
+                        <span className="font-mono text-slate-700">₹{sgstIncluded.toFixed(2)}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 italic">
+                        * Tax amounts are included within Item Total, not added on top.
+                      </div>
+                    </div>
 
-                <div className="flex justify-between text-base font-extrabold text-[#0A2E4E] pt-3 border-t-2 border-[#0A2E4E]">
-                  <span>Grand Total:</span>
-                  <span>₹{invoice.totalAmount}</span>
+                    <div className="flex justify-between text-slate-700 pt-1">
+                      <span>Delivery Charges:</span>
+                      <span className="font-bold text-slate-900">
+                        {invoice.shippingFee === 0 ? "FREE" : `₹${invoice.shippingFee}`}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-base font-extrabold text-[#0B2545] pt-3 border-t-2 border-[#0B2545]">
+                      <span>Grand Total:</span>
+                      <span>₹{grandTotal}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Official Stamp & Sign */}
             <div className="pt-6 flex justify-between items-end border-t border-slate-100">
