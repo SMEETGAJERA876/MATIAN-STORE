@@ -14,6 +14,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -35,11 +36,21 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products", hasDropdown: true },
-    { name: "Categories", href: "/categories" },
+    { name: "Categories", href: "/categories", hasDropdown: true },
     { name: "Offers", href: "/products?sale=true" },
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
+
+  const categoryItems = [
+    { name: "Laundry Care", desc: "Detergent Liquid & Softener", href: "/products?category=Laundry Care" },
+    { name: "Dish Care", desc: "Dishwash Gel & Paste", href: "/products?category=Dish Care" },
+    { name: "Floor Care", desc: "Disinfectant Cleaner", href: "/products?category=Floor Care" },
+    { name: "Toilet Care", desc: "Power Cleaner Gel", href: "/products?category=Toilet Care" },
+    { name: "Multi-Surface", desc: "Glass & Surface Cleaner", href: "/products?category=Multi-Surface" },
+  ];
+
+  const featuredProducts = products.slice(0, 4);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,62 +93,121 @@ export default function Navbar() {
             <Link href="/contact" className="hover:text-white transition hidden sm:inline">Track Order</Link>
             <span className="hidden sm:inline text-white/30">|</span>
             <Link href="/contact" className="hover:text-white transition hidden sm:inline">Support</Link>
-            <span className="hidden sm:inline text-white/30">|</span>
             <Link href="/contact" className="hover:text-white transition flex items-center gap-1">
               <span>Store Locator</span>
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Main Navbar Header */}
       <nav
         className={`transition-all duration-300 ${scrolled
           ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
           : "bg-white border-b border-slate-100"
           }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 h-14 sm:h-16 lg:h-[64px]">
-
-          {/* Brand Logo (Responsive: 28px Mobile, 32px Tablet/Desktop) */}
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 h-16 lg:h-[70px]">
           <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
             <img
               src="/images/matrin-logo-clean.webp"
               alt="MATRIN"
-              className="h-7 sm:h-8 lg:h-8 max-h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-103"
+              className="h-8 sm:h-9 lg:h-9 max-h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-103"
             />
           </Link>
-
-          {/* Desktop Navigation Links */}
           <div className="hidden items-center gap-6 lg:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
+              const isDropdownActive = activeDropdown === link.name;
               return (
-                <Link
+                <div
                   key={link.name}
-                  href={link.href}
-                  className={`text-sm font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${isActive
-                    ? "text-[#1E40AF]"
-                    : "text-slate-700 hover:text-[#1E40AF]"
-                    }`}
+                  className="relative group py-4"
+                  onMouseEnter={() => link.hasDropdown && setActiveDropdown(link.name)}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  <span>{link.name}</span>
-                  {link.hasDropdown && <ChevronDown size={14} className="text-slate-400" />}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeIndicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E40AF] rounded-full"
-                    />
+                  <Link
+                    href={link.href}
+                    className={`text-sm font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${isActive
+                      ? "text-[#1E40AF]"
+                      : "text-slate-700 hover:text-[#1E40AF]"
+                      }`}
+                  >
+                    <span>{link.name}</span>
+                    {link.hasDropdown && (
+                      <ChevronDown
+                        size={14}
+                        className={`text-slate-400 transition-transform duration-200 ${isDropdownActive ? "rotate-180 text-[#1E40AF]" : ""
+                          }`}
+                      />
+                    )}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E40AF] rounded-full"
+                      />
+                    )}
+                  </Link>
+                  {link.hasDropdown && (
+                    <AnimatePresence>
+                      {isDropdownActive && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute top-full left-0 w-[520px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
+                        >
+                          <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
+                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3">
+                              Shop by Category
+                            </div>
+                            {categoryItems.map((cat) => (
+                              <Link
+                                key={cat.name}
+                                href={cat.href}
+                                onClick={() => setActiveDropdown(null)}
+                                className="block p-2 rounded-xl hover:bg-blue-50/80 transition group/item"
+                              >
+                                <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#1E40AF] flex items-center justify-between">
+                                  <span>{cat.name}</span>
+                                  <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity text-[#1E40AF]" />
+                                </div>
+                                <div className="text-[10px] text-slate-400 font-medium">{cat.desc}</div>
+                              </Link>
+                            ))}
+                          </div>
+                          <div className="col-span-6 space-y-2">
+                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3 flex items-center justify-between">
+                              <span>Bestsellers</span>
+                              <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#1E40AF] font-bold">
+                                View All →
+                              </Link>
+                            </div>
+                            {featuredProducts.map((product) => (
+                              <Link
+                                key={product.id}
+                                href={`/products/${product.id}`}
+                                onClick={() => setActiveDropdown(null)}
+                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
+                              >
+                                <div className="h-9 w-9 shrink-0">
+                                  <ProductImage src={product.image} alt={product.name} fitMode="cover" roundedClassName="rounded-md" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs font-extrabold text-slate-800 truncate">{product.name}</div>
+                                  <div className="text-[10px] font-bold text-[#1E40AF]">₹{product.price}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   )}
-                </Link>
+                </div>
               );
             })}
           </div>
-
-          {/* Right Action Bar (Tablet & Desktop) */}
           <div className="hidden items-center gap-4 md:flex">
-
-            {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
               <input
                 type="text"
@@ -147,8 +217,6 @@ export default function Navbar() {
                 className="w-44 lg:w-56 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-9 py-1.5 pl-8.5 pr-3 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
               />
               <Search size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
-
-              {/* Autocomplete Dropdown */}
               {searchQuery.trim() && (
                 <div className="absolute top-11 right-0 w-80 rounded-2xl bg-white p-3 shadow-2xl border border-slate-100 z-50 space-y-2">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">
@@ -179,11 +247,9 @@ export default function Navbar() {
                 </div>
               )}
             </form>
-
-            {/* Account Link */}
             <Link
               href="/login"
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
             >
               {user ? (
@@ -196,87 +262,70 @@ export default function Navbar() {
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-[#1E40AF] transition">
-                  <User size={20} />
-                  <span className="hidden sm:inline">Sign In</span>
+                <div className="flex items-center gap-1 text-[#0B2545] hover:text-[#1E40AF] transition">
+                  <User size={22} />
+                  <span className="hidden sm:inline text-xs font-extrabold">Sign In</span>
                 </div>
               )}
             </Link>
-
-            {/* Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-[#0B2545] hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
-              <Heart size={40} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
+              <Heart size={24} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
             </button>
-
-            {/* Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-[#0B2545] hover:text-[#1E40AF] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
-              <ShoppingBag size={40} />
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
+              <ShoppingBag size={24} />
+              <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
             </button>
-
           </div>
-
-          {/* Mobile Action Bar (<640px) with Guaranteed 44x44px Minimum Touch Targets */}
           <div className="flex items-center gap-1 md:hidden">
-            {/* Mobile Search Toggle */}
             <button
               onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-[#0B2545] hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               aria-label="Search"
             >
-              <Search size={40} />
+              <Search size={22} />
             </button>
-
-            {/* Mobile Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-[#0B2545] hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Wishlist"
             >
-              <Heart size={40} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
+              <Heart size={24} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
             </button>
-
-            {/* Mobile Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-[#0B2545] hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Cart"
             >
-              <ShoppingBag size={40} />
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
+              <ShoppingBag size={24} />
+              <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1E40AF] text-[10px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
             </button>
-
-            {/* Mobile Hamburger Menu Button (Guaranteed 44x44px Tap Area) */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-800 p-2 rounded-xl hover:bg-slate-100 transition active:scale-95"
               aria-label="Toggle Navigation"
             >
-              {isOpen ? <X size={22} /> : <Menu size={22} />}
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
-
         </div>
-
-        {/* Expandable Mobile Search Bar */}
         <AnimatePresence>
           {isMobileSearchOpen && (
             <motion.div
