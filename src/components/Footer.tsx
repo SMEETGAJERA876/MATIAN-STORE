@@ -84,8 +84,9 @@ export default function Footer() {
 
           {/* Quick Links Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
-              Quick Links
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+              <span>Quick Links</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/" className="hover:text-white transition">Home</Link></li>
@@ -99,8 +100,9 @@ export default function Footer() {
 
           {/* Categories Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
-              Categories
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+              <span>Categories</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/products?category=Laundry Care" className="hover:text-white transition">Detergent</Link></li>
@@ -114,8 +116,9 @@ export default function Footer() {
 
           {/* Customer Support Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
-              Customer Support
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+              <span>Customer Support</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/contact" className="hover:text-white transition">Help Center</Link></li>
@@ -129,8 +132,9 @@ export default function Footer() {
 
           {/* Contact Us Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
-              Contact Us
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
+              <span>Contact Us</span>
             </h4>
             <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
               <div className="font-bold text-white">+91 98765 43210</div>
