@@ -18,6 +18,9 @@ type CartContextType = {
   applyCoupon: (code: string) => boolean;
   removeCoupon: () => void;
   total: number;
+  isCartDrawerOpen: boolean;
+  openCartDrawer: () => void;
+  closeCartDrawer: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -28,6 +31,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -54,6 +58,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, isLoaded]);
 
+  const openCartDrawer = () => setIsCartDrawerOpen(true);
+  const closeCartDrawer = () => setIsCartDrawerOpen(false);
+
   const addToCart = (product: Product, quantity = 1) => {
     setCart((prev) => {
       const existingIndex = prev.findIndex((item) => item.product.id === product.id);
@@ -66,6 +73,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return [...prev, { product, quantity }];
     });
+
+    // Auto-open Cart Drawer Slide-Over Modal when item is added!
+    setIsCartDrawerOpen(true);
 
     toast.success(`Added ${product.name} to cart!`, {
       icon: "🛒",
@@ -146,6 +156,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         applyCoupon,
         removeCoupon,
         total,
+        isCartDrawerOpen,
+        openCartDrawer,
+        closeCartDrawer,
       }}
     >
       {children}

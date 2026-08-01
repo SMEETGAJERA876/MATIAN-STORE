@@ -17,7 +17,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
-  const { cartCount } = useCart();
+  const { cartCount, openCartDrawer } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAdmin } = useAuth();
   const { products } = useProductStore();
@@ -217,17 +217,17 @@ export default function Navbar() {
               </span>
             </button>
 
-            {/* Cart Link */}
-            <Link
-              href="/cart"
+            {/* Cart Button */}
+            <button
+              onClick={openCartDrawer}
               className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
               <ShoppingBag size={20} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
-                {cartCount > 0 ? cartCount : 3}
+                {cartCount}
               </span>
-            </Link>
+            </button>
 
           </div>
 
@@ -254,17 +254,17 @@ export default function Navbar() {
               </span>
             </button>
 
-            {/* Mobile Cart Link */}
-            <Link
-              href="/cart"
+            {/* Mobile Cart Button */}
+            <button
+              onClick={openCartDrawer}
               className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Cart"
             >
               <ShoppingBag size={20} />
               <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
-                {cartCount > 0 ? cartCount : 3}
+                {cartCount}
               </span>
-            </Link>
+            </button>
 
             {/* Mobile Hamburger Menu Button (Guaranteed 44x44px Tap Area) */}
             <button

@@ -3,6 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import CartDrawerModal from "./CartDrawerModal";
 
 export default function AppWrapper({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoaded } = useAuth();
@@ -23,6 +24,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
       <Navbar />
       <div className="flex-1">{children}</div>
       <Footer />
+      <CartDrawerModal />
     </>
   );
 }
