@@ -84,8 +84,7 @@ export default function Footer() {
 
           {/* Quick Links Column */}
           <div className="space-y-4">
-            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
-              <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
+            <h4 className="text-base font-black uppercase tracking-wider text-white pb-2 border-b-2 border-white/30">
               <span style={{ color: "#ffffff", fontWeight: 900 }}>Quick Links</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -100,8 +99,7 @@ export default function Footer() {
 
           {/* Categories Column */}
           <div className="space-y-4">
-            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
-              <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
+            <h4 className="text-base font-black uppercase tracking-wider text-white pb-2 border-b-2 border-white/30">
               <span style={{ color: "#ffffff", fontWeight: 900 }}>Categories</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -116,8 +114,7 @@ export default function Footer() {
 
           {/* Customer Support Column */}
           <div className="space-y-4">
-            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
-              <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
+            <h4 className="text-base font-black uppercase tracking-wider text-white pb-2 border-b-2 border-white/30">
               <span style={{ color: "#ffffff", fontWeight: 900 }}>Customer Support</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
@@ -132,8 +129,7 @@ export default function Footer() {
 
           {/* Contact Us Column */}
           <div className="space-y-4">
-            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
-              <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
+            <h4 className="text-base font-black uppercase tracking-wider text-white pb-2 border-b-2 border-white/30">
               <span style={{ color: "#ffffff", fontWeight: 900 }}>Contact Us</span>
             </h4>
             <div className="space-y-2 text-slate-300 font-medium leading-relaxed">

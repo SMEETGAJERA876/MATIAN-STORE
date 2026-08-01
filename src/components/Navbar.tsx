@@ -16,7 +16,7 @@ export default function Navbar() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const { cartCount, openCartDrawer } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAdmin } = useAuth();
@@ -51,11 +51,11 @@ export default function Navbar() {
 
   const searchResults = searchQuery.trim()
     ? products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 5)
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+    ).slice(0, 5)
     : [];
 
   return (
@@ -92,14 +92,13 @@ export default function Navbar() {
 
       {/* Main Navbar Header */}
       <nav
-        className={`transition-all duration-300 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
-            : "bg-white border-b border-slate-100"
-        }`}
+        className={`transition-all duration-300 ${scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
+          : "bg-white border-b border-slate-100"
+          }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 h-14 sm:h-16 lg:h-[64px]">
-          
+
           {/* Brand Logo (Responsive: 28px Mobile, 32px Tablet/Desktop) */}
           <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
             <img
@@ -117,11 +116,10 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-sm font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${
-                    isActive
-                      ? "text-[#1E40AF]"
-                      : "text-slate-700 hover:text-[#1E40AF]"
-                  }`}
+                  className={`text-sm font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${isActive
+                    ? "text-[#1E40AF]"
+                    : "text-slate-700 hover:text-[#1E40AF]"
+                    }`}
                 >
                   <span>{link.name}</span>
                   {link.hasDropdown && <ChevronDown size={14} className="text-slate-400" />}
@@ -138,7 +136,7 @@ export default function Navbar() {
 
           {/* Right Action Bar (Tablet & Desktop) */}
           <div className="hidden items-center gap-4 md:flex">
-            
+
             {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
               <input
@@ -211,7 +209,7 @@ export default function Navbar() {
               className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
-              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <Heart size={40} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
@@ -223,7 +221,7 @@ export default function Navbar() {
               className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={40} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
@@ -239,7 +237,7 @@ export default function Navbar() {
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               aria-label="Search"
             >
-              <Search size={20} />
+              <Search size={40} />
             </button>
 
             {/* Mobile Wishlist Button */}
@@ -248,7 +246,7 @@ export default function Navbar() {
               className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Wishlist"
             >
-              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <Heart size={40} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
               <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
@@ -260,7 +258,7 @@ export default function Navbar() {
               className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Cart"
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={40} />
               <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
@@ -318,11 +316,10 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className={`min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center justify-between transition ${
-                        isActive
-                          ? "bg-blue-50 text-[#1E40AF]"
-                          : "text-slate-800 hover:bg-slate-50"
-                      }`}
+                      className={`min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center justify-between transition ${isActive
+                        ? "bg-blue-50 text-[#1E40AF]"
+                        : "text-slate-800 hover:bg-slate-50"
+                        }`}
                     >
                       <span>{link.name}</span>
                       <ArrowRight size={16} className={isActive ? "text-[#1E40AF]" : "text-slate-400"} />
