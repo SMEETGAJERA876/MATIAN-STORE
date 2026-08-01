@@ -37,30 +37,30 @@ const reviews = [
 
 export default function CustomerReviews() {
   return (
-    <section className="bg-[#FAF7F2] py-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="bg-[#F8FAFC] py-16 lg:py-20" id="reviews">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block">
             TESTIMONIALS
           </span>
-          <h2 className="mt-2 font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#0A2E4E]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B2545] tracking-tight">
             Loved by 50,000+ Indian Households
           </h2>
-          <p className="mt-3 text-slate-600 font-light text-sm">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium">
             Discover why families trust Matrin for superior home care and daily cleaning.
           </p>
         </div>
 
         {/* Reviews Cards Grid */}
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {reviews.map((rev) => (
             <div
               key={rev.id}
-              className="relative flex flex-col justify-between rounded-3xl bg-[#F5F1EB] p-8 border border-[#EFEAE4] transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="relative flex flex-col justify-between rounded-3xl bg-white p-7 border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
-              <Quote size={36} className="absolute top-6 right-6 text-[#0A2E4E]/10" />
+              <Quote size={36} className="absolute top-6 right-6 text-[#1E40AF]/10" />
 
               <div>
                 {/* Rating Stars */}
@@ -70,22 +70,22 @@ export default function CustomerReviews() {
                   ))}
                 </div>
 
-                <p className="mt-4 font-serif text-base leading-relaxed text-slate-800 italic">
+                <p className="mt-4 text-xs sm:text-sm leading-relaxed text-slate-700 font-medium italic">
                   &ldquo;{rev.comment}&rdquo;
                 </p>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-[#EFEAE4] flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider">
+                  <h3 className="font-extrabold text-[#0B2545] text-xs">
                     {rev.name}
                   </h3>
-                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
-                    <CheckCircle2 size={12} /> {rev.role}
+                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
+                    <CheckCircle2 size={13} /> {rev.role}
                   </div>
                 </div>
 
-                <span className="text-[10px] font-medium text-slate-400">
+                <span className="text-[10px] font-semibold text-slate-400">
                   {rev.date}
                 </span>
               </div>

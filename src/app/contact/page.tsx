@@ -1,7 +1,22 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, HelpCircle } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Send,
+  CheckCircle2,
+  Headphones,
+  Zap,
+  Heart,
+  MessageSquare,
+  ShieldCheck,
+  Award,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
@@ -10,7 +25,7 @@ export default function ContactPage() {
     name: "",
     email: "",
     phone: "",
-    subject: "General Inquiry",
+    subject: "",
     message: "",
   });
 
@@ -23,92 +38,98 @@ export default function ContactPage() {
       return;
     }
     setSubmitted(true);
-    toast.success("Message sent successfully! Our team will reply within 24 hours.", {
-      icon: "✉️",
-    });
+    toast.success("Message sent successfully! Our team will reply within 24 hours.");
   };
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] py-12">
-      <div className="mx-auto max-w-7xl px-6">
-        
-        {/* Page Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-            GET IN TOUCH
-          </span>
-          <h1 className="mt-2 font-serif text-4xl sm:text-5xl font-normal text-[#0A2E4E]">
-            We&apos;re Here to Help You
-          </h1>
-          <p className="mt-3 text-slate-600 font-light text-sm leading-relaxed">
-            Have questions regarding our products, bulk orders, or shipping? Reach out to us anytime!
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#F8FAFC] pb-16 font-sans">
+      
+      {/* Hero Section (Exact Match with Reference Image 3) */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#EBF3FB] via-[#F2F7FD] to-white py-12 lg:py-16 border-b border-slate-200/60">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
+          <div className="grid gap-10 lg:grid-cols-12 items-center">
+            
+            {/* Left Content */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="space-y-2">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-[#0B2545] tracking-tight">
+                  Contact Us
+                </h1>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E40AF] tracking-tight">
+                  We&apos;re here to help!
+                </h2>
+              </div>
 
-        {/* Contact Info Cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-lg">
+                Have a question, feedback or need support? Our team is always ready to assist you.
+              </p>
+
+              {/* 3 Top Badges (Exact Image 3) */}
+              <div className="grid grid-cols-3 gap-3 text-center text-xs font-bold text-slate-700">
+                <div className="rounded-2xl bg-white p-3.5 border border-slate-200/80 shadow-2xs space-y-1">
+                  <div className="mx-auto h-8 w-8 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center">
+                    <Headphones size={16} />
+                  </div>
+                  <div className="text-[11px] font-extrabold text-[#0B2545]">24/7 Support</div>
+                  <div className="text-[10px] text-slate-400 font-normal">We&apos;re always here to help you.</div>
+                </div>
+
+                <div className="rounded-2xl bg-white p-3.5 border border-slate-200/80 shadow-2xs space-y-1">
+                  <div className="mx-auto h-8 w-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <Zap size={16} />
+                  </div>
+                  <div className="text-[11px] font-extrabold text-[#0B2545]">Quick Response</div>
+                  <div className="text-[10px] text-slate-400 font-normal">We reply within 24 hours.</div>
+                </div>
+
+                <div className="rounded-2xl bg-white p-3.5 border border-slate-200/80 shadow-2xs space-y-1">
+                  <div className="mx-auto h-8 w-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+                    <Heart size={16} />
+                  </div>
+                  <div className="text-[11px] font-extrabold text-[#0B2545]">Customer First</div>
+                  <div className="text-[10px] text-slate-400 font-normal">Your satisfaction is our priority.</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Product Lineup Graphic */}
+            <div className="lg:col-span-6 flex justify-center">
+              <div className="relative w-full max-w-lg">
+                <img
+                  src="/images/matrin-hero-lineup.png"
+                  alt="Matrin Products"
+                  className="h-auto w-full object-contain drop-shadow-2xl"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Main Grid: Contact Form (Left Col 6) & Touch Cards (Right Col 6) (Exact Image 3) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-12">
+        <div className="grid gap-8 lg:grid-cols-12 items-start">
           
-          <div className="rounded-3xl bg-[#F5F1EB] p-6 border border-[#EFEAE4]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FAF7F2] text-[#0A2E4E] mb-4">
-              <Phone size={20} />
+          {/* Send Us a Message Form Card (Col 6) */}
+          <div className="lg:col-span-6 rounded-3xl bg-white p-8 border border-slate-100 shadow-sm space-y-6">
+            <div>
+              <h3 className="text-2xl font-extrabold text-[#0B2545]">
+                Send Us a Message
+              </h3>
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                Fill out the form and our team will get back to you.
+              </p>
             </div>
-            <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider">Customer Care</h3>
-            <p className="text-xs text-slate-600 font-light mt-1">+91 98765 43210</p>
-            <p className="text-xs text-slate-600 font-light">+91 98765 43211</p>
-          </div>
-
-          <div className="rounded-3xl bg-[#F5F1EB] p-6 border border-[#EFEAE4]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FAF7F2] text-[#0A2E4E] mb-4">
-              <Mail size={20} />
-            </div>
-            <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider">Email Support</h3>
-            <p className="text-xs text-slate-600 font-light mt-1">support@matrin.com</p>
-            <p className="text-xs text-slate-600 font-light">info@matrin.com</p>
-          </div>
-
-          <div className="rounded-3xl bg-[#F5F1EB] p-6 border border-[#EFEAE4]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FAF7F2] text-[#0A2E4E] mb-4">
-              <Clock size={20} />
-            </div>
-            <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider">Working Hours</h3>
-            <p className="text-xs text-slate-600 font-light mt-1">Mon - Sat: 9:00 AM - 8:00 PM IST</p>
-            <p className="text-xs font-semibold text-emerald-700">Sunday: Closed</p>
-          </div>
-
-          <div className="rounded-3xl bg-[#F5F1EB] p-6 border border-[#EFEAE4]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FAF7F2] text-[#0A2E4E] mb-4">
-              <MapPin size={20} />
-            </div>
-            <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider">Head Office</h3>
-            <p className="text-xs text-slate-600 font-light mt-1 leading-relaxed">
-              Matrin Hub, SG Highway, Ahmedabad, Gujarat 380015
-            </p>
-          </div>
-
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-12">
-          {/* Contact Form Left */}
-          <div className="lg:col-span-7 rounded-3xl bg-[#FAF7F2] p-8 sm:p-10 border border-[#EFEAE4]">
-            <h2 className="font-serif text-3xl font-normal text-[#0A2E4E] mb-1">
-              Send Us a Message
-            </h2>
-            <p className="text-xs text-slate-500 font-light mb-6">
-              Fill out the form below and our team will get back to you within 24 hours.
-            </p>
 
             {submitted ? (
-              <div className="rounded-2xl bg-[#F5F1EB] p-8 text-center border border-[#EFEAE4]">
-                <CheckCircle2 size={40} className="mx-auto text-emerald-700 mb-3" />
-                <h3 className="font-serif text-2xl font-normal text-[#0A2E4E]">
-                  Thank You, {formData.name}!
-                </h3>
-                <p className="text-xs text-slate-600 font-light mt-2">
-                  Your message has been dispatched. We will review your inquiry and respond shortly.
-                </p>
+              <div className="rounded-2xl bg-emerald-50 p-8 text-center border border-emerald-200 space-y-3">
+                <CheckCircle2 size={40} className="mx-auto text-emerald-600" />
+                <h4 className="text-xl font-bold text-emerald-950">Thank You, {formData.name}!</h4>
+                <p className="text-xs text-emerald-800">Your message has been sent successfully. We will reply to {formData.email} within 24 hours.</p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="mt-6 rounded-full bg-[#0A2E4E] px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#13426B]"
+                  className="mt-4 rounded-full bg-[#1E40AF] px-6 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#1a3899]"
                 >
                   Send Another Message
                 </button>
@@ -117,123 +138,249 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-bold text-[#0A2E4E] mb-1.5 block">
-                      Your Name *
-                    </label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Your Name *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Anjali Sharma"
+                      required
+                      placeholder="Enter your full name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-4 py-3 text-xs font-medium focus:border-[#0A2E4E] focus:bg-white focus:outline-hidden"
-                      required
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-[#0A2E4E] mb-1.5 block">
-                      Email Address *
-                    </label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
                     <input
                       type="email"
-                      placeholder="anjali@example.com"
+                      required
+                      placeholder="Enter your email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-4 py-3 text-xs font-medium focus:border-[#0A2E4E] focus:bg-white focus:outline-hidden"
-                      required
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
                     />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="text-xs font-bold text-[#0A2E4E] mb-1.5 block">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="+91 98765 00000"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-4 py-3 text-xs font-medium focus:border-[#0A2E4E] focus:bg-white focus:outline-hidden"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-[#0A2E4E] mb-1.5 block">
-                      Subject
-                    </label>
-                    <select
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-4 py-3 text-xs font-medium focus:border-[#0A2E4E] focus:bg-white focus:outline-hidden"
-                    >
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Order Tracking">Order Tracking</option>
-                      <option value="Wholesale & Bulk">Wholesale & Bulk</option>
-                      <option value="Feedback">Feedback</option>
-                    </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-[#0A2E4E] mb-1.5 block">
-                    Message *
-                  </label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Subject *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="How can we help you?"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Message *</label>
                   <textarea
                     rows={4}
-                    placeholder="Tell us how we can help you..."
+                    required
+                    placeholder="Type your message here..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-4 py-3 text-xs font-medium focus:border-[#0A2E4E] focus:bg-white focus:outline-hidden"
-                    required
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 rounded-full bg-[#0A2E4E] px-8 py-3.5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#13426B] transition active:scale-95 w-full sm:w-auto"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition active:scale-98"
                 >
-                  <Send size={15} /> Send Message
+                  <span>Send Message</span>
+                  <ArrowRight size={16} />
                 </button>
               </form>
             )}
           </div>
 
-          {/* Location Map Placeholder & Quick FAQ Right */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="rounded-3xl bg-[#F5F1EB] p-6 border border-[#EFEAE4]">
-              <h3 className="font-bold text-[#0A2E4E] text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
-                <MapPin size={16} /> Location Map
-              </h3>
-              
-              <div className="relative aspect-16/9 overflow-hidden rounded-2xl bg-[#0A2E4E] flex flex-col items-center justify-center text-center p-6 text-[#FAF7F2]">
-                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center mb-2 animate-bounce">
-                  <MapPin size={20} />
+          {/* Get in Touch Touch Cards (Col 6 - Exact Image 3) */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="rounded-3xl bg-white p-8 border border-slate-100 shadow-sm space-y-6">
+              <div>
+                <h3 className="text-2xl font-extrabold text-[#0B2545]">
+                  Get in Touch
+                </h3>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  Choose the best way to reach us.
+                </p>
+              </div>
+
+              {/* 4 Touch Cards (Exact Image 3) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Call Us */}
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+                    <Phone size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-extrabold text-[#0B2545]">Call Us</div>
+                    <div className="text-xs font-bold text-[#1E40AF] mt-0.5">+91 98765 43210</div>
+                    <div className="text-[10px] text-slate-400 font-medium">Mon - Sat: 9:00 AM - 6:00 PM</div>
+                  </div>
                 </div>
-                <div className="font-serif text-lg font-normal text-white">Matrin Cleaning Headquarters</div>
-                <div className="text-xs text-slate-300 font-light mt-0.5">SG Highway, Ahmedabad, India</div>
+
+                {/* WhatsApp */}
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                    <MessageSquare size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-extrabold text-[#0B2545]">WhatsApp</div>
+                    <div className="text-xs font-bold text-emerald-700 mt-0.5">+91 98765 43210</div>
+                    <div className="text-[10px] text-slate-400 font-medium">Chat with us on WhatsApp</div>
+                  </div>
+                </div>
+
+                {/* Email Us */}
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+                    <Mail size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-extrabold text-[#0B2545]">Email Us</div>
+                    <div className="text-xs font-bold text-purple-700 mt-0.5">support@matrin.com</div>
+                    <div className="text-[10px] text-slate-400 font-medium">We reply within 24 hours</div>
+                  </div>
+                </div>
+
+                {/* Visit Us */}
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+                    <MapPin size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-extrabold text-[#0B2545]">Visit Us</div>
+                    <div className="text-[11px] font-bold text-slate-700 mt-0.5">Matrin House, Clean City, Mumbai, Maharashtra - 400001</div>
+                    <a href="#" className="text-[10px] font-extrabold text-[#1E40AF] hover:underline block mt-1">View on Google Maps</a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Follow Us Section */}
+              <div className="pt-2 border-t border-slate-100">
+                <div className="text-xs font-extrabold text-[#0B2545] mb-3">Follow Us</div>
+                <div className="flex items-center gap-3">
+                  {["facebook", "instagram", "youtube", "twitter", "linkedin"].map((soc) => (
+                    <a
+                      key={soc}
+                      href="#"
+                      className="h-9 w-9 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center hover:bg-[#1E40AF] hover:text-white transition shadow-2xs capitalize text-xs font-bold"
+                    >
+                      {soc.charAt(0).toUpperCase()}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="rounded-3xl bg-[#0A2E4E] p-6 text-[#FAF7F2] shadow-md flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#E5D3C4]">INSTANT ANSWERS</span>
-                <h4 className="font-serif text-xl font-normal text-white mt-1">Looking for FAQs?</h4>
-                <p className="text-xs text-slate-300 font-light mt-1">Check out our answers to common questions.</p>
+        </div>
+      </section>
+
+      {/* Map Section with Office Overlay Card (Exact Match with Image 3) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-12">
+        <div className="relative overflow-hidden rounded-3xl bg-slate-200 h-80 border border-slate-200 shadow-sm flex items-center p-6 sm:p-10">
+          
+          {/* Background Map Graphic Styling */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-800/80 z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-20 z-0" />
+
+          {/* Location Marker Pin */}
+          <div className="absolute right-1/3 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center animate-bounce">
+            <div className="h-10 w-10 rounded-full bg-[#1E40AF] text-white flex items-center justify-center font-bold text-xs shadow-xl border-2 border-white">
+              📍
+            </div>
+            <span className="bg-white text-[#0B2545] font-extrabold text-[10px] px-2 py-0.5 rounded-md shadow-md mt-1">
+              MATRIN HOUSE
+            </span>
+          </div>
+
+          {/* Overlay Info Card (Exact Image 3) */}
+          <div className="relative z-10 rounded-2xl bg-white/95 backdrop-blur-md p-6 border border-slate-200 shadow-xl max-w-sm space-y-3">
+            <div className="flex items-center gap-2 text-xs font-extrabold text-[#1E40AF]">
+              <MapPin size={16} /> Our Office
+            </div>
+            <div>
+              <div className="text-sm font-extrabold text-[#0B2545]">Matrin House, Clean City</div>
+              <div className="text-xs text-slate-500 font-medium">Mumbai, Maharashtra - 400001</div>
+            </div>
+
+            <div className="space-y-1.5 pt-1 text-xs font-semibold text-slate-700">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-600" /> Easy to reach location
               </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-600" /> Nearby public transport
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-600" /> Ample parking space available
+              </div>
+            </div>
+          </div>
 
-              <Link
-                href="/#faq-section"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white backdrop-blur-xs hover:bg-white/20"
-              >
-                <HelpCircle size={20} />
-              </Link>
+        </div>
+      </section>
+
+      {/* Bottom 4 Trust Badges Bar (Exact Image 3) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-12">
+        <div className="rounded-3xl bg-white p-6 shadow-2xs border border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+              <Headphones size={20} />
+            </div>
+            <div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">Fast Support</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Quick solutions for all your queries.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">Safe & Secure</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Your information is always protected.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+              <Award size={20} />
+            </div>
+            <div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">Trusted by Thousands</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">50,000+ happy customers trust Matrin.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">100% Satisfaction</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">We are committed to your satisfaction.</p>
             </div>
           </div>
         </div>
+      </section>
 
-      </div>
     </main>
   );
 }

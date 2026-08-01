@@ -10,11 +10,11 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.8,
     reviewCount: 142,
-    image: "/images/products/detergent.png",
+    image: "/images/products/detergent.webp",
     galleryImages: [
-      "/images/products/detergent.png",
-      "/images/hero.png",
-      "/images/products/dish-cleaner.png",
+      "/images/products/detergent.webp",
+      "/images/hero.webp",
+      "/images/products/dish-cleaner.webp",
     ],
     description:
       "Matrin Ultra Liquid Detergent delivers powerful stain removal with advanced fabric care technology. Formulated to keep whites bright and colors vibrant while leaving a fresh ocean breeze scent.",
@@ -68,11 +68,11 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.9,
     reviewCount: 98,
-    image: "/images/products/dishwash.png",
+    image: "/images/products/dishwash.webp",
     galleryImages: [
-      "/images/products/dishwash.png",
-      "/images/products/dish-cleaner.png",
-      "/images/products/dishwash-cleaning.png",
+      "/images/products/dishwash.webp",
+      "/images/products/dish-cleaner.webp",
+      "/images/products/dishwash-cleaning.webp",
     ],
     description:
       "Matrin Power Dishwash Gel effortlessly cuts through tough grease and burnt-on food. Enriched with natural lemon extracts, it leaves utensils squeaky clean without drying your hands.",
@@ -117,10 +117,10 @@ export const products: Product[] = [
     discountPercentage: 20,
     rating: 4.7,
     reviewCount: 84,
-    image: "/images/products/floor-cleaner.png",
+    image: "/images/products/floor-cleaner.webp",
     galleryImages: [
-      "/images/products/floor-cleaner.png",
-      "/images/products/floor cleaner.png",
+      "/images/products/floor-cleaner.webp",
+      "/images/products/floor cleaner.webp",
     ],
     description:
       "Matrin Fresh Floor Cleaner kills 99.9% of germs while restoring high shine to marble, tile, and granite floors. Leaves a long-lasting floral pine fragrance.",
@@ -165,10 +165,10 @@ export const products: Product[] = [
     discountPercentage: 18,
     rating: 4.8,
     reviewCount: 110,
-    image: "/images/products/toilet-cleaner.png",
+    image: "/images/products/toilet-cleaner.webp",
     galleryImages: [
-      "/images/products/toilet-cleaner.png",
-      "/images/products/bathroom-cleaner.png",
+      "/images/products/toilet-cleaner.webp",
+      "/images/products/bathroom-cleaner.webp",
     ],
     description:
       "Matrin Max Toilet Cleaner features a thick power-cling formula that removes limescale, yellow stains, and tough grime with ease. Guarantees 10x deeper cleaning and freshness.",
@@ -213,10 +213,10 @@ export const products: Product[] = [
     discountPercentage: 23,
     rating: 4.9,
     reviewCount: 67,
-    image: "/images/products/bathroom-cleaner.png",
+    image: "/images/products/bathroom-cleaner.webp",
     galleryImages: [
-      "/images/products/bathroom-cleaner.png",
-      "/images/products/floor-cleaner.png",
+      "/images/products/bathroom-cleaner.webp",
+      "/images/products/floor-cleaner.webp",
     ],
     description:
       "Versatile surface disinfectant spray designed for countertops, door handles, glass, and kitchen appliances. Instant germ protection with non-greasy finish.",
@@ -261,10 +261,10 @@ export const products: Product[] = [
     discountPercentage: 19,
     rating: 4.8,
     reviewCount: 76,
-    image: "/images/products/detergent.png",
+    image: "/images/products/detergent.webp",
     galleryImages: [
-      "/images/products/detergent.png",
-      "/images/hero.png",
+      "/images/products/detergent.webp",
+      "/images/hero.webp",
     ],
     description:
       "Formulated with micro-encapsulated fragrance beads, Matrin Fabric Softener makes your clothes soft, anti-static, and fresh for up to 14 days.",

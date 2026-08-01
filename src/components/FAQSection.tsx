@@ -20,11 +20,6 @@ const faqs = [
     answer:
       "Standard delivery across India takes 2 to 4 business days. Metro cities usually receive orders within 24-48 hours. Orders above ₹499 qualify for Free Express Shipping.",
   },
-  {
-    question: "What is Matrin's return and refund policy?",
-    answer:
-      "We offer a 7-Day Hassle-Free Replacement/Return Policy. If you receive a damaged product or are unhappy with the performance, contact us for instant resolution.",
-  },
 ];
 
 export default function FAQSection() {
@@ -35,17 +30,17 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="py-20 bg-[#FAF7F2]" id="faq-section">
-      <div className="mx-auto max-w-4xl px-6">
+    <section className="py-16 lg:py-20 bg-white" id="faq-section">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
-        <div className="text-center mb-12">
-          <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+        <div className="text-center mb-12 space-y-2">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block">
             QUESTIONS & ANSWERS
           </span>
-          <h2 className="mt-2 font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#0A2E4E]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B2545] tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="mt-3 text-slate-600 font-light text-sm">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium">
             Have questions about our ingredients, delivery, or usage? We have answers.
           </p>
         </div>
@@ -56,17 +51,17 @@ export default function FAQSection() {
             return (
               <div
                 key={idx}
-                className="overflow-hidden rounded-2xl border border-[#EFEAE4] bg-[#F5F1EB] transition"
+                className="overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-50/60 transition shadow-2xs"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="flex w-full items-center justify-between p-6 text-left font-serif text-lg font-bold text-[#0A2E4E] hover:text-[#13426B]"
+                  className="flex w-full items-center justify-between p-6 text-left text-base font-extrabold text-[#0B2545] hover:text-[#1E40AF] transition"
                 >
-                  <span>{faq.question}</span>
+                  <span className="pr-4">{faq.question}</span>
                   <ChevronDown
-                    size={18}
-                    className={`transition-transform duration-300 text-slate-500 ${
-                      isOpen ? "rotate-180 text-[#0A2E4E]" : ""
+                    size={20}
+                    className={`shrink-0 transition-transform duration-300 text-slate-400 ${
+                      isOpen ? "rotate-180 text-[#1E40AF]" : ""
                     }`}
                   />
                 </button>
@@ -79,7 +74,7 @@ export default function FAQSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-6 pb-6 text-xs leading-relaxed text-slate-600 font-light border-t border-[#EFEAE4] pt-4">
+                      <div className="px-6 pb-6 text-xs sm:text-sm leading-relaxed text-slate-600 font-medium border-t border-slate-200/60 pt-4">
                         {faq.answer}
                       </div>
                     </motion.div>

@@ -5,7 +5,6 @@ import ProductGrid from "@/components/ProductGrid";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import CustomerReviews from "@/components/CustomerReviews";
 import FAQSection from "@/components/FAQSection";
-import Newsletter from "@/components/Newsletter";
 
 export default function Home() {
   return (
@@ -17,7 +16,6 @@ export default function Home() {
       <WhyChooseUs />
       <CustomerReviews />
       <FAQSection />
-      <Newsletter />
     </main>
   );
 }

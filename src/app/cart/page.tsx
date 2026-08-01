@@ -1,6 +1,10 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
+import { useProductStore } from "@/context/ProductStoreContext";
+import { useAuth } from "@/context/AuthContext";
+import { PaymentMethod, OrderInvoice, ShippingAddress } from "@/types/order";
+import InvoiceModal from "@/components/InvoiceModal";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -12,6 +16,16 @@ import {
   Truck,
   CheckCircle2,
   X,
+  CreditCard,
+  QrCode,
+  Building,
+  Banknote,
+  FileText,
+  Printer,
+  Sparkles,
+  MapPin,
+  User as UserIcon,
+  Phone,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -30,14 +44,103 @@ export default function CartPage() {
     total,
   } = useCart();
 
+  const { validateCoupon, applyCouponRedemption } = useProductStore();
+  const { user } = useAuth();
+
+  // Coupon state
   const [couponInput, setCouponInput] = useState("");
+
+  // Checkout step state: "cart" | "checkout" | "success"
+  const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout" | "success">("cart");
+
+  // Shipping details state
+  const [shippingDetails, setShippingDetails] = useState<ShippingAddress>({
+    fullName: user?.name || "Rohan Sharma",
+    phone: "9876543210",
+    email: user?.email || "customer@matrin.com",
+    addressLine: "Flat 402, Green Acres Apt, Bandra West",
+    city: "Mumbai",
+    state: "Maharashtra",
+    pincode: "400050",
+  });
+
+  // Payment method state
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
+  const [upiId, setUpiId] = useState("user@upi");
+  const [cardNumber, setCardNumber] = useState("4532 •••• •••• 8892");
+  const [cardExpiry, setCardExpiry] = useState("12/28");
+  const [cardCvv, setCardCvv] = useState("•••");
+  const [selectedBank, setSelectedBank] = useState("HDFC Bank");
+
+  // Generated Invoice state
+  const [generatedInvoice, setGeneratedInvoice] = useState<OrderInvoice | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    if (couponInput) {
-      applyCoupon(couponInput);
+    if (!couponInput) return;
+
+    const result = validateCoupon(couponInput, subtotal);
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
+
+    if (result.coupon) {
+      const label = result.coupon.discountType === "percentage"
+        ? `${result.coupon.discountValue}% OFF`
+        : `₹${result.coupon.discountValue} OFF`;
+
+      applyCoupon(result.coupon.code);
+      toast.success(`Coupon ${result.coupon.code} applied! (${label})`, { icon: "🏷️" });
       setCouponInput("");
     }
+  };
+
+  const handlePlaceOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!shippingDetails.fullName || !shippingDetails.phone || !shippingDetails.addressLine) {
+      toast.error("Please fill all shipping address fields!");
+      return;
+    }
+
+    if (appliedCoupon) {
+      applyCouponRedemption(appliedCoupon);
+    }
+
+    const tax = Math.round(subtotal * 0.18);
+    const invoiceNum = `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const newInvoice: OrderInvoice = {
+      id: `ord_${Date.now()}`,
+      invoiceNumber: invoiceNum,
+      orderDate: new Date().toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      dueDate: new Date().toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      customer: { ...shippingDetails },
+      items: [...cart],
+      subtotal,
+      discountAmount,
+      appliedCoupon: appliedCoupon || undefined,
+      shippingFee,
+      taxAmount: tax,
+      totalAmount: total,
+      paymentMethod,
+      paymentStatus: paymentMethod === "cod" ? "Cash on Delivery" : "Paid",
+      transactionId: `TXN-${Math.floor(10000000 + Math.random() * 90000000)}`,
+    };
+
+    setGeneratedInvoice(newInvoice);
+    setCheckoutStep("success");
+    toast.success("Order Placed Successfully! Tax Invoice Generated.", { icon: "🎉", duration: 5000 });
   };
 
   const freeShippingThreshold = 499;
@@ -47,28 +150,29 @@ export default function CartPage() {
   );
   const amountNeededForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
-  if (cart.length === 0) {
+  // Empty Cart State
+  if (cart.length === 0 && checkoutStep !== "success") {
     return (
-      <main className="min-h-screen bg-[#FAF7F2] py-20">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <div className="rounded-3xl bg-[#FAF7F2] p-12 border border-[#EFEAE4]">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#F5F1EB] text-[#0A2E4E]">
+      <main className="min-h-screen bg-[#F8FAFC] py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
+          <div className="rounded-3xl bg-white p-12 border border-slate-100 shadow-sm">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-[#1E40AF]">
               <ShoppingBag size={40} />
             </div>
 
-            <h1 className="mt-6 font-serif text-3xl sm:text-4xl font-normal text-[#0A2E4E]">
+            <h1 className="mt-6 text-3xl font-extrabold text-[#0B2545]">
               Your Cart is Empty
             </h1>
 
-            <p className="mt-3 text-slate-500 max-w-md mx-auto text-xs sm:text-sm font-light leading-relaxed">
+            <p className="mt-2 text-slate-500 max-w-md mx-auto text-xs sm:text-sm font-medium leading-relaxed">
               Looks like you haven&apos;t added any Matrin cleaning products to your shopping cart yet.
             </p>
 
             <Link
               href="/products"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0A2E4E] px-8 py-4 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#13426B] transition active:scale-95"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
             >
-              Explore Products
+              <span>Explore Products</span>
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -77,137 +181,457 @@ export default function CartPage() {
     );
   }
 
-  return (
-    <main className="min-h-screen bg-[#FAF7F2] py-12">
-      <div className="mx-auto max-w-7xl px-6">
-        <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">YOUR SELECTION</span>
-        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#0A2E4E] mb-8 mt-1">
-          Shopping Cart ({cart.length} {cart.length === 1 ? "item" : "items"})
-        </h1>
+  // Order Success Screen with Invoice Button
+  if (checkoutStep === "success" && generatedInvoice) {
+    return (
+      <main className="min-h-screen bg-[#F8FAFC] py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="rounded-3xl bg-white p-8 md:p-12 border border-slate-100 shadow-xl text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-inner">
+              <CheckCircle2 size={44} />
+            </div>
 
-        {/* Free Shipping Progress Meter */}
-        <div className="mb-8 rounded-2xl bg-[#F5F1EB] p-5 border border-[#EFEAE4]">
-          <div className="flex items-center justify-between text-xs font-semibold text-[#0A2E4E] mb-2">
-            <span className="flex items-center gap-1.5">
-              <Truck size={16} className="text-[#0A2E4E]" />
-              {subtotal >= freeShippingThreshold
-                ? "🎉 You unlock FREE Express Shipping!"
-                : `Add ₹${amountNeededForFreeShipping} more to get FREE Express Shipping`}
-            </span>
-            <span>{progressToFreeShipping}%</span>
+            <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-600">ORDER CONFIRMED</span>
+            <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-[#0B2545]">
+              Thank You for Your Order!
+            </h1>
+            <p className="mt-2 text-xs md:text-sm text-slate-600 font-medium">
+              Order ID: <strong className="font-mono text-[#1E40AF]">{generatedInvoice.invoiceNumber}</strong>
+            </p>
+
+            {/* Invoice Callout Card */}
+            <div className="my-8 rounded-2xl bg-blue-50/50 p-6 border border-blue-100 text-left space-y-4">
+              <div className="flex items-center justify-between border-b border-blue-100 pb-4">
+                <div>
+                  <h4 className="font-extrabold text-[#0B2545] text-sm">Official GST Tax Invoice</h4>
+                  <p className="text-xs text-slate-500 font-medium">Issued to {generatedInvoice.customer.fullName}</p>
+                </div>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                  {generatedInvoice.paymentStatus}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-500 font-medium block">Total Order Amount:</span>
+                  <span className="text-xl font-extrabold text-[#1E40AF]">₹{generatedInvoice.totalAmount}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium block">Payment Method:</span>
+                  <span className="font-bold text-slate-800 uppercase">{generatedInvoice.paymentMethod}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsInvoiceModalOpen(true)}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition"
+              >
+                <FileText size={18} /> View & Print Official Tax Invoice
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/products"
+                onClick={() => {
+                  clearCart();
+                  setCheckoutStep("cart");
+                }}
+                className="rounded-full border border-slate-300 px-8 py-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+              >
+                Continue Shopping
+              </Link>
+            </div>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[#FAF7F2]">
-            <div
-              className="h-full bg-[#0A2E4E] transition-all duration-500"
-              style={{ width: `${progressToFreeShipping}%` }}
-            />
+        </div>
+
+        <InvoiceModal
+          invoice={generatedInvoice}
+          isOpen={isInvoiceModalOpen}
+          onClose={() => setIsInvoiceModalOpen(false)}
+        />
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#F8FAFC] py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-slate-200/80 gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#0B2545]">
+              {checkoutStep === "cart" ? "Shopping Cart" : "Checkout & Payment"}
+            </h1>
+            <p className="mt-1 text-xs text-slate-500 font-medium">
+              {checkoutStep === "cart" ? `You have ${cart.length} item(s) in your bag` : "Select payment method and complete your order"}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setCheckoutStep("cart")}
+              className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
+                checkoutStep === "cart" ? "bg-[#1E40AF] text-white" : "bg-white text-slate-600 border border-slate-200"
+              }`}
+            >
+              1. Cart Items
+            </button>
+            <button
+              onClick={() => setCheckoutStep("checkout")}
+              className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
+                checkoutStep === "checkout" ? "bg-[#1E40AF] text-white" : "bg-white text-slate-600 border border-slate-200"
+              }`}
+            >
+              2. Payment & Address
+            </button>
           </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* Cart Items List - Left */}
-          <div className="lg:col-span-8 space-y-4">
-            {cart.map(({ product, quantity }) => (
-              <div
-                key={product.id}
-                className="flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl bg-[#FAF7F2] p-6 border border-[#EFEAE4]"
-              >
-                {/* Product Thumbnail & Title */}
-                <div className="flex items-center gap-4 w-full sm:w-auto">
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-[#F5F1EB] p-2 border border-[#EFEAE4]">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="h-full w-full object-contain"
+          
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {checkoutStep === "cart" ? (
+              <>
+                {/* Free Shipping Progress Bar */}
+                <div className="rounded-2xl bg-blue-50/60 p-4 border border-blue-100">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#1E40AF] mb-2">
+                    <span className="flex items-center gap-1.5">
+                      <Truck size={16} /> Free Shipping Progress
+                    </span>
+                    <span>
+                      {subtotal >= freeShippingThreshold
+                        ? "🎉 Unlocked FREE Shipping!"
+                        : `Add ₹${amountNeededForFreeShipping} more for FREE shipping`}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-blue-200/50 overflow-hidden">
+                    <div
+                      style={{ width: `${progressToFreeShipping}%` }}
+                      className="h-full rounded-full bg-[#1E40AF] transition-all duration-500"
                     />
                   </div>
+                </div>
 
-                  <div>
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                      {product.category}
-                    </span>
-                    <Link href={`/products/${product.id}`}>
-                      <h3 className="font-serif text-lg font-bold text-[#0A2E4E] hover:text-[#13426B] line-clamp-1">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    <div className="mt-0.5 text-xs text-slate-500">
-                      ₹{product.price} each
+                {/* Items List */}
+                <div className="rounded-3xl bg-white p-6 shadow-2xs border border-slate-100 divide-y divide-slate-100">
+                  {cart.map(({ product, quantity }) => (
+                    <div key={product.id} className="py-6 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-20 w-20 rounded-2xl object-contain bg-slate-50 p-2 border border-slate-100"
+                        />
+                        <div>
+                          <h3 className="text-base font-bold text-[#0B2545]">
+                            {product.name}
+                          </h3>
+                          <p className="text-xs text-slate-500 font-medium mt-0.5">{product.category}</p>
+                          <span className="text-sm font-extrabold text-[#1E40AF] mt-1 block">
+                            ₹{product.price}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between w-full sm:w-auto gap-6 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-100">
+                        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity - 1)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-200 font-bold text-xs"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center font-bold text-[#0B2545] text-xs">
+                            {quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity + 1)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-200 font-bold text-xs"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <span className="text-base font-extrabold text-[#0B2545] w-20 text-right">
+                          ₹{product.price * quantity}
+                        </span>
+
+                        <button
+                          onClick={() => removeFromCart(product.id)}
+                          className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
+                          title="Remove item"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              /* Checkout Form (Shipping & Payment Selection) */
+              <form onSubmit={handlePlaceOrder} className="space-y-6">
+                
+                {/* 1. Shipping Address */}
+                <div className="rounded-3xl bg-white p-6 md:p-8 border border-slate-100 shadow-2xs">
+                  <div className="flex items-center gap-2 mb-6 text-[#0B2545]">
+                    <MapPin size={20} className="text-[#1E40AF]" />
+                    <h3 className="text-xl font-bold">Shipping Address</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingDetails.fullName}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, fullName: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingDetails.phone}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Delivery Address *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingDetails.addressLine}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, addressLine: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingDetails.city}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        PIN Code *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingDetails.pincode}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, pincode: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Quantity Controls & Line Total */}
-                <div className="flex items-center justify-between w-full sm:w-auto gap-6 border-t sm:border-t-0 pt-4 sm:pt-0 border-[#EFEAE4]">
-                  <div className="flex items-center rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] p-1">
-                    <button
-                      onClick={() => updateQuantity(product.id, quantity - 1)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs"
-                    >
-                      -
-                    </button>
-                    <span className="w-8 text-center font-bold text-[#0A2E4E] text-xs">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(product.id, quantity + 1)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs"
-                    >
-                      +
-                    </button>
+                {/* 2. Select Payment Method */}
+                <div className="rounded-3xl bg-white p-6 md:p-8 border border-slate-100 shadow-2xs">
+                  <div className="flex items-center gap-2 mb-6 text-[#0B2545]">
+                    <CreditCard size={20} className="text-[#1E40AF]" />
+                    <h3 className="text-xl font-bold">Select Payment Method</h3>
                   </div>
 
-                  <span className="text-base font-extrabold text-[#0A2E4E] w-20 text-right">
-                    ₹{product.price * quantity}
-                  </span>
+                  {/* Options */}
+                  <div className="grid gap-3 sm:grid-cols-2 mb-6">
+                    
+                    {/* UPI Option */}
+                    <div
+                      onClick={() => setPaymentMethod("upi")}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
+                        paymentMethod === "upi"
+                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
+                        <QrCode size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#0B2545]">UPI (GPay / PhonePe / Paytm)</h4>
+                        <p className="text-[10px] text-slate-500 font-medium">Instant Zero-Fee Transfer</p>
+                      </div>
+                    </div>
+
+                    {/* Card Option */}
+                    <div
+                      onClick={() => setPaymentMethod("card")}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
+                        paymentMethod === "card"
+                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-[#1E40AF]">
+                        <CreditCard size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#0B2545]">Credit / Debit Card</h4>
+                        <p className="text-[10px] text-slate-500 font-medium">Visa, Mastercard, RuPay</p>
+                      </div>
+                    </div>
+
+                    {/* Net Banking */}
+                    <div
+                      onClick={() => setPaymentMethod("netbanking")}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
+                        paymentMethod === "netbanking"
+                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                        <Building size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#0B2545]">Net Banking</h4>
+                        <p className="text-[10px] text-slate-500 font-medium">All major Indian banks</p>
+                      </div>
+                    </div>
+
+                    {/* Cash on Delivery */}
+                    <div
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
+                        paymentMethod === "cod"
+                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                        <Banknote size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#0B2545]">Cash on Delivery</h4>
+                        <p className="text-[10px] text-slate-500 font-medium">Pay cash upon delivery</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Method Specific Inputs */}
+                  {paymentMethod === "upi" && (
+                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
+                      <label className="block text-xs font-bold text-slate-700">Enter UPI ID</label>
+                      <input
+                        type="text"
+                        value={upiId}
+                        onChange={(e) => setUpiId(e.target.value)}
+                        placeholder="yourname@upi"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-800"
+                      />
+                      <p className="text-[10px] text-slate-500 font-medium">⚡ Collect request will be sent to your UPI app.</p>
+                    </div>
+                  )}
+
+                  {paymentMethod === "card" && (
+                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Card Number</label>
+                        <input
+                          type="text"
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-800"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Expiry</label>
+                          <input
+                            type="text"
+                            value={cardExpiry}
+                            onChange={(e) => setCardExpiry(e.target.value)}
+                            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-800"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">CVV</label>
+                          <input
+                            type="password"
+                            value={cardCvv}
+                            onChange={(e) => setCardCvv(e.target.value)}
+                            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-800"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {paymentMethod === "netbanking" && (
+                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
+                      <label className="block text-xs font-bold text-slate-700">Select Your Bank</label>
+                      <select
+                        value={selectedBank}
+                        onChange={(e) => setSelectedBank(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs text-slate-800"
+                      >
+                        <option value="HDFC Bank">HDFC Bank</option>
+                        <option value="ICICI Bank">ICICI Bank</option>
+                        <option value="State Bank of India">State Bank of India (SBI)</option>
+                        <option value="Axis Bank">Axis Bank</option>
+                        <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                      </select>
+                    </div>
+                  )}
 
                   <button
-                    onClick={() => removeFromCart(product.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
-                    title="Remove item"
+                    type="submit"
+                    className="mt-6 w-full flex items-center justify-center gap-2 rounded-2xl bg-[#1E40AF] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] shadow-md shadow-blue-600/20"
                   >
-                    <Trash2 size={16} />
+                    <span>Place Order & Generate Tax Invoice</span>
+                    <ArrowRight size={16} />
                   </button>
                 </div>
-              </div>
-            ))}
+              </form>
+            )}
 
-            <div className="flex justify-between items-center pt-2">
-              <button
-                onClick={clearCart}
-                className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-rose-600"
-              >
-                Clear Cart
-              </button>
-
-              <Link
-                href="/products"
-                className="text-xs font-semibold uppercase tracking-wider text-[#0A2E4E] hover:underline"
-              >
-                ← Continue Shopping
-              </Link>
-            </div>
           </div>
 
-          {/* Order Summary Card - Right */}
+          {/* Right Summary Sidebar */}
           <div className="lg:col-span-4">
-            <div className="rounded-3xl bg-[#0A2E4E] text-[#FAF7F2] p-6 shadow-md border border-[#13426B] sticky top-24">
-              <h2 className="font-serif text-2xl font-normal text-white mb-6 border-b border-[#13426B] pb-4">
+            <div className="rounded-3xl bg-white text-slate-800 p-6 shadow-md border border-slate-100 sticky top-24 space-y-6">
+              <h2 className="text-xl font-extrabold text-[#0B2545] border-b border-slate-100 pb-4">
                 Order Summary
               </h2>
 
               {/* Coupon Form */}
-              <div className="mb-6">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2 block flex items-center gap-1">
-                  <Tag size={13} className="text-[#E5D3C4]" /> Promo Code
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 block flex items-center gap-1">
+                  <Tag size={14} className="text-[#1E40AF]" /> Promo Code
                 </label>
 
                 {appliedCoupon ? (
-                  <div className="flex items-center justify-between rounded-xl bg-white/10 p-3 text-xs font-bold text-emerald-300">
+                  <div className="flex items-center justify-between rounded-xl bg-emerald-50 p-3 text-xs font-bold text-emerald-800 border border-emerald-200">
                     <span className="flex items-center gap-1">
-                      <CheckCircle2 size={15} /> Code MATRIN10 (10% OFF)
+                      <CheckCircle2 size={15} /> Code {appliedCoupon}
                     </span>
-                    <button onClick={removeCoupon} className="hover:text-rose-400">
+                    <button onClick={removeCoupon} className="hover:text-rose-600">
                       <X size={15} />
                     </button>
                   </div>
@@ -218,75 +642,70 @@ export default function CartPage() {
                       placeholder="e.g. MATRIN10"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value)}
-                      className="flex-1 rounded-xl bg-white/10 px-3 py-2 text-xs uppercase font-bold text-white placeholder:text-slate-400 focus:outline-hidden"
+                      className="flex-1 rounded-xl bg-slate-50 px-3 py-2 text-xs uppercase font-bold text-slate-800 border border-slate-200 placeholder:text-slate-400 focus:outline-hidden"
                     />
                     <button
                       type="submit"
-                      className="rounded-xl bg-[#FAF7F2] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#0A2E4E] hover:bg-[#E5D3C4]"
+                      className="rounded-xl bg-[#1E40AF] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#1a3899] transition shadow-2xs"
                     >
                       Apply
                     </button>
                   </form>
                 )}
-                <span className="text-[10px] text-slate-400 mt-1 block font-light">
-                  Tip: Use code <strong className="text-[#E5D3C4]">MATRIN10</strong> for 10% discount.
+                <span className="text-[10px] text-slate-400 mt-1 block font-medium">
+                  Tip: Use code <strong className="text-[#1E40AF]">MATRIN10</strong> or <strong className="text-[#1E40AF]">CLEAN50</strong>
                 </span>
               </div>
 
               {/* Summary Items */}
-              <div className="space-y-3 text-xs font-light border-t border-[#13426B] pt-4">
-                <div className="flex justify-between text-slate-300">
+              <div className="space-y-3 text-xs font-semibold border-t border-slate-100 pt-4">
+                <div className="flex justify-between text-slate-600">
                   <span>Subtotal</span>
-                  <span className="font-bold text-white">
-                    ₹{subtotal}
-                  </span>
+                  <span className="font-extrabold text-slate-900">₹{subtotal}</span>
                 </div>
 
                 {appliedCoupon && (
-                  <div className="flex justify-between text-emerald-400 font-bold">
+                  <div className="flex justify-between text-emerald-600 font-bold">
                     <span>Coupon Discount</span>
                     <span>-₹{discountAmount}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between text-slate-300">
+                <div className="flex justify-between text-slate-600">
+                  <span>GST Tax (18% included)</span>
+                  <span className="font-extrabold text-slate-900">₹{Math.round(subtotal * 0.18)}</span>
+                </div>
+
+                <div className="flex justify-between text-slate-600">
                   <span>Shipping Fee</span>
-                  <span className="font-bold text-white">
-                    {shippingFee === 0 ? (
-                      <span className="text-emerald-400 font-bold">FREE</span>
-                    ) : (
-                      `₹${shippingFee}`
-                    )}
+                  <span className="font-bold text-[#1E40AF]">
+                    {shippingFee === 0 ? <span className="text-emerald-600 font-extrabold">FREE</span> : `₹${shippingFee}`}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-base font-extrabold text-white pt-4 border-t border-[#13426B]">
+                <div className="flex justify-between text-base font-extrabold text-slate-900 pt-4 border-t border-slate-100">
                   <span>Total Amount</span>
-                  <span className="text-[#E5D3C4]">₹{total}</span>
+                  <span className="text-[#1E40AF]">₹{total}</span>
                 </div>
               </div>
 
-              {/* Checkout CTA */}
-              <button
-                onClick={() => {
-                  toast.success("Order Placed Successfully! (Demo Checkout)", {
-                    duration: 4000,
-                    icon: "🎉",
-                  });
-                  clearCart();
-                }}
-                className="mt-6 w-full flex items-center justify-center gap-2 rounded-full bg-[#FAF7F2] py-4 text-xs font-bold uppercase tracking-widest text-[#0A2E4E] transition hover:bg-[#E5D3C4] active:scale-98 shadow-xs"
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight size={16} />
-              </button>
+              {checkoutStep === "cart" && (
+                <button
+                  onClick={() => setCheckoutStep("checkout")}
+                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#1E40AF] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] active:scale-98 shadow-md shadow-blue-600/20"
+                >
+                  <span>Proceed to Payment</span>
+                  <ArrowRight size={16} />
+                </button>
+              )}
 
-              <div className="mt-4 text-center flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-light">
-                <ShieldCheck size={13} className="text-emerald-400" />
-                <span>256-Bit SSL Encrypted & Secure Checkout</span>
+              <div className="text-center flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                <ShieldCheck size={14} className="text-emerald-600" />
+                <span>256-Bit SSL Encrypted Tax Invoice Checkout</span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </main>

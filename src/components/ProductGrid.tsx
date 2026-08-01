@@ -1,18 +1,29 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import SearchBar from "./SearchBar";
 import CategoryFilter, { SortOption } from "./CategoryFilter";
-import { products } from "@/data/products";
+import { useProductStore } from "@/context/ProductStoreContext";
 import { ProductCategory } from "@/types/product";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function ProductGrid() {
-  const [search, setSearch] = useState("");
+  const { products } = useProductStore();
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams ? searchParams.get("search") || "" : "";
+  const [search, setSearch] = useState(initialQuery);
   const [category, setCategory] = useState<ProductCategory>("All");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
+
+  useEffect(() => {
+    const q = searchParams ? searchParams.get("search") : null;
+    if (q !== null) {
+      setSearch(q);
+    }
+  }, [searchParams]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return products

@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Truck, RefreshCw, Award } from "lucide-react";
+import { ShieldCheck, Truck, Award } from "lucide-react";
 
 export default function TrustBadges() {
   const badges = [
@@ -15,11 +15,6 @@ export default function TrustBadges() {
       subtitle: "Lab-certified antibacterial formula",
     },
     {
-      icon: <RefreshCw className="text-[#0A2E4E]" size={22} />,
-      title: "7-Day Easy Returns",
-      subtitle: "Hassle-free replacement policy",
-    },
-    {
       icon: <Award className="text-[#0A2E4E]" size={22} />,
       title: "100% Quality Assured",
       subtitle: "Non-toxic & pet-safe chemistry",
@@ -29,7 +24,7 @@ export default function TrustBadges() {
   return (
     <section className="border-y border-[#EFEAE4] bg-[#F5F1EB] py-8">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {badges.map((badge, idx) => (
             <div
               key={idx}

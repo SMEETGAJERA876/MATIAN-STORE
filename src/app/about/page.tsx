@@ -1,182 +1,414 @@
 "use client";
 
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Newsletter from "@/components/Newsletter";
-import { Target, Compass, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import {
+  ShieldCheck,
+  Leaf,
+  Sparkles,
+  ArrowRight,
+  Heart,
+  Award,
+  Users,
+  CheckCircle2,
+  Send,
+  Droplet,
+  FlaskConical,
+  PackageCheck,
+  Shield,
+  Smile,
+  Store,
+  Compass,
+  Check,
+} from "lucide-react";
+import Newsletter from "@/components/Newsletter";
 
 export default function AboutPage() {
   const stats = [
-    { label: "HAPPY HOUSEHOLDS", value: "50,000+" },
-    { label: "GERM DEFENSE", value: "99.9%" },
-    { label: "CITIES DELIVERED", value: "50+" },
-    { label: "CUSTOMER RATING", value: "4.9 ★" },
+    { value: "50,000+", label: "Happy Customers", icon: Users, bg: "bg-blue-50 text-[#1E40AF]" },
+    { value: "2M+", label: "Bottles Sold", icon: Droplet, bg: "bg-emerald-50 text-emerald-600" },
+    { value: "98%", label: "Customer Satisfaction", icon: Smile, bg: "bg-purple-50 text-purple-600" },
+    { value: "500+", label: "Retail Partners", icon: Store, bg: "bg-amber-50 text-amber-600" },
   ];
 
-  const milestones = [
+  const teamMembers = [
     {
-      year: "2021",
-      title: "Founded in Ahmedabad",
-      description: "Started with a vision to create non-toxic, skin-friendly home cleaning formulations.",
+      name: "Rohit Sharma",
+      role: "Founder & CEO",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300",
     },
     {
-      year: "2023",
-      title: "Nationwide Expansion",
-      description: "Expanded shipping to over 50 major cities across India with 99.9% lab certification.",
+      name: "Ananya Verma",
+      role: "Head of Research",
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300",
     },
     {
-      year: "2024",
-      title: "Eco-Concentrated Launch",
-      description: "Introduced 3x ultra-concentrated liquid detergents reducing plastic waste by 40%.",
+      name: "Vikram Patel",
+      role: "Operations Head",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
     },
     {
-      year: "2026",
-      title: "Leading Home Care Brand",
-      description: "Serving over 50,000 families with premium liquid cleaning products daily.",
+      name: "Priya Nair",
+      role: "Quality Head",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=300",
     },
   ];
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] py-12">
-      <div className="mx-auto max-w-7xl px-6">
-        
-        {/* Hero Section */}
-        <div className="rounded-3xl bg-[#0A2E4E] p-10 md:p-16 text-[#FAF7F2] shadow-md mb-16 text-center max-w-5xl mx-auto">
-          <span className="text-xs font-semibold uppercase tracking-widest text-[#E5D3C4]">
-            OUR STORY & VALUES
-          </span>
-          <h1 className="mt-3 font-serif text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white leading-tight">
-            Redefining Home Hygiene with Safe & Effective Chemistry
-          </h1>
-          <p className="mt-4 text-slate-300 text-xs sm:text-sm font-light max-w-2xl mx-auto leading-relaxed">
-            At Matrin, we believe that a clean home should never come at the cost of your family&apos;s health or the environment.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#F8FAFC] pb-16 font-sans">
+      
+      {/* Hero Section (Exact Match with Reference Image 2) */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#EBF3FB] via-[#F2F7FD] to-white py-12 lg:py-16 border-b border-slate-200/60">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
+          <div className="grid gap-10 lg:grid-cols-12 items-center">
+            
+            {/* Left Content */}
+            <div className="lg:col-span-6 space-y-6">
+              <span className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100">
+                ABOUT MATRIN
+              </span>
 
-        {/* Stats Section */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-20">
-          {stats.map((stat, idx) => (
-            <div
-              key={idx}
-              className="rounded-3xl bg-[#F5F1EB] p-8 text-center border border-[#EFEAE4]"
-            >
-              <div className="font-serif text-4xl sm:text-5xl font-normal text-[#0A2E4E]">
-                {stat.value}
+              <div className="space-y-1">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B2545] tracking-tight leading-tight">
+                  Pure Cleaning.
+                </h1>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1E40AF] tracking-tight leading-tight flex items-center gap-2">
+                  Better Living.<span className="text-emerald-500 text-3xl">🍃</span>
+                </h1>
               </div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-2">
-                {stat.label}
+
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
+                At Matrin, we believe a clean home leads to a healthier and happier life. Our eco-friendly cleaning solutions are safe for your family and tough on stains.
+              </p>
+
+              {/* Inline Feature Tags (Exact Image 2) */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-bold text-slate-700">
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                    <Leaf size={14} />
+                  </div>
+                  <span>Plant Based Ingredients</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center border border-blue-100">
+                    <ShieldCheck size={14} />
+                  </div>
+                  <span>Safe for Your Family</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
+                    <Sparkles size={14} />
+                  </div>
+                  <span>Powerful Cleaning</span>
+                </div>
               </div>
             </div>
-          ))}
+
+            {/* Right Product Bottles Graphic */}
+            <div className="lg:col-span-6 flex justify-center">
+              <div className="relative w-full max-w-lg">
+                <img
+                  src="/images/matrin-hero-lineup.png"
+                  alt="Matrin Product Lineup"
+                  className="h-auto w-full object-contain drop-shadow-2xl"
+                />
+              </div>
+            </div>
+
+          </div>
         </div>
+      </section>
 
-        {/* Story Section */}
-        <div className="grid gap-12 lg:grid-cols-2 items-center mb-20 rounded-3xl bg-[#FAF7F2] p-8 md:p-12 border border-[#EFEAE4]">
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-              THE JOURNEY
-            </span>
-            <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-normal text-[#0A2E4E]">
-              Built on Science, Driven by Pure Care
+      {/* Floating 4 Metrics Stats Bar (Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 -mt-8 relative z-20">
+        <div className="rounded-3xl bg-white p-6 shadow-xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          {stats.map((st, idx) => {
+            const IconC = st.icon;
+            return (
+              <div key={idx} className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
+                <div className={`h-12 w-12 rounded-2xl ${st.bg} flex items-center justify-center shrink-0 border border-slate-100`}>
+                  <IconC size={22} />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-[#0B2545]">{st.value}</div>
+                  <div className="text-xs font-semibold text-slate-500">{st.label}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* OUR STORY Section (Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="space-y-8">
+          <div className="max-w-2xl space-y-2">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">OUR STORY</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B2545] tracking-tight">
+              Built on Care. Driven by Quality.
             </h2>
-            <p className="mt-4 text-slate-600 text-xs sm:text-sm font-light leading-relaxed">
-              Matrin was created to address a major gap in the market: traditional cleaning products relied heavily on harsh industrial bleach and corrosive acids that damaged surfaces and irritated skin.
+            <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
+              Matrin was born from a simple idea - cleaning products should be effective, safe and environmentally responsible. We started our journey to create high-performance cleaning solutions using plant-based ingredients that care for your home and the planet.
             </p>
-            <p className="mt-3 text-slate-600 text-xs sm:text-sm font-light leading-relaxed">
-              Our team of chemical engineers spent 2 years formulating non-toxic, bio-degradable active ingredients that match or exceed commercial cleaning strength while remaining completely safe for daily home use.
-            </p>
-
-            <div className="mt-6 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#0A2E4E]">
-                <CheckCircle2 size={15} className="text-emerald-700" /> 100% Dermatologically Tested Formulations
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#0A2E4E]">
-                <CheckCircle2 size={15} className="text-emerald-700" /> Bio-degradable Surfactants & Recyclable Bottles
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#0A2E4E]">
-                <CheckCircle2 size={15} className="text-emerald-700" /> Certified 99.9% Antibacterial Efficacy
-              </div>
+            <div className="pt-2">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition"
+              >
+                <span>Read Our Full Story</span>
+                <ArrowRight size={14} />
+              </Link>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl bg-[#0A2E4E] p-8 text-[#FAF7F2] shadow-md border border-[#13426B]">
-            <div className="font-serif text-2xl font-normal text-[#E5D3C4] mb-4">Matrin Quality Guarantee</div>
-            <p className="text-xs text-slate-300 font-light leading-relaxed italic font-serif">
-              &ldquo;Every bottle of Matrin that leaves our facility represents our unyielding commitment to your family&apos;s health and home hygiene.&rdquo;
-            </p>
-            <div className="mt-6 pt-4 border-t border-[#13426B] flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#FAF7F2] text-[#0A2E4E] flex items-center justify-center font-bold text-sm font-serif">
-                M
+          {/* 3 Story Cards Grid (Exact Image 2) */}
+          <div className="grid gap-6 sm:grid-cols-3">
+            {/* Card 1 */}
+            <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
+              <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=400"
+                  alt="Safe & Tested"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+                  <ShieldCheck size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0B2545]">Safe & Tested</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Dermatologically tested and family safe.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
+              <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=400"
+                  alt="Eco-Friendly"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                  <Leaf size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0B2545]">Eco-Friendly</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Biodegradable formulas that protect nature.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="rounded-3xl bg-white p-6 border border-slate-100 shadow-sm space-y-4">
+              <div className="h-44 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=400"
+                  alt="Better Living"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+                  <Sparkles size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0B2545]">Better Living</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Clean homes for a healthier tomorrow.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* OUR VALUES Section (Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="rounded-3xl bg-blue-50/50 p-8 sm:p-10 border border-blue-100/80 space-y-8">
+          <div className="space-y-1">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">OUR VALUES</span>
+            <h2 className="text-3xl font-extrabold text-[#0B2545]">The Matrin Promise</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex items-start gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0">
+                <ShieldCheck size={20} />
               </div>
               <div>
-                <div className="text-xs font-bold text-white uppercase tracking-wider">The Matrin Founding Team</div>
-                <div className="text-[10px] text-slate-400 font-light">Ahmedabad, Gujarat</div>
+                <h4 className="text-xs font-extrabold text-[#0B2545]">Integrity</h4>
+                <p className="text-[11px] text-slate-500 mt-1">Honest practices and transparent products.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
+              <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Award size={20} />
+              </div>
+              <div>
+                <h4 className="text-xs font-extrabold text-[#0B2545]">Quality</h4>
+                <p className="text-[11px] text-slate-500 mt-1">Premium ingredients for powerful results.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
+              <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <Leaf size={20} />
+              </div>
+              <div>
+                <h4 className="text-xs font-extrabold text-[#0B2545]">Sustainability</h4>
+                <p className="text-[11px] text-slate-500 mt-1">Eco-conscious choices for a better planet.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
+              <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                <Users size={20} />
+              </div>
+              <div>
+                <h4 className="text-xs font-extrabold text-[#0B2545]">Customer First</h4>
+                <p className="text-[11px] text-slate-500 mt-1">Your satisfaction is our top priority.</p>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Mission & Vision */}
-        <div className="grid gap-8 md:grid-cols-2 mb-20">
-          <div className="rounded-3xl bg-[#F5F1EB] p-8 border border-[#EFEAE4]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FAF7F2] text-[#0A2E4E] mb-6">
-              <Target size={24} />
-            </div>
-            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-[#0A2E4E]">Our Mission</h3>
-            <p className="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed">
-              To empower every household with accessible, high-performance, non-toxic cleaning solutions that elevate daily hygiene without compromising personal health or environmental sustainability.
+      {/* OUR PROCESS Section (4 Steps - Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="space-y-8">
+          <div className="space-y-1">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">OUR PROCESS</span>
+            <h2 className="text-3xl font-extrabold text-[#0B2545]">From Nature to Your Home</h2>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-xl">
+              We carefully select the best natural ingredients, blend them with advanced science and deliver powerful cleaning solutions you can trust.
             </p>
           </div>
 
-          <div className="rounded-3xl bg-[#F5F1EB] p-8 border border-[#EFEAE4]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FAF7F2] text-[#0A2E4E] mb-6">
-              <Compass size={24} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="rounded-2xl bg-white p-6 border border-slate-100 text-center space-y-3 shadow-2xs">
+              <div className="mx-auto h-12 w-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                <Leaf size={22} />
+              </div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">1. Natural Ingredients</h4>
+              <p className="text-[11px] text-slate-500 leading-snug">Carefully sourced plant based ingredients.</p>
             </div>
-            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-[#0A2E4E]">Our Vision</h3>
-            <p className="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed">
-              To become India&apos;s most trusted eco-conscious home care brand, setting new standards for zero-waste packaging, sustainable manufacturing, and lab-certified antibacterial efficacy.
-            </p>
+
+            <div className="rounded-2xl bg-white p-6 border border-slate-100 text-center space-y-3 shadow-2xs">
+              <div className="mx-auto h-12 w-12 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center border border-blue-100">
+                <FlaskConical size={22} />
+              </div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">2. Advanced Research</h4>
+              <p className="text-[11px] text-slate-500 leading-snug">Scientifically formulated for maximum performance.</p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-6 border border-slate-100 text-center space-y-3 shadow-2xs">
+              <div className="mx-auto h-12 w-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
+                <ShieldCheck size={22} />
+              </div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">3. Strict Quality Checks</h4>
+              <p className="text-[11px] text-slate-500 leading-snug">Tested for safety, purity and effectiveness.</p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-6 border border-slate-100 text-center space-y-3 shadow-2xs">
+              <div className="mx-auto h-12 w-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
+                <PackageCheck size={22} />
+              </div>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">4. Delivered to You</h4>
+              <p className="text-[11px] text-slate-500 leading-snug">Bringing safe, powerful cleaning to your home.</p>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Milestone Timeline */}
-        <div className="mb-20">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-              GROWTH JOURNEY
-            </span>
-            <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-normal text-[#0A2E4E]">
-              Company Milestones
-            </h2>
+      {/* MEET OUR TEAM Section (Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="grid gap-8 lg:grid-cols-12 items-center">
+          {/* Left Text Card */}
+          <div className="lg:col-span-4 rounded-3xl bg-[#EBF3FB] p-8 border border-blue-100 space-y-4">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">MEET OUR TEAM</span>
+            <h3 className="text-2xl font-extrabold text-[#0B2545]">The People Behind Matrin</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              A passionate team of experts working every day to make your home cleaner, safer and better.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition"
+              >
+                <span>Join Our Journey</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {milestones.map((m, idx) => (
-              <div
-                key={idx}
-                className="relative rounded-3xl bg-[#FAF7F2] p-6 border border-[#EFEAE4]"
-              >
-                <span className="inline-block rounded-full bg-[#E5D3C4] px-3 py-1 text-[10px] font-bold text-[#0A2E4E]">
-                  {m.year}
-                </span>
-                <h4 className="mt-3 font-serif text-xl font-normal text-[#0A2E4E]">
-                  {m.title}
-                </h4>
-                <p className="mt-2 text-xs text-slate-500 font-light leading-relaxed">
-                  {m.description}
-                </p>
+          {/* Right 4 Team Cards Grid (Exact Image 2) */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {teamMembers.map((member, idx) => (
+              <div key={idx} className="rounded-2xl bg-white p-3 border border-slate-100 text-center space-y-2 shadow-2xs">
+                <div className="h-40 w-full rounded-xl overflow-hidden bg-slate-100">
+                  <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold text-[#0B2545]">{member.name}</h4>
+                  <p className="text-[10px] text-slate-400 font-semibold">{member.role}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Why Choose Us */}
-        <WhyChooseUs />
+      {/* CERTIFIED & TRUSTED Badges Bar (Exact Match with Image 2) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="rounded-3xl bg-white p-8 border border-slate-100 shadow-2xs space-y-6">
+          <div className="text-center space-y-1">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">CERTIFIED & TRUSTED</span>
+            <p className="text-xs text-slate-500 font-medium">Our products are certified, tested and trusted by thousands of families.</p>
+          </div>
 
-        {/* Newsletter */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center text-xs font-bold text-slate-700">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center border border-blue-100 font-extrabold">
+                ISO
+              </div>
+              <div>ISO Certified</div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 font-extrabold">
+                GMP
+              </div>
+              <div>Quality Certified</div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
+                <Heart size={20} />
+              </div>
+              <div>Cruelty Free</div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
+                <Leaf size={20} />
+              </div>
+              <div>Biodegradable Formula</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Banner */}
+      <div className="mt-16">
         <Newsletter />
-
       </div>
+
     </main>
   );
 }

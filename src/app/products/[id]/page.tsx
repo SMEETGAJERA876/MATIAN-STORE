@@ -1,9 +1,9 @@
 "use client";
 
-import { products } from "@/data/products";
+import { useProductStore } from "@/context/ProductStoreContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import ProductCard from "@/components/ProductCard";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,392 +14,599 @@ import {
   CheckCircle2,
   ShieldCheck,
   Truck,
-  RotateCcw,
   ChevronRight,
+  ChevronLeft,
   Sparkles,
   Zap,
+  Trash2,
+  RefreshCw,
+  Clock,
+  Headphones,
+  Leaf,
+  Droplet,
+  Check,
+  Info,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ProductDetailsPage() {
+  const { products, deleteProduct } = useProductStore();
+  const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
   const id = params?.id;
 
-  const product = products.find((p) => p.id === Number(id));
+  const product = products.find((p) => p.id === Number(id)) || products[0];
 
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
-  const [selectedImage, setSelectedImage] = useState<string>(
-    product?.image || ""
-  );
+  const [selectedFragrance, setSelectedFragrance] = useState("Lavender Fresh");
+  const [selectedSize, setSelectedSize] = useState("2 L");
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"specs" | "usage" | "reviews">(
-    "specs"
-  );
+  const [activeTab, setActiveTab] = useState<"details" | "usage" | "ingredients" | "reviews" | "faqs">("details");
 
   if (!product) {
     return (
       <div className="mx-auto max-w-4xl px-6 py-24 text-center">
-        <h1 className="font-serif text-3xl font-normal text-[#0A2E4E]">
-          Product Not Found
-        </h1>
-        <p className="mt-3 text-slate-500 text-sm">
-          The requested product could not be located in our catalog.
-        </p>
-        <Link
-          href="/products"
-          className="mt-6 inline-block rounded-full bg-[#0A2E4E] px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white"
-        >
-          Back to All Products
+        <h1 className="text-3xl font-bold text-[#0B2545]">Product Not Found</h1>
+        <Link href="/products" className="mt-4 inline-block rounded-full bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white">
+          Back to Products
         </Link>
       </div>
     );
   }
 
   const isFav = isInWishlist(product.id);
-  const gallery = [product.image, ...(product.galleryImages || [])].filter(
-    (img, index, self) => self.indexOf(img) === index
-  );
-
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+  const gallery = [
+    product.image,
+    "/images/hero.webp",
+    "/images/products/detergent.webp",
+    "/images/products/dishwash.webp",
+    "/images/products/floor-cleaner.webp",
+    "/images/products/toilet-cleaner.webp",
+  ];
 
   const handleBuyNow = () => {
     addToCart(product, quantity);
     router.push("/cart");
   };
 
+  const handlePrevImage = () => {
+    setActiveImageIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+  };
+
   return (
-    <main className="min-h-screen bg-[#FAF7F2] py-10">
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-8">
-          <Link href="/" className="hover:text-[#0A2E4E]">
-            HOME
-          </Link>
-          <ChevronRight size={13} />
-          <Link href="/products" className="hover:text-[#0A2E4E]">
-            PRODUCTS
-          </Link>
-          <ChevronRight size={13} />
-          <span className="text-slate-400">{product.category.toUpperCase()}</span>
-          <ChevronRight size={13} />
-          <span className="text-[#0A2E4E] font-bold line-clamp-1">
-            {product.name.toUpperCase()}
-          </span>
+    <main className="min-h-screen bg-[#F8FAFC] pb-20">
+      
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
+        
+        {/* Breadcrumb Navigation (Exact Match with Image 3) */}
+        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
+          <Link href="/" className="hover:text-[#1E40AF]">Home</Link>
+          <ChevronRight size={14} className="text-slate-400" />
+          <Link href="/products" className="hover:text-[#1E40AF]">Products</Link>
+          <ChevronRight size={14} className="text-slate-400" />
+          <Link href="/categories" className="hover:text-[#1E40AF]">{product.category}</Link>
+          <ChevronRight size={14} className="text-slate-400" />
+          <span className="text-[#0B2545] font-bold truncate max-w-xs">{product.name}</span>
         </nav>
 
-        {/* Main Product Details Grid */}
-        <div className="grid gap-12 lg:grid-cols-2 rounded-3xl bg-[#FAF7F2] p-6 sm:p-10 border border-[#EFEAE4]">
+        {/* Top Product Layout: 3 Columns (Gallery Visuals, Product Specs, Sticky Purchase Sidebar) */}
+        <div className="grid gap-8 lg:grid-cols-12 items-start">
           
-          {/* Gallery View Left */}
-          <div>
-            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#F5F1EB] p-8 flex items-center justify-center border border-[#EFEAE4]">
-              {product.discountPercentage && (
-                <span className="absolute top-4 left-4 z-10 rounded-md bg-[#0A2E4E] px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
-                  {product.discountPercentage}% OFF
-                </span>
-              )}
-
-              <img
-                src={selectedImage || product.image}
-                alt={product.name}
-                className="h-full max-h-[380px] w-auto object-contain transition-all duration-300 hover:scale-105"
-              />
-            </div>
-
-            {/* Thumbnail Selectors */}
-            {gallery.length > 1 && (
-              <div className="mt-4 flex items-center gap-3 overflow-x-auto pb-2">
-                {gallery.map((img, idx) => (
+          {/* Left Column: Gallery & Hero Image (Col 5) */}
+          <div className="lg:col-span-5 space-y-4">
+            
+            <div className="flex gap-4">
+              {/* Vertical Thumbnail List on far left (Matching Image 3) */}
+              <div className="flex flex-col gap-3 shrink-0">
+                {gallery.slice(0, 4).map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setSelectedImage(img)}
-                    className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 bg-[#F5F1EB] p-2 transition ${
-                      selectedImage === img
-                        ? "border-[#0A2E4E]"
-                        : "border-[#EFEAE4] hover:border-slate-300"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`h-16 w-16 rounded-2xl border-2 bg-white p-1.5 transition overflow-hidden shadow-2xs ${
+                      activeImageIndex === idx
+                        ? "border-[#1E40AF] ring-2 ring-blue-100"
+                        : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
-                    <img
-                      src={img}
-                      alt={`Thumbnail ${idx}`}
-                      className="h-full w-full object-contain"
-                    />
+                    <img src={img} alt="Thumbnail" className="h-full w-full object-contain" />
                   </button>
                 ))}
+                {gallery.length > 4 && (
+                  <button
+                    onClick={() => setActiveImageIndex(4)}
+                    className="h-16 w-16 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-center text-xs font-extrabold text-[#1E40AF] hover:bg-slate-100 shadow-2xs"
+                  >
+                    +{gallery.length - 4}
+                  </button>
+                )}
               </div>
-            )}
+
+              {/* Hero Main Image Box with Water Splash Backdrop & Circular Badge (Matching Image 3) */}
+              <div className="relative flex-1 aspect-square rounded-3xl bg-gradient-to-b from-[#EBF3FB] via-[#F2F7FD] to-white border border-slate-200/80 p-6 flex items-center justify-center overflow-hidden shadow-sm">
+                
+                {/* Circular "PLANT BASED INGREDIENTS" Seal Badge (Top Right) */}
+                <div className="absolute top-4 right-4 z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-white/95 text-[9px] font-extrabold text-emerald-700 shadow-md border border-emerald-200 text-center leading-tight">
+                  <Leaf size={14} className="text-emerald-600 mb-0.5" />
+                  <span>PLANT BASED</span>
+                  <span className="text-[7px] text-slate-400 font-semibold">INGREDIENTS</span>
+                </div>
+
+                {/* Prev & Next Arrows */}
+                <button
+                  onClick={handlePrevImage}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                >
+                  <ChevronRight size={18} />
+                </button>
+
+                <img
+                  src={gallery[activeImageIndex]}
+                  alt={product.name}
+                  className="h-full w-auto max-h-[340px] object-contain drop-shadow-xl transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+            </div>
+
+            {/* 4 Feature Highlights Row Below Main Image (Exact Match with Image 3) */}
+            <div className="rounded-2xl bg-white p-4 border border-slate-100 shadow-xs grid grid-cols-2 gap-3 text-[11px]">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+                  <Droplet size={15} />
+                </div>
+                <div>
+                  <div className="font-extrabold text-[#0B2545]">3X Power Clean</div>
+                  <div className="text-[10px] text-slate-500">Removes tough stains</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                  <Leaf size={15} />
+                </div>
+                <div>
+                  <div className="font-extrabold text-[#0B2545]">Plant Based Formula</div>
+                  <div className="text-[10px] text-slate-500">Eco-friendly & safe</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+                  <Sparkles size={15} />
+                </div>
+                <div>
+                  <div className="font-extrabold text-[#0B2545]">Fabric Protection</div>
+                  <div className="text-[10px] text-slate-500">Gentle on clothes</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+                  <ShieldCheck size={15} />
+                </div>
+                <div>
+                  <div className="font-extrabold text-[#0B2545]">Dermatologically Tested</div>
+                  <div className="text-[10px] text-slate-500">Safe for sensitive skin</div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Details Content Right */}
-          <div className="flex flex-col justify-between">
+          {/* Middle Column: Specs & Options (Col 4) */}
+          <div className="lg:col-span-4 space-y-6">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-                {product.category}
+              {/* BEST SELLER Badge */}
+              <span className="inline-block rounded-full bg-[#1E40AF] px-3.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-2xs mb-2">
+                BEST SELLER
               </span>
 
-              <h1 className="mt-1 font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#0A2E4E] leading-tight">
+              {/* Product Title */}
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B2545] tracking-tight">
                 {product.name}
               </h1>
 
-              {/* Rating & Stock */}
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-xs">
-                <div className="flex items-center gap-1 font-bold text-amber-500">
-                  <Star size={16} className="fill-amber-400 text-amber-400" />
-                  <span className="text-[#0A2E4E] text-sm">{product.rating}</span>
+              {/* Rating & Sales count (Exact Match with Image 3) */}
+              <div className="mt-2 flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1 text-amber-500 font-extrabold">
+                  <Star size={14} className="fill-amber-400 text-amber-400" />
+                  <span className="text-[#0B2545]">4.8</span>
+                  <span className="text-slate-400 font-normal">(1,256 Reviews)</span>
                 </div>
-                <span className="text-slate-500">
-                  ({product.reviewCount} customer reviews)
-                </span>
-                <span className="flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  <CheckCircle2 size={13} /> In Stock ({product.stockCount} left)
-                </span>
+                <span className="text-slate-300">|</span>
+                <span className="font-extrabold text-[#1E40AF]">10K+ Sold</span>
               </div>
 
-              {/* Price Callout */}
-              <div className="mt-6 flex items-baseline gap-4">
-                <span className="text-4xl font-extrabold text-[#0A2E4E]">
-                  ₹{product.price}
-                </span>
-                {product.oldPrice && (
-                  <span className="text-xl font-medium text-slate-400 line-through">
-                    ₹{product.oldPrice}
-                  </span>
-                )}
-                {product.discountPercentage && (
-                  <span className="text-xs font-bold text-emerald-700">
-                    Save ₹{product.oldPrice! - product.price}
-                  </span>
-                )}
-              </div>
-
-              <p className="mt-5 text-xs sm:text-sm text-slate-600 font-light leading-relaxed">
-                {product.description}
+              {/* Short Description */}
+              <p className="mt-3 text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
+                Powerful 3X cleaning with plant-based ingredients. Tough on stains, gentle on clothes & safe for your family.
               </p>
 
-              {/* Highlights Bullet List */}
-              <div className="mt-6 space-y-2">
-                {product.features?.map((feat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 text-xs font-medium text-slate-700"
+              {/* 4 Feature Tags Row */}
+              <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
+                <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
+                  <Leaf size={14} className="text-emerald-600" />
+                  <span>Plant Based Ingredients</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
+                  <ShieldCheck size={14} className="text-[#1E40AF]" />
+                  <span>Safe for Your Family</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
+                  <Sparkles size={14} className="text-purple-600" />
+                  <span>Tough on Stains</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
+                  <Droplet size={14} className="text-pink-600" />
+                  <span>Color Safe Formula</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Fragrance Selector Pills (Matching Image 3) */}
+            <div>
+              <label className="block text-xs font-bold text-[#0B2545] mb-2">
+                Fragrance
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { name: "Lavender Fresh", icon: "🪻" },
+                  { name: "Lime Power", icon: "🍋" },
+                  { name: "Ocean Fresh", icon: "🌊" },
+                ].map((frag) => (
+                  <button
+                    key={frag.name}
+                    onClick={() => setSelectedFragrance(frag.name)}
+                    className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
+                      selectedFragrance === frag.name
+                        ? "border-[#1E40AF] bg-blue-50/60 text-[#1E40AF] ring-1 ring-[#1E40AF]"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
                   >
-                    <Sparkles size={14} className="text-[#0A2E4E] shrink-0" />
-                    <span>{feat}</span>
-                  </div>
+                    <span>{frag.icon}</span>
+                    <span>{frag.name}</span>
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Actions & Quantity */}
-            <div className="mt-8 pt-6 border-t border-[#EFEAE4]">
-              <div className="flex flex-wrap items-center gap-4">
-                
-                {/* Quantity Select */}
-                <div className="flex items-center rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] p-1">
+            {/* Pricing Callout (Matching Image 3: ₹299 struck ₹399 25% OFF) */}
+            <div className="pt-2 border-t border-slate-100">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-extrabold text-[#1E40AF]">
+                  ₹299
+                </span>
+                <span className="text-base font-semibold text-slate-400 line-through">
+                  ₹399
+                </span>
+                <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-extrabold text-emerald-800">
+                  25% OFF
+                </span>
+              </div>
+              <p className="text-[11px] font-semibold text-slate-400 mt-1">
+                (Inclusive of all taxes)
+              </p>
+            </div>
+
+            {/* Size Selector Pills (Matching Image 3) */}
+            <div>
+              <label className="block text-xs font-bold text-[#0B2545] mb-2">
+                Size
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {["500 ml", "1 L", "2 L", "5 L"].map((sz) => (
+                  <button
+                    key={sz}
+                    onClick={() => setSelectedSize(sz)}
+                    className={`rounded-xl border py-2 text-xs font-extrabold transition text-center ${
+                      selectedSize === sz
+                        ? "border-[#1E40AF] bg-blue-50/60 text-[#1E40AF] ring-1 ring-[#1E40AF]"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {sz}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Sticky Sidebar Purchase Box (Col 3 matching Image 3) */}
+          <div className="lg:col-span-3 space-y-4 lg:sticky lg:top-24">
+            
+            <div className="rounded-3xl bg-white p-5 border border-slate-200/80 shadow-md space-y-4">
+              
+              {/* Free Delivery Promo Header */}
+              <div className="flex items-center gap-2.5 rounded-2xl bg-blue-50 p-3 border border-blue-100 text-xs font-bold text-[#1E40AF]">
+                <Truck size={18} className="text-[#1E40AF] shrink-0" />
+                <div>
+                  <div>Free Delivery</div>
+                  <div className="text-[10px] text-slate-500 font-normal">On orders above ₹499</div>
+                </div>
+              </div>
+
+              {/* Quantity Stepper */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Quantity</label>
+                <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1 w-full justify-between">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold"
+                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center"
                   >
                     -
                   </button>
-                  <span className="w-10 text-center font-bold text-[#0A2E4E]">
-                    {quantity}
-                  </span>
+                  <span className="font-extrabold text-sm text-[#0B2545]">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold"
+                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center"
                   >
                     +
                   </button>
                 </div>
+              </div>
 
-                {/* Add to Cart */}
-                <button
-                  onClick={() => addToCart(product, quantity)}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#0A2E4E] py-4 px-6 font-semibold uppercase tracking-wider text-white text-xs hover:bg-[#13426B] transition shadow-xs"
-                >
-                  <ShoppingBag size={16} /> Add to Cart
-                </button>
+              {/* Add to Cart Button (Solid Blue) */}
+              <button
+                onClick={() => addToCart(product, quantity)}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
+              >
+                <ShoppingBag size={16} />
+                <span>Add to Cart</span>
+              </button>
 
-                {/* Buy Now Button */}
-                <button
-                  onClick={handleBuyNow}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#E5D3C4] py-4 px-6 font-semibold uppercase tracking-wider text-[#0A2E4E] text-xs hover:bg-[#d8c3b2] transition shadow-xs"
-                >
-                  <Zap size={16} /> Buy Now
-                </button>
+              {/* Buy Now Button (Outlined Blue with Lightning) */}
+              <button
+                onClick={handleBuyNow}
+                className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[#1E40AF] py-3 text-xs font-bold text-[#1E40AF] hover:bg-blue-50 transition active:scale-98"
+              >
+                <Zap size={16} />
+                <span>Buy Now</span>
+              </button>
 
-                {/* Wishlist Button */}
+              {/* Wishlist Link */}
+              <div className="text-center pt-1">
                 <button
                   onClick={() => toggleWishlist(product)}
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl border transition ${
-                    isFav
-                      ? "border-rose-200 bg-rose-50 text-rose-500"
-                      : "border-[#EFEAE4] text-slate-700 hover:bg-[#F5F1EB]"
+                  className={`inline-flex items-center gap-1.5 text-xs font-bold transition ${
+                    isFav ? "text-rose-500" : "text-slate-600 hover:text-[#1E40AF]"
                   }`}
-                  title="Wishlist"
                 >
-                  <Heart size={20} className={isFav ? "fill-rose-500" : ""} />
+                  <Heart size={15} className={isFav ? "fill-rose-500" : ""} />
+                  <span>{isFav ? "In Wishlist" : "Add to Wishlist"}</span>
                 </button>
-
               </div>
 
-              {/* Trust Callouts */}
-              <div className="mt-6 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-500 pt-4 border-t border-[#EFEAE4]">
-                <div className="flex flex-col items-center gap-1">
-                  <Truck size={16} className="text-[#0A2E4E]" />
-                  <span>Free Shipping &gt; ₹499</span>
+              {/* Estimated Delivery Box (Matching Image 3) */}
+              <div className="rounded-2xl bg-emerald-50/60 p-3 border border-emerald-100 text-xs">
+                <div className="flex items-center justify-between font-bold text-emerald-950">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 size={15} className="text-emerald-600" /> Estimated Delivery
+                  </span>
+                  <button type="button" className="text-[10px] text-[#1E40AF] hover:underline">View Details</button>
                 </div>
-                <div className="flex flex-col items-center gap-1">
-                  <ShieldCheck size={16} className="text-[#0A2E4E]" />
-                  <span>99.9% Germ Defense</span>
+                <p className="text-xs font-extrabold text-slate-800 mt-1">
+                  24 - 27 May, 2025
+                </p>
+              </div>
+
+              {/* Trust Items List (Matching Image 3) */}
+              <div className="space-y-2.5 pt-2 text-xs font-semibold text-slate-700">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-[#1E40AF]" />
+                  <span>100% Secure Payments</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
-                  <RotateCcw size={16} className="text-[#0A2E4E]" />
-                  <span>7-Day Easy Returns</span>
+                <div className="flex items-center gap-2">
+                  <RefreshCw size={16} className="text-[#1E40AF]" />
+                  <span>Easy Returns & Refunds</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock size={16} className="text-[#1E40AF]" />
+                  <span>7 Days Replacement</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Headphones size={16} className="text-[#1E40AF]" />
+                  <span>24/7 Customer Support</span>
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
 
-        {/* Tabbed Specs & Reviews Section */}
-        <div className="mt-12 rounded-3xl bg-[#FAF7F2] p-8 border border-[#EFEAE4]">
-          <div className="flex border-b border-[#EFEAE4] gap-8">
-            <button
-              onClick={() => setActiveTab("specs")}
-              className={`pb-4 font-serif text-lg font-bold transition border-b-2 ${
-                activeTab === "specs"
-                  ? "border-[#0A2E4E] text-[#0A2E4E]"
-                  : "border-transparent text-slate-500 hover:text-[#0A2E4E]"
-              }`}
-            >
-              Specifications & Info
-            </button>
-            <button
-              onClick={() => setActiveTab("usage")}
-              className={`pb-4 font-serif text-lg font-bold transition border-b-2 ${
-                activeTab === "usage"
-                  ? "border-[#0A2E4E] text-[#0A2E4E]"
-                  : "border-transparent text-slate-500 hover:text-[#0A2E4E]"
-              }`}
-            >
-              Usage Instructions
-            </button>
-            <button
-              onClick={() => setActiveTab("reviews")}
-              className={`pb-4 font-serif text-lg font-bold transition border-b-2 ${
-                activeTab === "reviews"
-                  ? "border-[#0A2E4E] text-[#0A2E4E]"
-                  : "border-transparent text-slate-500 hover:text-[#0A2E4E]"
-              }`}
-            >
-              Customer Reviews ({product.reviews?.length || 0})
-            </button>
-          </div>
-
-          <div className="mt-6 text-xs text-slate-600 font-light">
-            {activeTab === "specs" && (
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="rounded-xl bg-[#F5F1EB] p-4 border border-[#EFEAE4]">
-                  <span className="font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Volume:</span>
-                  <div className="font-bold text-[#0A2E4E] text-sm mt-0.5">
-                    {product.specifications.volume}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[#F5F1EB] p-4 border border-[#EFEAE4]">
-                  <span className="font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Fragrance:</span>
-                  <div className="font-bold text-[#0A2E4E] text-sm mt-0.5">
-                    {product.specifications.scent}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[#F5F1EB] p-4 border border-[#EFEAE4]">
-                  <span className="font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Shelf Life:</span>
-                  <div className="font-bold text-[#0A2E4E] text-sm mt-0.5">
-                    {product.specifications.shelfLife}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[#F5F1EB] p-4 border border-[#EFEAE4]">
-                  <span className="font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Formulation:</span>
-                  <div className="font-bold text-[#0A2E4E] text-sm mt-0.5">
-                    {product.specifications.formulation}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "usage" && (
-              <div className="rounded-xl bg-[#F5F1EB] p-6 leading-relaxed border border-[#EFEAE4]">
-                <h3 className="font-serif text-lg font-bold text-[#0A2E4E] mb-2">
-                  How to Use {product.name}:
-                </h3>
-                <p className="text-slate-700">{product.specifications.usageInstructions}</p>
-              </div>
-            )}
-
-            {activeTab === "reviews" && (
-              <div className="space-y-4">
-                {product.reviews && product.reviews.length > 0 ? (
-                  product.reviews.map((rev) => (
-                    <div
-                      key={rev.id}
-                      className="rounded-2xl border border-[#EFEAE4] bg-[#F5F1EB] p-5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#0A2E4E]">
-                            {rev.userName}
-                          </span>
-                          {rev.verifiedPurchase && (
-                            <span className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold uppercase">
-                              <CheckCircle2 size={11} /> Verified Buyer
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[11px] text-slate-400">{rev.date}</span>
-                      </div>
-                      <div className="mt-1.5 flex text-amber-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={13}
-                            className={i < rev.rating ? "fill-amber-400 text-amber-400" : "text-slate-300"}
-                          />
-                        ))}
-                      </div>
-                      <p className="mt-2 text-xs text-slate-700 font-serif italic">
-                        &ldquo;{rev.comment}&rdquo;
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-500">No reviews yet for this product.</p>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Related Products Grid */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">RECOMMENDED</span>
-            <h3 className="font-serif text-3xl font-normal text-[#0A2E4E] mb-8 mt-1">
-              You Might Also Like
-            </h3>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedProducts.map((relProduct) => (
-                <ProductCard key={relProduct.id} product={relProduct} />
+        {/* Tabbed Specs Section & Recommended Products Row (Exact Match with Image 3) */}
+        <div className="mt-14 grid gap-8 lg:grid-cols-12">
+          
+          {/* Tabbed Info Box (Col 8) */}
+          <div className="lg:col-span-8 rounded-3xl bg-white p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+            
+            {/* Tab Headers */}
+            <div className="flex border-b border-slate-200 gap-6 overflow-x-auto">
+              {[
+                { id: "details", label: "Product Details" },
+                { id: "usage", label: "How to Use" },
+                { id: "ingredients", label: "Ingredients" },
+                { id: "reviews", label: "Reviews (1,256)" },
+                { id: "faqs", label: "FAQs" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`pb-3 text-xs sm:text-sm font-bold whitespace-nowrap transition border-b-2 ${
+                    activeTab === tab.id
+                      ? "border-[#1E40AF] text-[#1E40AF]"
+                      : "border-transparent text-slate-500 hover:text-[#1E40AF]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
               ))}
             </div>
+
+            {/* Tab Content Area */}
+            <div className="mt-6 space-y-6 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              {activeTab === "details" && (
+                <div className="space-y-4">
+                  <p>
+                    Matrin Detergent Liquid is specially formulated with plant-based cleaning agents that penetrate deep into fabric to remove tough stains and dirt. It is gentle on clothes and keeps them bright, fresh and long-lasting.
+                  </p>
+
+                  {/* 4 Feature Icon Badges Box inside tab (Exact Image 3) */}
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 border border-slate-200/60">
+                      <div className="h-9 w-9 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0">
+                        <Droplet size={18} />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-[#0B2545] text-xs">Suitable for Load</div>
+                        <div className="text-[10px] text-slate-500">Top Load & Front Load</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 border border-slate-200/60">
+                      <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <ShieldCheck size={18} />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-[#0B2545] text-xs">No Harmful Chemicals</div>
+                        <div className="text-[10px] text-slate-500">Zero phosphates or parabens</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 border border-slate-200/60">
+                      <div className="h-9 w-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                        <Sparkles size={18} />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-[#0B2545] text-xs">Works in Hard Water</div>
+                        <div className="text-[10px] text-slate-500">Fast lather & easy rinse</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 border border-slate-200/60">
+                      <div className="h-9 w-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                        <Leaf size={18} />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-[#0B2545] text-xs">Biodegradable Formula</div>
+                        <div className="text-[10px] text-slate-500">100% Eco-safe wash</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "usage" && (
+                <div className="space-y-2">
+                  <h4 className="font-bold text-[#0B2545]">Machine Wash (Front & Top Load):</h4>
+                  <p>Pour 1 capful (40ml) for standard 4-5 kg wash loads directly into liquid wash tray.</p>
+                  <h4 className="font-bold text-[#0B2545] pt-2">Hand Wash:</h4>
+                  <p>Mix 1 capful in 10 liters of water. Soak clothes for 20 mins and rinse thoroughly.</p>
+                </div>
+              )}
+
+              {activeTab === "ingredients" && (
+                <p>
+                  Plant-derived surfactants, bio-enzymes, natural lavender extracts, fabric protection polymers, coconut-based lather boosters, demineralized water.
+                </p>
+              )}
+
+              {activeTab === "reviews" && (
+                <div className="space-y-3">
+                  <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60">
+                    <div className="flex items-center justify-between font-bold text-xs">
+                      <span>Priya S.</span>
+                      <span className="text-amber-500">★★★★★</span>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-600">Great liquid detergent! Clothes smell amazing and feel super soft.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "faqs" && (
+                <div className="space-y-2 text-xs">
+                  <p className="font-bold text-[#0B2545]">Is it safe for baby clothes?</p>
+                  <p>Yes, Matrin detergent is non-toxic and hypoallergenic, making it completely safe for infant clothes.</p>
+                </div>
+              )}
+            </div>
+
           </div>
-        )}
+
+          {/* Bottom Right "You may also like" Mini Cards Column (Col 4 matching Image 3) */}
+          <div className="lg:col-span-4 rounded-3xl bg-white p-6 border border-slate-200/80 shadow-xs space-y-4">
+            
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="font-extrabold text-[#0B2545] text-sm">
+                You may also like
+              </h3>
+              <Link href="/products" className="text-xs font-bold text-[#1E40AF] hover:underline">
+                View All
+              </Link>
+            </div>
+
+            {/* Mini Recommended Products List */}
+            <div className="space-y-3">
+              {[
+                {
+                  id: 2,
+                  name: "Matrin Dishwash Liquid 500ml",
+                  price: "₹149",
+                  image: "/images/products/dishwash.webp",
+                },
+                {
+                  id: 3,
+                  name: "Matrin Floor Cleaner Lavender 1L",
+                  price: "₹199",
+                  image: "/images/products/floor-cleaner.webp",
+                },
+                {
+                  id: 4,
+                  name: "Matrin Toilet Cleaner 500ml",
+                  price: "₹129",
+                  image: "/images/products/toilet-cleaner.webp",
+                },
+              ].map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/products/${item.id}`}
+                  className="flex items-center gap-3 p-2.5 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-100 transition group"
+                >
+                  <div className="h-16 w-16 rounded-xl bg-white p-1 border border-slate-200/60 shrink-0 flex items-center justify-center">
+                    <img src={item.image} alt={item.name} className="h-full w-auto object-contain group-hover:scale-105 transition-transform" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#0B2545] line-clamp-1 group-hover:text-[#1E40AF] transition-colors">
+                      {item.name}
+                    </h4>
+                    <p className="text-xs font-extrabold text-[#1E40AF] mt-1">
+                      {item.price}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
     </main>
   );
 }
