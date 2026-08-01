@@ -1,7 +1,8 @@
 "use client";
 
 import { OrderInvoice } from "@/types/order";
-import { X, Printer, Download, CheckCircle2, ShieldCheck, FileText, Sparkles } from "lucide-react";
+import { COMPANY_INFO } from "@/data/companyInfo";
+import { X, Printer, Download, CheckCircle2, ShieldCheck, FileText, Sparkles, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function InvoiceModal({
@@ -48,6 +49,12 @@ export default function InvoiceModal({
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl bg-white border border-[#EFEAE4] shadow-2xl print:shadow-none print:border-none print:rounded-none print:max-w-none print:w-full my-auto"
         >
+          {/* Top Demo Disclaimer Warning Banner */}
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-amber-900 text-[11px] font-extrabold tracking-wide flex items-center justify-center gap-2">
+            <AlertTriangle size={14} className="text-amber-600 shrink-0" />
+            <span>SAMPLE / DEMO INVOICE — Not a Valid Tax Document</span>
+          </div>
+
           {/* Action Bar Header (Hidden in Print) */}
           <div className="flex items-center justify-between bg-[#0A2E4E] p-4 text-white print:hidden">
             <div className="flex items-center gap-2">
@@ -71,19 +78,24 @@ export default function InvoiceModal({
           </div>
 
           {/* Printable Invoice Body */}
-          <div className="p-8 sm:p-10 font-sans text-slate-800 space-y-8 bg-white print:p-6" id="invoice-print-area">
+          <div className="relative p-8 sm:p-10 font-sans text-slate-800 space-y-8 bg-white print:p-6 overflow-hidden" id="invoice-print-area">
             
+            {/* Diagonal Semi-Transparent Demo Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] rotate-[-30deg] text-4xl sm:text-6xl font-black uppercase text-slate-900 select-none z-0">
+              SAMPLE / DEMO INVOICE
+            </div>
+
             {/* Invoice Top Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-6 gap-6">
+            <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-6 gap-6">
               <div>
                 <img
                   src="/images/matrin-logo-clean.webp"
                   alt="MATRIN"
                   className="h-10 w-auto object-contain mb-2"
                 />
-                <p className="text-xs text-slate-500 font-medium">MATRIN STORE INDIA PRIVATE LIMITED</p>
-                <p className="text-[11px] text-slate-400">GSTIN: 27AAACM1234F1Z5 | CIN: U74999MH2025PTC123456</p>
-                <p className="text-[11px] text-slate-400">Plot 42, Tech Park, Andheri East, Mumbai 400069</p>
+                <p className="text-xs text-slate-500 font-medium">{COMPANY_INFO.legalName}</p>
+                <p className="text-[11px] text-slate-400">GSTIN: {COMPANY_INFO.gstin} | CIN: {COMPANY_INFO.cin}</p>
+                <p className="text-[11px] text-slate-400">{COMPANY_INFO.address}</p>
               </div>
 
               <div className="text-left sm:text-right">
@@ -216,8 +228,12 @@ export default function InvoiceModal({
                 <CheckCircle2 size={18} /> Tax Paid & Verified Digitally
               </div>
               <div className="text-right">
-                <div className="h-10 w-28 border border-dashed border-[#0A2E4E]/40 rounded-lg mx-auto flex items-center justify-center text-[10px] font-bold text-[#0A2E4E] uppercase tracking-wider mb-1 bg-blue-50/50">
-                  [MATRIN SEAL]
+                <div className="h-12 w-28 border-2 border-emerald-600/60 rounded-xl mx-auto flex flex-col items-center justify-center text-[9px] font-extrabold text-emerald-800 uppercase tracking-widest bg-emerald-50/40 p-1 shadow-2xs mb-1">
+                  <div className="flex items-center gap-1">
+                    <ShieldCheck size={11} className="text-emerald-600" />
+                    <span>MATRIN</span>
+                  </div>
+                  <span className="text-[7px] text-emerald-600 font-semibold tracking-normal mt-0.5">DIGITAL SEAL</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Authorized Signatory</span>
               </div>
