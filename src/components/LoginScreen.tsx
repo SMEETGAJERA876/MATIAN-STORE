@@ -21,6 +21,8 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import toast from "react-hot-toast";
+
 export default function LoginScreen() {
   const { login, quickAdminLogin, quickUserLogin, register } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -31,17 +33,28 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
+  // Real-time password validation rules
+  const hasMinLength = password.length >= 8;
+  const hasLetter = /[a-zA-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const isPasswordValid = hasMinLength && hasLetter && hasNumber;
+
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
-    // Map email/username to login method
     login(email, password);
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !name) return;
-    register(name, email, password || "USER!@#$");
+    if (!email || !name || !password) return;
+
+    if (!isPasswordValid) {
+      toast.error("Password must be at least 8 characters with 1 letter & 1 number.");
+      return;
+    }
+
+    register(name, email, password);
   };
 
   return (
@@ -250,6 +263,32 @@ export default function LoginScreen() {
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
+
+                    {/* Real-Time Password Validation Guidance */}
+                    <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-[11px]">
+                      <div className="flex items-center justify-between text-slate-500 font-medium">
+                        <span>Must be at least 8 characters with 1 letter & 1 number:</span>
+                        {password && (
+                          <span className={isPasswordValid ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>
+                            {isPasswordValid ? "✓ Strong Password" : "Incomplete"}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5 pt-0.5">
+                        <div className={`flex items-center gap-1 font-medium transition ${hasMinLength ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasMinLength ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>8+ Chars</span>
+                        </div>
+                        <div className={`flex items-center gap-1 font-medium transition ${hasLetter ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasLetter ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>1 Letter</span>
+                        </div>
+                        <div className={`flex items-center gap-1 font-medium transition ${hasNumber ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasNumber ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>1 Number</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Forgot Password Link */}
@@ -315,6 +354,32 @@ export default function LoginScreen() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
                     />
+
+                    {/* Real-Time Password Validation Guidance */}
+                    <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-[11px]">
+                      <div className="flex items-center justify-between text-slate-500 font-medium">
+                        <span>Must be at least 8 characters with 1 letter & 1 number:</span>
+                        {password && (
+                          <span className={isPasswordValid ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>
+                            {isPasswordValid ? "✓ Strong Password" : "Incomplete"}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5 pt-0.5">
+                        <div className={`flex items-center gap-1 font-medium transition ${hasMinLength ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasMinLength ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>8+ Chars</span>
+                        </div>
+                        <div className={`flex items-center gap-1 font-medium transition ${hasLetter ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasLetter ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>1 Letter</span>
+                        </div>
+                        <div className={`flex items-center gap-1 font-medium transition ${hasNumber ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
+                          {hasNumber ? <CheckCircle2 size={12} className="shrink-0 text-emerald-600" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
+                          <span>1 Number</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <button
