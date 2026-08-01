@@ -21,21 +21,25 @@ export default function Hero() {
           {/* Left Column: Pure Cleaning. Better Living. */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Main Headline (Exact Typography from Reference Image 4) */}
+            {/* Authentic Brand Trust Tag */}
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200/60 px-3.5 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>🌿 100% Bio-Based • Non-Toxic Formula</span>
+            </div>
+
+            {/* Main Headline */}
             <div className="space-y-1">
               <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#0B2545] leading-[1.08]">
-                Pure Cleaning.
+                Pure Plant Power.
               </h1>
               <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#1E40AF] leading-[1.08] flex items-center gap-2">
-                Better Living.<span className="text-emerald-500 text-4xl sm:text-5xl">🍃</span>
+                Unbeatable Clean.<span className="text-emerald-500 text-4xl sm:text-5xl">🍃</span>
               </h1>
             </div>
 
-            {/* Subtitle (Exact Match) */}
+            {/* Subtitle */}
             <p className="text-base sm:text-lg text-slate-600 font-medium max-w-lg leading-relaxed">
-              Powerful formulas. Safe for your home.
-              <br />
-              Trusted by thousands of happy families.
+              Professional-strength cleaning backed by dermatologically tested plant science. Safe for kids, pets, and everyday living.
             </p>
 
             {/* CTA Buttons Row */}
@@ -44,7 +48,7 @@ export default function Hero() {
                 href="/products"
                 className="group inline-flex items-center gap-2.5 rounded-full bg-[#1E40AF] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-[#1a3899] hover:shadow-blue-600/30 active:scale-95"
               >
-                <span>Shop Now</span>
+                <span>Shop Lineup</span>
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
 
@@ -82,16 +86,19 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column: Matrin Product Lineup Showcase (Exact Image 4) */}
+          {/* Right Column: Matrin Product Lineup Showcase */}
           <div className="lg:col-span-6 flex justify-center">
-            <div className="relative w-full max-w-xl">
+            <div className="relative w-full max-w-xl p-2 rounded-3xl bg-gradient-to-b from-white/80 to-white/40 backdrop-blur-xs border border-white/60 shadow-2xl shadow-blue-900/10">
+              <div className="absolute top-4 right-4 z-10 rounded-full bg-white/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] shadow-xs border border-blue-100 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" /> Authentic Lineup
+              </div>
               <motion.img
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
                 src="/images/matrin-hero-lineup.png"
                 alt="Matrin Cleaning Products Lineup"
-                className="h-auto w-full object-contain drop-shadow-2xl hover:scale-102 transition-transform duration-500"
+                className="h-auto w-full rounded-2xl object-cover drop-shadow-xl hover:scale-102 transition-transform duration-500"
               />
             </div>
           </div>

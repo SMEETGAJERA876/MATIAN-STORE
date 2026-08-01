@@ -22,7 +22,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-slate-100 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         
         {/* Product Image Box */}
-        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-gradient-to-b from-[#EBF3FB] via-[#F2F7FD] to-white p-6 flex items-center justify-center border border-slate-100/60">
+        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#F8FAFC] p-3 flex items-center justify-center border border-slate-100/80 shadow-inner group-hover:bg-white transition-colors duration-300">
           
           {/* Discount Badge if available */}
           {product.discountPercentage && (
@@ -44,11 +44,11 @@ export default function ProductCard({ product }: { product: Product }) {
           </button>
 
           {/* Product Image Link */}
-          <Link href={`/products/${product.id}`} className="block h-full w-full">
+          <Link href={`/products/${product.id}`} className="block h-full w-full overflow-hidden rounded-xl">
             <img
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-106 drop-shadow-md"
+              className="h-full w-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
             />
           </Link>
 
