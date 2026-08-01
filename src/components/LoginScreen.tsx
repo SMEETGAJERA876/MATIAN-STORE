@@ -73,7 +73,6 @@ export default function LoginScreen() {
           
           {/* Subtle Floating Water Drops Graphics */}
           <div className="absolute top-10 right-10 text-cyan-400/40 text-4xl animate-pulse pointer-events-none">💧</div>
-          <div className="absolute top-1/3 left-6 text-emerald-400/40 text-3xl animate-bounce pointer-events-none">🍃</div>
 
           {/* Top Brand Logo */}
           <div className="relative z-10">
@@ -92,8 +91,8 @@ export default function LoginScreen() {
               <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#0B2545] leading-tight">
                 Pure Cleaning.
               </h1>
-              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#1E40AF] leading-tight flex items-center gap-2">
-                Better Living.<span className="text-emerald-500 text-3xl">🍃</span>
+              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#1E40AF] leading-tight">
+                Better Living.
               </h1>
             </div>
 

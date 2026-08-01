@@ -85,8 +85,8 @@ export default function AboutPage() {
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B2545] tracking-tight leading-tight">
                   Pure Cleaning.
                 </h1>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1E40AF] tracking-tight leading-tight flex items-center gap-2">
-                  Better Living.<span className="text-emerald-500 text-3xl">🍃</span>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1E40AF] tracking-tight leading-tight">
+                  Better Living.
                 </h1>
               </div>
 

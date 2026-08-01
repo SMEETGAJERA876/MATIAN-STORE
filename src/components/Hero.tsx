@@ -7,33 +7,19 @@ import { motion } from "framer-motion";
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#EBF3FB] via-[#F3F8FC] to-white pt-10 pb-16 lg:pt-14 lg:pb-24">
-      {/* Floating Leaves Decorative Graphics */}
-      <div className="absolute top-10 left-6 text-emerald-500/40 text-2xl animate-pulse pointer-events-none">
-        🍃
-      </div>
-      <div className="absolute top-1/4 right-8 text-emerald-500/40 text-3xl animate-bounce pointer-events-none">
-        🍃
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
           
           {/* Left Column: Pure Cleaning. Better Living. */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Authentic Brand Trust Tag */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200/60 px-3.5 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>🌿 100% Bio-Based • Non-Toxic Formula</span>
-            </div>
-
             {/* Main Headline */}
             <div className="space-y-1">
               <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#0B2545] leading-[1.08]">
                 Pure Plant Power.
               </h1>
-              <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#1E40AF] leading-[1.08] flex items-center gap-2">
-                Unbeatable Clean.<span className="text-emerald-500 text-4xl sm:text-5xl">🍃</span>
+              <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#1E40AF] leading-[1.08]">
+                Unbeatable Clean.
               </h1>
             </div>
 

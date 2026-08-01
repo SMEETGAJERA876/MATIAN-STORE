@@ -122,7 +122,6 @@ export default function CategoriesPage() {
       <section className="relative overflow-hidden bg-gradient-to-r from-[#EBF3FB] via-[#F1F6FD] to-[#EBF3FB] py-10 lg:py-14 border-b border-slate-200/60">
         {/* Subtle Water Bubbles Decoration */}
         <div className="absolute top-4 left-10 text-cyan-400/30 text-3xl animate-pulse pointer-events-none">💧</div>
-        <div className="absolute bottom-6 right-12 text-emerald-400/30 text-3xl animate-bounce pointer-events-none">🍃</div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>

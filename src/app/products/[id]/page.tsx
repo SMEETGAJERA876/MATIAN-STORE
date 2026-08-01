@@ -133,13 +133,6 @@ export default function ProductDetailsPage() {
               {/* Hero Main Image Box */}
               <div className="relative flex-1 aspect-square rounded-3xl overflow-hidden shadow-sm">
                 
-                {/* Circular "PLANT BASED INGREDIENTS" Seal Badge (Top Right) */}
-                <div className="absolute top-4 right-4 z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-white/95 text-[9px] font-extrabold text-emerald-700 shadow-md border border-emerald-200 text-center leading-tight">
-                  <Leaf size={14} className="text-emerald-600 mb-0.5" />
-                  <span>PLANT BASED</span>
-                  <span className="text-[7px] text-slate-400 font-semibold">INGREDIENTS</span>
-                </div>
-
                 {/* Prev & Next Arrows */}
                 <button
                   onClick={handlePrevImage}
