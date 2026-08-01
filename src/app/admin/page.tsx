@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ProductImage from "@/components/ProductImage";
 import { useAuth } from "@/context/AuthContext";
 import { useProductStore } from "@/context/ProductStoreContext";
 import CouponManager from "@/components/admin/CouponManager";
@@ -549,7 +550,9 @@ export default function AdminDashboardPage() {
                 {topSellingProducts.map((p, i) => (
                   <div key={i} className="flex items-center justify-between text-xs p-2 rounded-2xl hover:bg-slate-50 transition">
                     <div className="flex items-center gap-3">
-                      <img src={p.image} alt={p.name} className="h-10 w-10 object-contain rounded-xl bg-slate-50 p-1 border border-slate-100" />
+                      <div className="h-10 w-10 shrink-0">
+                        <ProductImage src={p.image} alt={p.name} fitMode="cover" roundedClassName="rounded-xl" />
+                      </div>
                       <div>
                         <div className="font-bold text-[#0B2545] line-clamp-1">{p.name}</div>
                         <div className="text-[10px] text-slate-400 font-medium">{p.sold} Sold</div>
@@ -614,7 +617,9 @@ export default function AdminDashboardPage() {
                 {lowStockAlerts.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between text-xs p-2 rounded-2xl bg-rose-50/50 border border-rose-100">
                     <div className="flex items-center gap-2.5">
-                      <img src={item.image} alt={item.name} className="h-9 w-9 object-contain rounded-lg bg-white p-1 border border-slate-200/60" />
+                      <div className="h-9 w-9 shrink-0">
+                        <ProductImage src={item.image} alt={item.name} fitMode="cover" roundedClassName="rounded-lg" />
+                      </div>
                       <div className="font-bold text-[#0B2545] text-[11px] line-clamp-1">{item.name}</div>
                     </div>
                     <div className="text-[11px] font-extrabold text-rose-600 whitespace-nowrap">

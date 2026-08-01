@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import ProductImage from "@/components/ProductImage";
 import {
   Star,
   Heart,
@@ -110,13 +111,13 @@ export default function ProductDetailsPage() {
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`h-16 w-16 rounded-2xl border-2 bg-white p-1.5 transition overflow-hidden shadow-2xs ${
+                    className={`h-16 w-16 rounded-2xl transition overflow-hidden shadow-2xs ${
                       activeImageIndex === idx
-                        ? "border-[#1E40AF] ring-2 ring-blue-100"
-                        : "border-slate-200 hover:border-slate-300"
+                        ? "ring-2 ring-[#1E40AF]"
+                        : "opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="Thumbnail" className="h-full w-full object-contain" />
+                    <ProductImage src={img} alt="Thumbnail" fitMode="cover" roundedClassName="rounded-2xl" />
                   </button>
                 ))}
                 {gallery.length > 4 && (
@@ -129,8 +130,8 @@ export default function ProductDetailsPage() {
                 )}
               </div>
 
-              {/* Hero Main Image Box with Water Splash Backdrop & Circular Badge (Matching Image 3) */}
-              <div className="relative flex-1 aspect-square rounded-3xl bg-gradient-to-b from-[#EBF3FB] via-[#F2F7FD] to-white border border-slate-200/80 p-6 flex items-center justify-center overflow-hidden shadow-sm">
+              {/* Hero Main Image Box */}
+              <div className="relative flex-1 aspect-square rounded-3xl overflow-hidden shadow-sm">
                 
                 {/* Circular "PLANT BASED INGREDIENTS" Seal Badge (Top Right) */}
                 <div className="absolute top-4 right-4 z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-white/95 text-[9px] font-extrabold text-emerald-700 shadow-md border border-emerald-200 text-center leading-tight">
@@ -142,21 +143,22 @@ export default function ProductDetailsPage() {
                 {/* Prev & Next Arrows */}
                 <button
                   onClick={handlePrevImage}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
                 >
                   <ChevronLeft size={18} />
                 </button>
                 <button
                   onClick={handleNextImage}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
                 >
                   <ChevronRight size={18} />
                 </button>
 
-                <img
-                  src={gallery[activeImageIndex]}
+                <ProductImage
+                  src={gallery[activeImageIndex] || product.image}
                   alt={product.name}
-                  className="h-full w-auto max-h-[340px] object-contain drop-shadow-xl transition-transform duration-300 hover:scale-105"
+                  fitMode="cover"
+                  roundedClassName="rounded-3xl"
                 />
               </div>
             </div>
@@ -586,8 +588,8 @@ export default function ProductDetailsPage() {
                   href={`/products/${item.id}`}
                   className="flex items-center gap-3 p-2.5 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-100 transition group"
                 >
-                  <div className="h-16 w-16 rounded-xl bg-white p-1 border border-slate-200/60 shrink-0 flex items-center justify-center">
-                    <img src={item.image} alt={item.name} className="h-full w-auto object-contain group-hover:scale-105 transition-transform" />
+                  <div className="h-16 w-16 shrink-0">
+                    <ProductImage src={item.image} alt={item.name} fitMode="cover" roundedClassName="rounded-xl" />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-[#0B2545] line-clamp-1 group-hover:text-[#1E40AF] transition-colors">

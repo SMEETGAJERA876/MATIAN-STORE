@@ -8,6 +8,8 @@ import { Star, Heart, ShoppingBag, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 import QuickViewModal from "./QuickViewModal";
 
+import ProductImage from "./ProductImage";
+
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -21,8 +23,8 @@ export default function ProductCard({ product }: { product: Product }) {
     <>
       <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-slate-100 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         
-        {/* Product Image Box */}
-        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#F8FAFC] p-3 flex items-center justify-center border border-slate-100/80 shadow-inner group-hover:bg-white transition-colors duration-300">
+        {/* Product Image Container */}
+        <div className="relative w-full">
           
           {/* Discount Badge if available */}
           {product.discountPercentage && (
@@ -44,16 +46,16 @@ export default function ProductCard({ product }: { product: Product }) {
           </button>
 
           {/* Product Image Link */}
-          <Link href={`/products/${product.id}`} className="block h-full w-full overflow-hidden rounded-xl">
-            <img
+          <Link href={`/products/${product.id}`} className="block h-full w-full">
+            <ProductImage
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+              fitMode="cover"
             />
           </Link>
 
           {/* Hover Quick View Trigger */}
-          <div className="absolute inset-x-0 bottom-3 flex justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-3">
+          <div className="absolute inset-x-0 bottom-3 flex justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-3 z-10">
             <button
               onClick={() => setIsQuickViewOpen(true)}
               className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/95 backdrop-blur-xs py-2 text-[11px] font-bold text-[#1E40AF] shadow-md hover:bg-white transition"

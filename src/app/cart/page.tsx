@@ -7,6 +7,7 @@ import { PaymentMethod, OrderInvoice, ShippingAddress } from "@/types/order";
 import InvoiceModal from "@/components/InvoiceModal";
 import Link from "next/link";
 import { useState } from "react";
+import ProductImage from "@/components/ProductImage";
 import {
   Trash2,
   ShoppingBag,
@@ -321,11 +322,14 @@ export default function CartPage() {
                   {cart.map(({ product, quantity }) => (
                     <div key={product.id} className="py-6 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="flex items-center gap-4 w-full sm:w-auto">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-20 w-20 rounded-2xl object-contain bg-slate-50 p-2 border border-slate-100"
-                        />
+                        <div className="h-20 w-20 shrink-0">
+                          <ProductImage
+                            src={product.image}
+                            alt={product.name}
+                            fitMode="cover"
+                            roundedClassName="rounded-2xl"
+                          />
+                        </div>
                         <div>
                           <h3 className="text-base font-bold text-[#0B2545]">
                             {product.name}

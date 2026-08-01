@@ -7,6 +7,7 @@ import { X, Star, Heart, ShoppingBag, Check } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import ProductImage from "./ProductImage";
 
 type QuickViewModalProps = {
   product: Product | null;
@@ -55,10 +56,10 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 </span>
               )}
 
-              <img
+              <ProductImage
                 src={product.image}
                 alt={product.name}
-                className="max-h-72 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                fitMode="cover"
               />
             </div>
 

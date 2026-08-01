@@ -19,6 +19,7 @@ import {
   Layers,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import ProductImage from "@/components/ProductImage";
 
 export default function CategoriesPage() {
   const [selectedPill, setSelectedPill] = useState("all");
@@ -183,11 +184,11 @@ export default function CategoriesPage() {
               className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300"
             >
               {/* Card Banner Artwork */}
-              <div className={`relative h-56 w-full bg-gradient-to-b ${cat.bgGradient} p-6 flex items-center justify-center overflow-hidden`}>
-                <img
+              <div className="relative w-full p-2">
+                <ProductImage
                   src={cat.image}
                   alt={cat.title}
-                  className="h-44 w-auto object-contain drop-shadow-md transition-transform duration-500 group-hover:scale-108"
+                  fitMode="cover"
                 />
               </div>
 

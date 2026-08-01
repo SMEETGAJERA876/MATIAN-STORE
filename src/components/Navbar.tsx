@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, Heart, User, ShoppingBag, Menu, X, Shield, Sparkles, ArrowRight, Truck, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ProductImage from "./ProductImage";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -160,7 +161,9 @@ export default function Navbar() {
                         onClick={() => setSearchQuery("")}
                         className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
                       >
-                        <img src={item.image} alt={item.name} className="h-10 w-10 object-contain bg-slate-50 rounded-md p-1 border border-slate-100" />
+                        <div className="h-10 w-10 shrink-0">
+                          <ProductImage src={item.image} alt={item.name} fitMode="cover" roundedClassName="rounded-md" />
+                        </div>
                         <div className="flex-1 min-w-0 text-left">
                           <div className="text-xs font-extrabold text-slate-900 truncate">{item.name}</div>
                           <div className="text-[11px] text-slate-500 font-semibold">{item.category} • ₹{item.price}</div>
