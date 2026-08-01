@@ -8,10 +8,12 @@ import { Search, Heart, User, ShoppingBag, Menu, X, Shield, Sparkles, ArrowRight
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductImage from "./ProductImage";
+import WishlistModal from "./WishlistModal";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -203,17 +205,17 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Wishlist Link */}
-            <Link
-              href="/products"
+            {/* Wishlist Button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
               className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
-              <Heart size={20} />
+              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
               <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
-                {wishlistCount > 0 ? wishlistCount : 2}
+                {wishlistCount}
               </span>
-            </Link>
+            </button>
 
             {/* Cart Link */}
             <Link
@@ -240,17 +242,17 @@ export default function Navbar() {
               <Search size={20} />
             </button>
 
-            {/* Mobile Wishlist Link */}
-            <Link
-              href="/products"
+            {/* Mobile Wishlist Button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
               className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] p-2 rounded-xl transition active:scale-95"
               title="Wishlist"
             >
-              <Heart size={20} />
+              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
               <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
-                {wishlistCount > 0 ? wishlistCount : 2}
+                {wishlistCount}
               </span>
-            </Link>
+            </button>
 
             {/* Mobile Cart Link */}
             <Link
@@ -342,6 +344,9 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </nav>
+
+      {/* Wishlist Modal Drawer */}
+      <WishlistModal isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
     </header>
   );
 }
