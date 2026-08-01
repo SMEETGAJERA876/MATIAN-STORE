@@ -56,12 +56,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const openAuthModal = () => {
-    setIsAuthModalOpen(true);
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
   };
 
-  const closeAuthModal = () => {
-    setIsAuthModalOpen(false);
-  };
+  const closeAuthModal = () => {};
 
   const login = (identifier: string, pass: string): boolean => {
     const cleanId = identifier.trim().toLowerCase();

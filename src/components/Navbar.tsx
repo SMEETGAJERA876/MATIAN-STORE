@@ -179,10 +179,10 @@ export default function Navbar() {
             </form>
 
             {/* Account Icon */}
-            <button
-              onClick={() => openAuthModal()}
+            <Link
+              href="/login"
               className="relative flex items-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5"
-              title={user ? `Logged in as ${user.name}` : "Account"}
+              title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
             >
               {user ? (
                 <div className="flex items-center gap-1.5 rounded-full bg-blue-50 py-1 px-3 border border-blue-200">
@@ -194,9 +194,12 @@ export default function Navbar() {
                   </span>
                 </div>
               ) : (
-                <User size={22} />
+                <div className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-[#1E40AF] transition">
+                  <User size={20} />
+                  <span className="hidden sm:inline">Sign In</span>
+                </div>
               )}
-            </button>
+            </Link>
 
             {/* Wishlist Icon with badge matching Reference Image (badge count 2) */}
             <Link
