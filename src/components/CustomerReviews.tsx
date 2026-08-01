@@ -46,7 +46,7 @@ export default function CustomerReviews() {
             TESTIMONIALS
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B2545] tracking-tight">
-            Loved by 50,000+ Indian Households
+            What Early Customers Are Saying
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 font-medium">
             Discover why families trust Matrin for superior home care and daily cleaning.

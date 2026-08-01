@@ -105,7 +105,7 @@ export default function Hero() {
 
         </div>
 
-        {/* Bottom Floating Stats Bar (Exact Match with Image 4) */}
+        {/* Bottom Floating Brand Value Bar (Option A - Mission-Framed Value Statements) */}
         <div className="mt-12 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
           
           <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
@@ -113,8 +113,8 @@ export default function Hero() {
               <Users size={22} />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">50K+</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Happy Customers</p>
+              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Every Indian Home</div>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">Built for Local Needs</p>
             </div>
           </div>
 
@@ -123,8 +123,8 @@ export default function Hero() {
               <Shield size={22} />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">100%</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Safe & Effective</p>
+              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Plant-Based</div>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">Non-Toxic Formulas</p>
             </div>
           </div>
 
@@ -133,8 +133,8 @@ export default function Hero() {
               <Leaf size={22} />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">Eco Friendly</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Better for Nature</p>
+              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Dermatologically</div>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">Tested & Gentle</p>
             </div>
           </div>
 
@@ -143,12 +143,59 @@ export default function Hero() {
               <Award size={22} />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">Premium Quality</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Trusted Products</p>
+              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Made in India</div>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">Crafted with Care</p>
             </div>
           </div>
 
         </div>
+
+        {/* 
+        ===================================================================
+        Option B — Configurable Numeric Stats Block (Post-Launch Alternate)
+        Uncomment this block and import LAUNCH_NUMERIC_STATS from '@/data/stats' 
+        once real verified launch numbers are available.
+        ===================================================================
+        {/*
+        <div className="mt-12 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
+            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
+              <Users size={22} />
+            </div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.happyCustomers}</div>
+              <p className="text-xs sm:text-sm font-bold text-slate-600">Happy Customers</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
+            <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
+              <Shield size={22} />
+            </div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.bottlesSold}</div>
+              <p className="text-xs sm:text-sm font-bold text-slate-600">Bottles Sold</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
+            <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100 shadow-2xs">
+              <Leaf size={22} />
+            </div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.customerSatisfaction}</div>
+              <p className="text-xs sm:text-sm font-bold text-slate-600">Satisfaction</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
+            <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100 shadow-2xs">
+              <Award size={22} />
+            </div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.retailPartners}</div>
+              <p className="text-xs sm:text-sm font-bold text-slate-600">Retail Partners</p>
+            </div>
+          </div>
+        </div>
+        */}
 
       </div>
     </section>

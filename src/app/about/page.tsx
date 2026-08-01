@@ -23,12 +23,26 @@ import {
 import Newsletter from "@/components/Newsletter";
 
 export default function AboutPage() {
+  // Option A Active Mission Statements (pre-launch value claims)
   const stats = [
-    { value: "50,000+", label: "Happy Customers", icon: Users, bg: "bg-blue-50 text-[#1E40AF]" },
-    { value: "2M+", label: "Bottles Sold", icon: Droplet, bg: "bg-emerald-50 text-emerald-600" },
-    { value: "98%", label: "Customer Satisfaction", icon: Smile, bg: "bg-purple-50 text-purple-600" },
-    { value: "500+", label: "Retail Partners", icon: Store, bg: "bg-amber-50 text-amber-600" },
+    { title: "Every Indian Home", label: "Built for Local Needs", icon: Users, bg: "bg-blue-50 text-[#1E40AF]" },
+    { title: "Plant-Based", label: "Non-Toxic Formulas", icon: Droplet, bg: "bg-emerald-50 text-emerald-600" },
+    { title: "Dermatologically", label: "Tested & Gentle", icon: Smile, bg: "bg-purple-50 text-purple-600" },
+    { title: "Made in India", label: "Crafted with Care", icon: Store, bg: "bg-amber-50 text-amber-600" },
   ];
+
+  /*
+  ===================================================================
+  Option B — Configurable Numeric Stats Array (Post-Launch Alternate)
+  Import LAUNCH_NUMERIC_STATS from '@/data/stats' when real data is ready:
+  ===================================================================
+  const statsNumeric = [
+    { value: LAUNCH_NUMERIC_STATS.happyCustomers, label: "Happy Customers", icon: Users, bg: "bg-blue-50 text-[#1E40AF]" },
+    { value: LAUNCH_NUMERIC_STATS.bottlesSold, label: "Bottles Sold", icon: Droplet, bg: "bg-emerald-50 text-emerald-600" },
+    { value: LAUNCH_NUMERIC_STATS.customerSatisfaction, label: "Customer Satisfaction", icon: Smile, bg: "bg-purple-50 text-purple-600" },
+    { value: LAUNCH_NUMERIC_STATS.retailPartners, label: "Retail Partners", icon: Store, bg: "bg-amber-50 text-amber-600" },
+  ];
+  */
 
   const teamMembers = [
     {
@@ -131,8 +145,8 @@ export default function AboutPage() {
                   <IconC size={22} />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#0B2545]">{st.value}</div>
-                  <div className="text-xs font-semibold text-slate-500">{st.label}</div>
+                  <div className="text-sm font-extrabold text-[#0B2545] leading-tight">{st.title}</div>
+                  <div className="text-xs font-medium text-slate-500 mt-0.5">{st.label}</div>
                 </div>
               </div>
             );

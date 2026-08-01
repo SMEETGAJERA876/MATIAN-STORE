@@ -271,8 +271,8 @@ export default function CategoriesPage() {
               <Award size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Trusted by Thousands</h4>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">50,000+ happy customers trust Matrin.</p>
+              <h4 className="text-xs font-extrabold text-[#0B2545]">Built for Every Home</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Formulated for Indian household needs.</p>
             </div>
           </div>
 
