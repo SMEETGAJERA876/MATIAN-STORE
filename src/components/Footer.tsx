@@ -84,9 +84,9 @@ export default function Footer() {
 
           {/* Quick Links Column */}
           <div className="space-y-4">
-            <h4 className="text-[#ffffff] text-sm sm:text-base font-extrabold uppercase tracking-wider flex items-center gap-2 pb-1.5 border-b border-white/20">
+            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
               <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
-              <span style={{ color: "#ffffff" }}>Quick Links</span>
+              <span style={{ color: "#ffffff", fontWeight: 900 }}>Quick Links</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/" className="hover:text-white transition">Home</Link></li>
@@ -100,9 +100,9 @@ export default function Footer() {
 
           {/* Categories Column */}
           <div className="space-y-4">
-            <h4 className="text-[#ffffff] text-sm sm:text-base font-extrabold uppercase tracking-wider flex items-center gap-2 pb-1.5 border-b border-white/20">
+            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
               <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
-              <span style={{ color: "#ffffff" }}>Categories</span>
+              <span style={{ color: "#ffffff", fontWeight: 900 }}>Categories</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/products?category=Laundry Care" className="hover:text-white transition">Detergent</Link></li>
@@ -116,9 +116,9 @@ export default function Footer() {
 
           {/* Customer Support Column */}
           <div className="space-y-4">
-            <h4 className="text-[#ffffff] text-sm sm:text-base font-extrabold uppercase tracking-wider flex items-center gap-2 pb-1.5 border-b border-white/20">
+            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
               <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
-              <span style={{ color: "#ffffff" }}>Customer Support</span>
+              <span style={{ color: "#ffffff", fontWeight: 900 }}>Customer Support</span>
             </h4>
             <ul className="space-y-2 text-slate-300 font-medium">
               <li><Link href="/contact" className="hover:text-white transition">Help Center</Link></li>
@@ -132,9 +132,9 @@ export default function Footer() {
 
           {/* Contact Us Column */}
           <div className="space-y-4">
-            <h4 className="text-[#ffffff] text-sm sm:text-base font-extrabold uppercase tracking-wider flex items-center gap-2 pb-1.5 border-b border-white/20">
+            <h4 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b-2 border-white/30">
               <span className="h-2 w-2 rounded-full bg-[#22D3EE] shrink-0"></span>
-              <span style={{ color: "#ffffff" }}>Contact Us</span>
+              <span style={{ color: "#ffffff", fontWeight: 900 }}>Contact Us</span>
             </h4>
             <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
               <div className="font-bold text-white text-sm">+91 98765 43210</div>
