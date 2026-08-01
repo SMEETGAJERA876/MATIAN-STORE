@@ -113,11 +113,17 @@ export default function ProductDetailsPage() {
                     onClick={() => setActiveImageIndex(idx)}
                     className={`h-16 w-16 rounded-2xl transition overflow-hidden shadow-2xs ${
                       activeImageIndex === idx
-                        ? "ring-2 ring-[#1E40AF]"
-                        : "opacity-80 hover:opacity-100"
+                        ? "ring-2 ring-[#1E40AF] opacity-100"
+                        : "opacity-75 hover:opacity-100"
                     }`}
                   >
-                    <ProductImage src={img} alt="Thumbnail" fitMode="cover" roundedClassName="rounded-2xl" />
+                    <ProductImage
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      fitMode="contain"
+                      paddingClassName="p-1"
+                      roundedClassName="rounded-2xl"
+                    />
                   </button>
                 ))}
                 {gallery.length > 4 && (
@@ -131,26 +137,30 @@ export default function ProductDetailsPage() {
               </div>
 
               {/* Hero Main Image Box */}
-              <div className="relative flex-1 aspect-square rounded-3xl overflow-hidden shadow-sm">
+              <div className="relative flex-1 aspect-square rounded-3xl overflow-hidden shadow-sm bg-white border border-slate-100">
                 
                 {/* Prev & Next Arrows */}
                 <button
                   onClick={handlePrevImage}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:bg-white hover:scale-105 transition"
+                  aria-label="Previous Image"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={20} />
                 </button>
                 <button
                   onClick={handleNextImage}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 shadow-md flex items-center justify-center text-slate-700 hover:bg-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:bg-white hover:scale-105 transition"
+                  aria-label="Next Image"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={20} />
                 </button>
 
                 <ProductImage
+                  key={activeImageIndex}
                   src={gallery[activeImageIndex] || product.image}
                   alt={product.name}
-                  fitMode="cover"
+                  fitMode="contain"
+                  paddingClassName="p-4"
                   roundedClassName="rounded-3xl"
                 />
               </div>

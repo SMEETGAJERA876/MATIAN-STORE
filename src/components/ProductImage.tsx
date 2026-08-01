@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ProductImageProps {
   src: string;
@@ -31,6 +31,11 @@ export default function ProductImage({
 }: ProductImageProps) {
   const [imgSrc, setImgSrc] = useState<string>(src || fallbackSrc);
   const [hasError, setHasError] = useState<boolean>(!src);
+
+  useEffect(() => {
+    setImgSrc(src || fallbackSrc);
+    setHasError(!src);
+  }, [src, fallbackSrc]);
 
   const handleError = () => {
     if (!hasError) {
