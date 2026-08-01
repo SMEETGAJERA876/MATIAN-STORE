@@ -9,6 +9,7 @@ import AddProductModal from "@/components/admin/AddProductModal";
 import InvoiceModal from "@/components/InvoiceModal";
 import { OrderInvoice } from "@/types/order";
 import { useRouter } from "next/navigation";
+import { MOCK_DASHBOARD_STATS, MOCK_RECENT_ORDERS, MOCK_SALES_ANALYTICS } from "@/data/mockDashboardData";
 import {
   BarChart3,
   Package,
@@ -55,7 +56,7 @@ import Link from "next/link";
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isAdmin, openAuthModal } = useAuth();
-  const { products, salesAnalytics, deleteProduct, toggleStock } = useProductStore();
+  const { products, orders, salesAnalytics, deleteProduct, toggleStock } = useProductStore();
 
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -243,6 +244,12 @@ export default function AdminDashboardPage() {
       {/* Main Content View (Exact Match with Reference Image 1) */}
       <div className="flex-1 flex flex-col min-w-0">
         
+        {/* Persistent Sample Data Warning Indicator Banner */}
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-amber-900 text-xs font-bold flex items-center justify-center gap-2">
+          <AlertTriangle size={14} className="text-amber-600 shrink-0" />
+          <span>Showing sample metrics — connect your order database to see live production analytics.</span>
+        </div>
+
         {/* Top Header Bar (Exact Match with Image 1) */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between shadow-2xs">
           {/* Search bar & Hamburger */}
@@ -501,34 +508,64 @@ export default function AdminDashboardPage() {
 
             </div>
 
-            {/* Recent Orders List Card (Col 4 - Exact Match with Image 1) */}
+            {/* Recent Orders List Card */}
             <div className="lg:col-span-4 rounded-3xl bg-white p-6 border border-slate-100 shadow-2xs space-y-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h3 className="font-extrabold text-[#0B2545] text-base">
-                    Recent Orders
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-[#0B2545] text-base">
+                      Recent Orders
+                    </h3>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md ${
+                      orders.length > 0
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                    }`}>
+                      {orders.length > 0 ? `${orders.length} Live Orders` : "Sample Data"}
+                    </span>
+                  </div>
                   <button onClick={() => setActiveNav("Orders")} className="text-xs font-bold text-[#1E40AF] hover:underline">
                     View All
                   </button>
                 </div>
 
                 <div className="divide-y divide-slate-100">
-                  {recentOrders.map((ord) => (
-                    <div key={ord.id} className="py-3 flex items-center justify-between text-xs">
-                      <div>
-                        <div className="font-extrabold text-[#0B2545]">{ord.id}</div>
-                        <div className="text-slate-500 font-medium text-[11px]">{ord.customer} • <span className="text-slate-400">{ord.time}</span></div>
-                      </div>
+                  {orders.length > 0 ? (
+                    orders.slice(0, 5).map((ord) => (
+                      <div key={ord.id} className="py-3 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="font-extrabold text-[#0B2545] flex items-center gap-1.5">
+                            <span>{ord.invoiceNumber}</span>
+                            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-xs">LIVE</span>
+                          </div>
+                          <div className="text-slate-500 font-medium text-[11px]">{ord.customer.fullName} • <span className="text-slate-400">{ord.orderDate}</span></div>
+                        </div>
 
-                      <div className="text-right">
-                        <div className="font-bold text-slate-800">{ord.amount}</div>
-                        <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold mt-0.5 ${ord.statusBg}`}>
-                          {ord.status}
-                        </span>
+                        <div className="text-right">
+                          <div className="font-bold text-slate-800">₹{ord.totalAmount}</div>
+                          <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold mt-0.5 bg-emerald-100 text-emerald-800">
+                            {ord.paymentStatus}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    MOCK_RECENT_ORDERS.map((ord) => (
+                      <div key={ord.id} className="py-3 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="font-extrabold text-[#0B2545]">{ord.orderId}</div>
+                          <div className="text-slate-500 font-medium text-[11px]">{ord.customerName} • <span className="text-slate-400">{ord.date}</span></div>
+                        </div>
+
+                        <div className="text-right">
+                          <div className="font-bold text-slate-800">₹{ord.totalAmount}</div>
+                          <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold mt-0.5 bg-blue-100 text-blue-800">
+                            {ord.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

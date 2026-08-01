@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product, ProductCategory } from "@/types/product";
 import { Coupon } from "@/types/coupon";
 import { SalesAnalytics } from "@/types/sales";
+import { OrderInvoice } from "@/types/order";
 import { products as defaultProducts } from "@/data/products";
 import toast from "react-hot-toast";
 
@@ -86,6 +87,7 @@ const initialSalesData: SalesAnalytics = {
 export interface ProductStoreContextType {
   products: Product[];
   coupons: Coupon[];
+  orders: OrderInvoice[];
   salesAnalytics: SalesAnalytics;
   addProduct: (newProd: Omit<Product, "id" | "rating" | "reviewCount" | "reviews">) => Product;
   updateProduct: (id: number, updatedFields: Partial<Product>) => void;
@@ -96,6 +98,7 @@ export interface ProductStoreContextType {
   toggleCouponStatus: (id: string) => void;
   validateCoupon: (code: string, cartTotal: number) => { valid: boolean; coupon?: Coupon; message: string };
   applyCouponRedemption: (code: string) => void;
+  addOrder: (invoice: OrderInvoice) => void;
 }
 
 const ProductStoreContext = createContext<ProductStoreContextType | undefined>(undefined);
@@ -103,6 +106,7 @@ const ProductStoreContext = createContext<ProductStoreContextType | undefined>(u
 export function ProductStoreProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>(defaultProducts);
   const [coupons, setCoupons] = useState<Coupon[]>(initialCoupons);
+  const [orders, setOrders] = useState<OrderInvoice[]>([]);
   const [salesAnalytics] = useState<SalesAnalytics>(initialSalesData);
 
   // Load stored state from localStorage on mount
@@ -116,10 +120,24 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
       if (storedCoupons) {
         setCoupons(JSON.parse(storedCoupons));
       }
+      const storedOrders = localStorage.getItem("matrin_placed_orders");
+      if (storedOrders) {
+        setOrders(JSON.parse(storedOrders));
+      }
     } catch (e) {
       console.error("Failed to load store data from localStorage:", e);
     }
   }, []);
+
+  const addOrder = (newInvoice: OrderInvoice) => {
+    const updated = [newInvoice, ...orders];
+    setOrders(updated);
+    try {
+      localStorage.setItem("matrin_placed_orders", JSON.stringify(updated));
+    } catch (e) {
+      console.error("Failed to save placed order:", e);
+    }
+  };
 
   const saveProducts = (updatedProds: Product[]) => {
     setProducts(updatedProds);
@@ -250,6 +268,7 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
       value={{
         products,
         coupons,
+        orders,
         salesAnalytics,
         addProduct,
         updateProduct,
@@ -260,6 +279,7 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
         toggleCouponStatus,
         validateCoupon,
         applyCouponRedemption,
+        addOrder,
       }}
     >
       {children}

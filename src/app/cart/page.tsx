@@ -45,7 +45,7 @@ export default function CartPage() {
     total,
   } = useCart();
 
-  const { validateCoupon, applyCouponRedemption } = useProductStore();
+  const { validateCoupon, applyCouponRedemption, addOrder } = useProductStore();
   const { user } = useAuth();
 
   // Coupon state
@@ -139,6 +139,7 @@ export default function CartPage() {
       transactionId: `TXN-${Math.floor(10000000 + Math.random() * 90000000)}`,
     };
 
+    addOrder(newInvoice);
     setGeneratedInvoice(newInvoice);
     setCheckoutStep("success");
     toast.success("Order Placed Successfully! Tax Invoice Generated.", { icon: "🎉", duration: 5000 });
