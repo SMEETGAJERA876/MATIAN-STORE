@@ -202,8 +202,14 @@ export default function Navbar() {
                                 onClick={() => setActiveDropdown(null)}
                                 className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
                               >
-                                <div className="h-9 w-9 shrink-0">
-                                  <ProductImage src={product.image} alt={product.name} fitMode="cover" roundedClassName="rounded-md" />
+                                <div className="h-11 w-11 shrink-0">
+                                  <ProductImage
+                                    src={product.image}
+                                    alt={product.name}
+                                    fitMode="contain"
+                                    paddingClassName="p-1"
+                                    roundedClassName="rounded-xl"
+                                  />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="text-xs font-extrabold text-slate-800 truncate">{product.name}</div>
@@ -247,10 +253,16 @@ export default function Navbar() {
                         key={item.id}
                         href={`/products/${item.id}`}
                         onClick={() => setSearchQuery("")}
-                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
+                        className="flex items-center gap-3.5 p-2 rounded-xl hover:bg-slate-50 transition"
                       >
-                        <div className="h-10 w-10 shrink-0">
-                          <ProductImage src={item.image} alt={item.name} fitMode="cover" roundedClassName="rounded-md" />
+                        <div className="h-12 w-12 shrink-0">
+                          <ProductImage
+                            src={item.image}
+                            alt={item.name}
+                            fitMode="contain"
+                            paddingClassName="p-1"
+                            roundedClassName="rounded-xl"
+                          />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                           <div className="text-xs font-extrabold text-slate-900 truncate">{item.name}</div>

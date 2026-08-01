@@ -14,6 +14,7 @@ interface ProductImageProps {
   fallbackSrc?: string;
   roundedClassName?: string;
   showHoverEffect?: boolean;
+  paddingClassName?: string;
 }
 
 export default function ProductImage({
@@ -26,6 +27,7 @@ export default function ProductImage({
   fallbackSrc = "/images/matrin-logo-clean.png",
   roundedClassName = "rounded-2xl",
   showHoverEffect = true,
+  paddingClassName = "p-3",
 }: ProductImageProps) {
   const [imgSrc, setImgSrc] = useState<string>(src || fallbackSrc);
   const [hasError, setHasError] = useState<boolean>(!src);
@@ -39,7 +41,7 @@ export default function ProductImage({
 
   return (
     <div
-      className={`relative ${aspectRatio} w-full overflow-hidden ${roundedClassName} bg-[#F4F6FB] p-3 flex items-center justify-center border border-slate-100/80 shadow-2xs ${className}`}
+      className={`relative ${aspectRatio} w-full overflow-hidden ${roundedClassName} bg-[#F4F6FB] ${paddingClassName} flex items-center justify-center border border-slate-100/80 shadow-2xs ${className}`}
     >
       <img
         src={imgSrc}
