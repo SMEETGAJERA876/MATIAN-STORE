@@ -151,16 +151,6 @@ export default function AuthModal() {
                   </div>
                 </div>
 
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    onClick={closeAuthModal}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-amber-600 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-amber-700 transition"
-                  >
-                    <Sparkles size={16} /> Open Admin Dashboard
-                  </Link>
-                )}
-
                 {/* My Orders & Tax Invoices Section */}
                 <div className="text-left space-y-3 pt-2">
                   <div className="flex items-center justify-between">

@@ -36,7 +36,6 @@ export default function Navbar() {
     { name: "Offers", href: "/products?sale=true" },
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
-    ...(isAdmin ? [{ name: "Admin 👑", href: "/admin" }] : []),
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {

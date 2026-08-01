@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductImage from "@/components/ProductImage";
 import { useAuth } from "@/context/AuthContext";
 import { useProductStore } from "@/context/ProductStoreContext";
@@ -8,6 +8,7 @@ import CouponManager from "@/components/admin/CouponManager";
 import AddProductModal from "@/components/admin/AddProductModal";
 import InvoiceModal from "@/components/InvoiceModal";
 import { OrderInvoice } from "@/types/order";
+import { useRouter } from "next/navigation";
 import {
   BarChart3,
   Package,
@@ -52,7 +53,8 @@ import {
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
-  const { user, isAdmin, openAuthModal, quickAdminLogin } = useAuth();
+  const router = useRouter();
+  const { user, isAdmin, openAuthModal } = useAuth();
   const { products, salesAnalytics, deleteProduct, toggleStock } = useProductStore();
 
   const [activeNav, setActiveNav] = useState("Dashboard");
@@ -64,7 +66,14 @@ export default function AdminDashboardPage() {
   const [adminSelectedInvoice, setAdminSelectedInvoice] = useState<OrderInvoice | null>(null);
   const [isAdminInvoiceOpen, setIsAdminInvoiceOpen] = useState(false);
 
-  // Access check
+  // Enforce strict route guard redirecting unauthenticated users to Sign In page
+  useEffect(() => {
+    if (!isAdmin) {
+      router.push("/login");
+    }
+  }, [isAdmin, router]);
+
+  // Access check fallback screen while redirecting
   if (!isAdmin) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center bg-[#F8FAFC]">
@@ -73,21 +82,15 @@ export default function AdminDashboardPage() {
         </div>
         <h2 className="text-3xl font-extrabold text-[#0B2545]">Admin Access Required</h2>
         <p className="mt-2 text-sm text-slate-500 max-w-md font-medium">
-          Please log in with Admin privileges to access the Matrin Store Management Panel.
+          Redirecting to Sign In page...
         </p>
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <button
-            onClick={quickAdminLogin}
-            className="rounded-2xl bg-[#1E40AF] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg hover:bg-[#1a3899] transition flex items-center justify-center gap-2"
+            onClick={() => router.push("/login")}
+            className="rounded-2xl bg-[#1E40AF] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg hover:bg-[#1a3899] transition"
           >
-            👑 Log In as Demo Admin
-          </button>
-          <button
-            onClick={() => openAuthModal("login")}
-            className="rounded-2xl border border-slate-300 bg-white px-6 py-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
-          >
-            Custom Sign In
+            Go to Sign In
           </button>
         </div>
       </div>
