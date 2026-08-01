@@ -99,9 +99,7 @@ export default function Navbar() {
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Main Navbar Header (Compact 54px Height Matching Reference) */}
+      </div>      {/* Main Navbar Header (Desktop Height 64px Sweet Spot) */}
       <nav
         className={`transition-all duration-300 ${
           scrolled
@@ -109,41 +107,41 @@ export default function Navbar() {
             : "bg-white border-b border-slate-100"
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 h-12 sm:h-14 lg:h-[54px]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4 lg:py-4 h-14 sm:h-16 lg:h-[64px]">
           
-          {/* Brand Logo */}
+          {/* Brand Logo (42px Max-Height Fitting 40px-50px Spec) */}
           <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
             <img
               src="/images/matrin-logo-clean.webp"
               alt="MATRIN"
-              className="h-6 sm:h-7 lg:h-7 max-h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-103"
+              className="h-8 sm:h-9 lg:h-[42px] max-h-[42px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
             />
           </Link>
 
-          {/* Desktop Navigation Links (Compact Editorial Spacing) */}
-          <div className="hidden items-center gap-4 lg:gap-5 lg:flex">
+          {/* Desktop Navigation Links (15px Font-Size Spec) */}
+          <div className="hidden items-center gap-5 lg:gap-7 lg:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isDropdownActive = activeDropdown === link.name;
               return (
                 <div
                   key={link.name}
-                  className="relative group py-2"
+                  className="relative group py-3"
                   onMouseEnter={() => link.hasDropdown && setActiveDropdown(link.name)}
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   <Link
                     href={link.href}
-                    className={`text-xs sm:text-[13px] font-semibold tracking-tight transition-colors flex items-center gap-1 py-1 relative ${
+                    className={`text-sm sm:text-[15px] lg:text-[15px] font-semibold tracking-wide transition-colors flex items-center gap-1 py-1 relative ${
                       isActive
                         ? "text-[#1E40AF]"
-                        : "text-slate-700 hover:text-[#1E40AF]"
+                        : "text-slate-800 hover:text-[#1E40AF]"
                     }`}
                   >
                     <span>{link.name}</span>
                     {link.hasDropdown && (
                       <ChevronDown
-                        size={13}
+                        size={14}
                         className={`text-slate-400 transition-transform duration-200 ${
                           isDropdownActive ? "rotate-180 text-[#1E40AF]" : ""
                         }`}
@@ -162,15 +160,15 @@ export default function Navbar() {
                     <AnimatePresence>
                       {isDropdownActive && (
                         <motion.div
-                          initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full left-0 w-[500px] rounded-2xl bg-white p-4 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-4"
+                          className="absolute top-full left-0 w-[520px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
                         >
                           {/* Left Column: Categories List */}
-                          <div className="col-span-6 space-y-1.5 border-r border-slate-100 pr-3">
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-2">
+                          <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
+                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3">
                               Shop by Category
                             </div>
                             {categoryItems.map((cat) => (
@@ -178,7 +176,7 @@ export default function Navbar() {
                                 key={cat.name}
                                 href={cat.href}
                                 onClick={() => setActiveDropdown(null)}
-                                className="block p-1.5 rounded-xl hover:bg-blue-50/80 transition group/item"
+                                className="block p-2 rounded-xl hover:bg-blue-50/80 transition group/item"
                               >
                                 <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#1E40AF] flex items-center justify-between">
                                   <span>{cat.name}</span>
@@ -190,8 +188,8 @@ export default function Navbar() {
                           </div>
 
                           {/* Right Column: Featured Products Preview */}
-                          <div className="col-span-6 space-y-1.5">
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-2 flex items-center justify-between">
+                          <div className="col-span-6 space-y-2">
+                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3 flex items-center justify-between">
                               <span>Bestsellers</span>
                               <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#1E40AF] font-bold">
                                 View All →
@@ -202,15 +200,15 @@ export default function Navbar() {
                                 key={product.id}
                                 href={`/products/${product.id}`}
                                 onClick={() => setActiveDropdown(null)}
-                                className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-50 transition"
+                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
                               >
-                                <div className="h-9 w-9 shrink-0">
+                                <div className="h-10 w-10 shrink-0">
                                   <ProductImage
                                     src={product.image}
                                     alt={product.name}
                                     fitMode="contain"
-                                    paddingClassName="p-0.5"
-                                    roundedClassName="rounded-lg"
+                                    paddingClassName="p-1"
+                                    roundedClassName="rounded-xl"
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -230,7 +228,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Action Bar (Tablet & Desktop) */}
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-4 md:flex">
             
             {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
@@ -239,14 +237,14 @@ export default function Navbar() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-36 lg:w-48 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-8 py-1 pl-7.5 pr-2.5 text-[11px] font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
+                className="w-44 lg:w-56 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-9 py-1.5 pl-8.5 pr-3 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#1E40AF] focus:outline-hidden transition-all shadow-2xs"
               />
-              <Search size={13} className="absolute left-2.5 text-slate-400 pointer-events-none" />
+              <Search size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
 
               {/* Autocomplete Dropdown */}
               {searchQuery.trim() && (
-                <div className="absolute top-10 right-0 w-80 rounded-2xl bg-white p-3 shadow-2xl border border-slate-100 z-50 space-y-2">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2">
+                <div className="absolute top-11 right-0 w-80 rounded-2xl bg-white p-3 shadow-2xl border border-slate-100 z-50 space-y-2">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">
                     Matches ({searchResults.length})
                   </div>
                   {searchResults.length > 0 ? (
@@ -284,21 +282,21 @@ export default function Navbar() {
             {/* Account Link */}
             <Link
               href="/login"
-              className="min-h-[36px] min-w-[36px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1 rounded-xl hover:bg-slate-50"
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
             >
               {user ? (
-                <div className="flex items-center gap-1.5 rounded-full bg-blue-50 py-0.5 px-2.5 border border-blue-200">
-                  <span className="h-4.5 w-4.5 rounded-full bg-[#1E40AF] text-white text-[9px] font-bold flex items-center justify-center">
+                <div className="flex items-center gap-1.5 rounded-full bg-blue-50 py-1 px-3 border border-blue-200">
+                  <span className="h-5 w-5 rounded-full bg-[#1E40AF] text-white text-[10px] font-bold flex items-center justify-center">
                     {user.name.charAt(0)}
                   </span>
-                  <span className="text-[11px] font-bold text-[#1E40AF] max-w-[80px] truncate">
+                  <span className="text-xs font-bold text-[#1E40AF] max-w-[90px] truncate">
                     {user.name.split(" ")[0]}
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 hover:text-[#1E40AF] transition">
-                  <User size={17} />
+                <div className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-[#1E40AF] transition">
+                  <User size={19} />
                   <span className="hidden sm:inline">Sign In</span>
                 </div>
               )}
@@ -307,11 +305,11 @@ export default function Navbar() {
             {/* Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[36px] min-w-[36px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1 rounded-xl hover:bg-slate-50"
+              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
-              <Heart size={18} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
-              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1E40AF] text-[8px] font-extrabold text-white shadow-2xs">
+              <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
             </button>
@@ -319,14 +317,15 @@ export default function Navbar() {
             {/* Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[36px] min-w-[36px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1 rounded-xl hover:bg-slate-50"
+              className="min-h-[40px] min-w-[40px] relative flex items-center justify-center text-slate-700 hover:text-[#1E40AF] transition-colors p-1.5 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
-              <ShoppingBag size={18} />
-              <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1E40AF] text-[8px] font-extrabold text-white shadow-2xs">
+              <ShoppingBag size={20} />
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1E40AF] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
             </button>
+
           </div>
 
           {/* Mobile Action Bar (<640px) */}
