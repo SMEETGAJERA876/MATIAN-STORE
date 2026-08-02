@@ -1,14 +1,12 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import CartDrawerModal from "./CartDrawerModal";
 
 export default function AppWrapper({ children }: { children: React.ReactNode }) {
   const { isLoaded } = useAuth();
-  const pathname = usePathname();
 
   if (!isLoaded) {
     return (
@@ -21,12 +19,6 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
         </div>
       </div>
     );
-  }
-
-  const isAdminRoute = pathname?.startsWith("/admin");
-
-  if (isAdminRoute) {
-    return <div className="flex-1 min-h-screen bg-[#0F172A]">{children}</div>;
   }
 
   return (

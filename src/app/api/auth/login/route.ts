@@ -75,7 +75,8 @@ export async function POST(req: Request) {
       };
       const token = generateToken(tokenPayload);
 
-      const redirectTo = "/";
+      const originalAdminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001";
+      const redirectTo = user.role === "ADMIN" ? originalAdminUrl : "/";
 
       const response = jsonResponse({
         success: true,
