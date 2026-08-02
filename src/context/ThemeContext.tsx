@@ -18,7 +18,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const savedTheme = (localStorage.getItem("matrin-theme") as Theme) || "light";
+    const savedTheme = (localStorage.getItem("matrin-theme") as Theme) || (localStorage.getItem("matrin_theme") as Theme) || "light";
     setThemeState(savedTheme);
     setMounted(true);
   }, []);

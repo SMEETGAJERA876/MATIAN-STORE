@@ -326,10 +326,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [activeModule, setActiveModule] = useState<ModuleType>('dashboard');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('matrin_theme') === 'dark';
+      const stored = localStorage.getItem('matrin-theme') || localStorage.getItem('matrin_theme');
+      if (stored) return stored === 'dark';
+      return document.documentElement.classList.contains('dark');
     }
-    return true;
+    return false;
   });
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>('');
@@ -369,11 +372,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   useEffect(() => {
+    const root = document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      localStorage.setItem('matrin-theme', 'dark');
       localStorage.setItem('matrin_theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      localStorage.setItem('matrin-theme', 'light');
       localStorage.setItem('matrin_theme', 'light');
     }
   }, [isDarkMode]);
