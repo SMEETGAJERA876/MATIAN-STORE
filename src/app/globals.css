@@ -21,6 +21,36 @@
   --color-[#0B2545]: #0B2545;
   --color-[#1E40AF]: #1E40AF;
   --color-[#F8FAFC]: #F8FAFC;
+  --color-matrin-primary: #0B3A75;
+  --color-matrin-primary-dark: #062247;
+  --color-matrin-secondary: #1F5EFF;
+  --color-matrin-secondary-hover: #0047FF;
+  --color-matrin-bg: #F6F8FC;
+  --color-matrin-darkbg: #0F172A;
+  --color-matrin-card: #FFFFFF;
+  --color-matrin-darkcard: #1E293B;
+  --color-matrin-text: #111827;
+  --color-matrin-darktext: #F9FAFB;
+  --color-matrin-gray: #6B7280;
+  --color-matrin-lightgray: #F3F4F6;
+  --color-matrin-border: #E5E7EB;
+  --color-matrin-darkborder: #334155;
+  --color-matrin-success: #22C55E;
+  --color-matrin-warning: #F59E0B;
+  --color-matrin-danger: #EF4444;
+}
+
+@utility shadow-soft {
+  box-shadow: 0 4px 20px -2px rgba(11, 58, 117, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+}
+@utility shadow-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+@utility shadow-elevated {
+  box-shadow: 0 10px 30px -5px rgba(11, 58, 117, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+}
+@utility shadow-glow {
+  box-shadow: 0 0 20px rgba(31, 94, 255, 0.25);
 }
 
 html {
