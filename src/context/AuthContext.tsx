@@ -80,9 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success(`Welcome back, ${data.user.name}!`, { icon: "👤" });
 
       if (typeof window !== "undefined") {
-        const originalAdminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001";
         if (data.user.role === "ADMIN" || data.user.email?.toLowerCase().includes("admin")) {
-          window.location.href = originalAdminUrl;
+          window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/";
         }
