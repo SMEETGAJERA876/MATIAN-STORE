@@ -32,6 +32,7 @@ export interface AuthContextType {
   closeAuthModal: () => void;
   login: (email: string, password: string) => Promise<boolean> | boolean;
   quickUserLogin: () => void;
+  quickAdminLogin?: () => void;
   register: (name: string, email: string, password: string) => Promise<boolean> | boolean;
   logout: () => void;
 }
