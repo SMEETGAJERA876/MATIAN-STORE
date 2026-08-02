@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       };
       const token = generateToken(tokenPayload);
 
-      const redirectTo = user.role === "ADMIN" ? "/admin/dashboard" : "/";
+      const redirectTo = "/";
 
       const response = jsonResponse({
         success: true,
@@ -140,7 +140,7 @@ export async function POST(req: Request) {
       name: memUser.name,
     };
     const token = generateToken(tokenPayload);
-    const redirectTo = memUser.role === "ADMIN" ? "/admin/dashboard" : "/";
+    const redirectTo = "/";
 
     const response = jsonResponse({
       success: true,

@@ -80,11 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success(`Welcome back, ${data.user.name}!`, { icon: "👤" });
 
       if (typeof window !== "undefined") {
-        if (data.user.role === "ADMIN") {
-          window.location.href = "/admin/dashboard";
-        } else {
-          window.location.href = "/";
-        }
+        window.location.href = "/";
       }
 
       return true;
@@ -122,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success(`Account created! Welcome, ${data.user.name}!`, { icon: "🚀" });
 
       if (typeof window !== "undefined") {
-        window.location.href = data.user.role === "ADMIN" ? "/admin/dashboard" : "/";
+        window.location.href = "/";
       }
 
       return true;

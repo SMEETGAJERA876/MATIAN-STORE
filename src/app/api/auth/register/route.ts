@@ -53,7 +53,7 @@ export async function POST(req: Request) {
           createdAt: newUser.createdAt,
         },
         token,
-        redirectTo: userRole === "ADMIN" ? "/admin/dashboard" : "/",
+        redirectTo: "/",
       });
 
       response.cookies.set(TOKEN_NAME, token, {
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
         createdAt: memoryUser.createdAt,
       },
       token,
-      redirectTo: userRole === "ADMIN" ? "/admin/dashboard" : "/",
+      redirectTo: "/",
     });
 
     response.cookies.set(TOKEN_NAME, token, {
