@@ -26,6 +26,6 @@ export interface OrderInvoice {
   taxAmount: number; // GST 18%
   totalAmount: number;
   paymentMethod: PaymentMethod;
-  paymentStatus: "Paid" | "Pending" | "Cash on Delivery";
+  paymentStatus: "Paid" | "Pending" | "Cash on Delivery" | "Shipped" | "Delivered" | "Cancelled" | "Refunded";
   transactionId?: string;
 }

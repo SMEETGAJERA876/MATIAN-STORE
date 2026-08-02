@@ -4,55 +4,49 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, AuthContextType } from "@/types/auth";
 import toast from "react-hot-toast";
 
-const initialUsers: User[] = [
-  {
-    id: "usr_admin",
-    name: "Matrin Admin",
-    email: "admin@matrin.com",
-    role: "admin",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-    createdAt: "2025-01-01",
-    totalOrders: 28,
-    totalSpent: 14500,
-    status: "Active",
-  },
-  {
-    id: "usr_demo",
-    name: "Standard User",
-    email: "user@matrin.com",
-    role: "user",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
-    createdAt: "2025-05-01",
-    totalOrders: 2,
-    totalSpent: 1290,
-    status: "Active",
-  },
-];
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>(initialUsers);
+  const [token, setToken] = useState<string | null>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Load user from localStorage on mount
+  // Initialize Auth & fetch session from API / localStorage
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem("matrin_auth_user");
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
+    async function loadAuth() {
+      try {
+        const savedToken = localStorage.getItem("matrin_jwt_token");
+        const savedUser = localStorage.getItem("matrin_auth_user");
+
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+        if (savedToken) {
+          setToken(savedToken);
+        }
+
+        // Verify session via API
+        const res = await fetch("/api/auth/me", {
+          headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setUser(data.user);
+            localStorage.setItem("matrin_auth_user", JSON.stringify(data.user));
+          }
+        }
+      } catch (e) {
+        console.error("Auth loading error:", e);
+      } finally {
+        setIsLoaded(true);
       }
-      const savedUsers = localStorage.getItem("matrin_all_users");
-      if (savedUsers) {
-        setAllUsers(JSON.parse(savedUsers));
-      }
-    } catch (e) {
-      console.error("Failed to parse stored auth user:", e);
-    } finally {
-      setIsLoaded(true);
     }
+
+    loadAuth();
   }, []);
 
   const openAuthModal = () => {
@@ -63,126 +57,96 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const closeAuthModal = () => {};
 
-  const login = (identifier: string, pass: string): boolean => {
-    const cleanId = identifier.trim().toLowerCase();
-    const cleanPass = pass.trim();
+  const login = async (identifier: string, pass: string): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: identifier, password: pass }),
+      });
 
-    // Check Admin login (username 'admin' or 'admin@matrin.com')
-    if (cleanId === "admin" || cleanId === "admin@matrin.com") {
-      if (cleanPass === "ADMIN!@#$" || cleanPass === "admin123" || cleanPass === "admin") {
-        const adminUser = allUsers.find(u => u.role === "admin") || initialUsers[0];
-        setUser(adminUser);
-        localStorage.setItem("matrin_auth_user", JSON.stringify(adminUser));
-        toast.success("Welcome back, Admin!", { icon: "👑" });
-        closeAuthModal();
-        if (typeof window !== "undefined") {
-          window.location.href = "/admin";
-        }
-        return true;
-      } else {
-        toast.error("Incorrect Admin Password.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Login failed.");
         return false;
       }
-    }
 
-    // Check Standard User login (username 'user' or 'user@matrin.com')
-    if (cleanId === "user" || cleanId === "user@matrin.com") {
-      if (cleanPass === "USER!@#$" || cleanPass === "user123" || cleanPass === "user") {
-        const standardUser = allUsers.find(u => u.email === "user@matrin.com") || initialUsers[1];
-        setUser(standardUser);
-        localStorage.setItem("matrin_auth_user", JSON.stringify(standardUser));
-        toast.success("Welcome back, User!", { icon: "👤" });
-        closeAuthModal();
-        if (typeof window !== "undefined") {
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("matrin_auth_user", JSON.stringify(data.user));
+      localStorage.setItem("matrin_jwt_token", data.token);
+
+      toast.success(`Welcome back, ${data.user.name}!`, { icon: "👤" });
+
+      if (typeof window !== "undefined") {
+        if (data.user.role === "ADMIN") {
+          window.location.href = "/admin/dashboard";
+        } else {
           window.location.href = "/";
         }
-        return true;
-      } else {
-        toast.error("Incorrect Password.");
-        return false;
       }
-    }
 
-    // Check other registered users
-    const matched = allUsers.find(u => u.email.toLowerCase() === cleanId || u.name.toLowerCase() === cleanId);
-    if (matched) {
-      setUser(matched);
-      localStorage.setItem("matrin_auth_user", JSON.stringify(matched));
-      toast.success(`Welcome back, ${matched.name}!`, { icon: "✨" });
-      closeAuthModal();
-      if (typeof window !== "undefined") {
-        window.location.href = "/";
-      }
       return true;
+    } catch (e: unknown) {
+      const error = e as Error;
+      toast.error(error.message || "An unexpected error occurred during login.");
+      return false;
     }
-
-    // Allow mock fallback login for custom email/user
-    const newUser: User = {
-      id: `usr_${Date.now()}`,
-      name: identifier.split("@")[0] || "Customer",
-      email: cleanId.includes("@") ? cleanId : `${cleanId}@matrin.com`,
-      role: "user",
-      createdAt: new Date().toISOString().split("T")[0],
-      totalOrders: 0,
-      totalSpent: 0,
-      status: "Active",
-    };
-    
-    setUser(newUser);
-    const updatedUsers = [...allUsers, newUser];
-    setAllUsers(updatedUsers);
-    localStorage.setItem("matrin_auth_user", JSON.stringify(newUser));
-    localStorage.setItem("matrin_all_users", JSON.stringify(updatedUsers));
-    toast.success(`Welcome to Matrin, ${newUser.name}!`, { icon: "🎉" });
-    closeAuthModal();
-    if (typeof window !== "undefined") {
-      window.location.href = "/";
-    }
-    return true;
-  };
-
-  const quickAdminLogin = () => {
-    login("admin", "ADMIN!@#$");
   };
 
   const quickUserLogin = () => {
-    login("user", "USER!@#$");
+    login("user@matrin.com", "User123!");
   };
 
-  const register = (name: string, email: string, pass: string): boolean => {
-    const cleanEmail = email.trim().toLowerCase();
-    if (allUsers.some(u => u.email.toLowerCase() === cleanEmail)) {
-      toast.error("An account with this email already exists!");
+  const register = async (name: string, email: string, pass: string): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password: pass }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Registration failed.");
+        return false;
+      }
+
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("matrin_auth_user", JSON.stringify(data.user));
+      localStorage.setItem("matrin_jwt_token", data.token);
+
+      toast.success(`Account created! Welcome, ${data.user.name}!`, { icon: "🚀" });
+
+      if (typeof window !== "undefined") {
+        window.location.href = data.user.role === "ADMIN" ? "/admin/dashboard" : "/";
+      }
+
+      return true;
+    } catch (e: unknown) {
+      const error = e as Error;
+      toast.error(error.message || "Registration failed.");
       return false;
     }
-
-    const newUser: User = {
-      id: `usr_${Date.now()}`,
-      name: name.trim(),
-      email: cleanEmail,
-      role: "user",
-      createdAt: new Date().toISOString().split("T")[0],
-      totalOrders: 0,
-      totalSpent: 0,
-      status: "Active",
-    };
-
-    const updatedUsers = [...allUsers, newUser];
-    setAllUsers(updatedUsers);
-    setUser(newUser);
-    localStorage.setItem("matrin_auth_user", JSON.stringify(newUser));
-    localStorage.setItem("matrin_all_users", JSON.stringify(updatedUsers));
-    toast.success(`Account created! Welcome, ${newUser.name}!`, { icon: "🚀" });
-    closeAuthModal();
-    return true;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("matrin_auth_user");
-    toast.success("Signed out successfully");
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Logout API error:", e);
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem("matrin_auth_user");
+      localStorage.removeItem("matrin_jwt_token");
+      toast.success("Signed out successfully");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
   };
 
@@ -190,14 +154,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        role: user?.role || null,
+        token,
         isAuthenticated: !!user,
-        isAdmin: user?.role === "admin",
         isLoaded,
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,
         login,
-        quickAdminLogin,
         quickUserLogin,
         register,
         logout,

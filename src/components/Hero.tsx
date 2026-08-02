@@ -1,98 +1,101 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Leaf, FlaskConical, Users, Shield, Award } from "lucide-react";
+import { ArrowRight, ShieldCheck, Leaf, Sparkles, Users, Shield, Award } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#EBF3FB] via-[#F3F8FC] to-white pt-10 pb-16 lg:pt-14 lg:pb-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
+    <section className="relative overflow-hidden bg-gradient-to-r from-[#EAF3FA] via-[#F1F7FC] to-[#E3F0FA] pt-8 pb-14 lg:pt-12 lg:pb-20 border-b border-blue-100/60">
+      
+      {/* Background Water Splash FX Accents */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200/40 via-transparent to-transparent pointer-events-none" />
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
           
-          {/* Left Column: Pure Cleaning. Better Living. */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Left Column: Text Content & CTAs */}
+          <div className="lg:col-span-5 space-y-6">
             
+            {/* Eyebrow Tag */}
+            <div className="inline-block">
+              <span className="text-xs sm:text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">
+                PREMIUM CLEANING PRODUCTS
+              </span>
+            </div>
+
             {/* Main Headline */}
             <div className="space-y-1">
-              <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#0B2545] leading-[1.08]">
-                Pure Plant Power.
+              <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0B2545] leading-[1.1]">
+                Clean Home.
               </h1>
-              <h1 className="font-sans text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#1E40AF] leading-[1.08]">
-                Unbeatable Clean.
+              <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0B2545] leading-[1.1]">
+                Better Living.
               </h1>
             </div>
 
             {/* Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 font-medium max-w-lg leading-relaxed">
-              Professional-strength cleaning backed by dermatologically tested plant science. Safe for kids, pets, and everyday living.
+            <p className="text-sm sm:text-base text-slate-600 font-medium max-w-md leading-relaxed">
+              Powerful cleaning. Gentle on hands. Safe for your home and the planet.
             </p>
 
-            {/* CTA Buttons Row */}
-            <div className="pt-2 flex flex-wrap items-center gap-4">
+            {/* CTA Button */}
+            <div className="pt-2">
               <Link
                 href="/products"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-[#1E40AF] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-[#1a3899] hover:shadow-blue-600/30 active:scale-95"
+                className="group inline-flex items-center gap-3 rounded-full bg-[#0B4B8A] px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-[#083A6D] hover:shadow-blue-900/30 active:scale-95"
               >
-                <span>Shop Lineup</span>
+                <span>SHOP COLLECTION</span>
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-              </Link>
-
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-[#1E40AF] px-7 py-3 text-sm font-bold text-[#1E40AF] transition-all hover:bg-[#1E40AF] hover:text-white active:scale-95"
-              >
-                <span>Explore Products</span>
               </Link>
             </div>
 
-            {/* Inline Feature Icons (3 Columns matching reference Image 4) */}
-            <div className="pt-6 border-t border-slate-200/70 grid grid-cols-3 gap-3 text-xs sm:text-sm font-bold text-slate-800">
+            {/* 3 Key Feature Icons Row */}
+            <div className="pt-6 grid grid-cols-3 gap-2 sm:gap-4 text-xs font-bold text-slate-800 border-t border-blue-200/50">
               <div className="flex items-center gap-2">
-                <div className="h-9 w-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
-                  <Leaf size={18} />
+                <div className="h-8 w-8 rounded-full bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
+                  <Leaf size={16} />
                 </div>
-                <span>Plant Based Ingredients</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-700">Plant Based</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="h-9 w-9 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
-                  <ShieldCheck size={18} />
+                <div className="h-8 w-8 rounded-full bg-blue-100/80 text-[#1E40AF] flex items-center justify-center shrink-0">
+                  <ShieldCheck size={16} />
                 </div>
-                <span>Tough on Stains Gentle on Hands</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-700">Safe for Families</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="h-9 w-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100 shadow-2xs">
-                  <FlaskConical size={18} />
+                <div className="h-8 w-8 rounded-full bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
+                  <Sparkles size={16} />
                 </div>
-                <span>No Harmful Chemicals</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-700">Powerful Cleaning</span>
               </div>
             </div>
 
           </div>
 
-          {/* Right Column: Matrin Product Lineup Showcase */}
-          <div className="lg:col-span-6 flex justify-center">
-            <div className="relative w-full max-w-xl p-2 rounded-3xl bg-gradient-to-b from-white/80 to-white/40 backdrop-blur-xs border border-white/60 shadow-2xl shadow-blue-900/10">
-              <div className="absolute top-4 right-4 z-10 rounded-full bg-white/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] shadow-xs border border-blue-100 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" /> Authentic Lineup
-              </div>
-              <motion.img
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                src="/images/matrin-hero-lineup.png"
-                alt="Matrin Cleaning Products Lineup"
-                className="h-auto w-full rounded-2xl object-cover drop-shadow-xl hover:scale-102 transition-transform duration-500"
+          {/* Right Column: Full Hero Product Showcase Photo */}
+          <div className="lg:col-span-7 flex justify-center lg:justify-end">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7 }}
+              className="relative w-full max-w-2xl overflow-hidden rounded-3xl shadow-xl shadow-blue-900/10 border border-white/80 bg-white/40 backdrop-blur-xs group"
+            >
+              <img
+                src="/images/matrin-full-hero-banner.png"
+                alt="MATRIN Clean Home Better Living Product Lineup"
+                className="w-full h-auto object-cover rounded-3xl transition-transform duration-700 group-hover:scale-102"
               />
-            </div>
+            </motion.div>
           </div>
 
         </div>
 
-        {/* Bottom Floating Brand Value Bar (Option A - Mission-Framed Value Statements) */}
-        <div className="mt-12 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+        {/* Bottom Floating Brand Value Bar */}
+        <div className="mt-10 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
           
           <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
             <div className="h-12 w-12 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
@@ -124,64 +127,7 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100 shadow-2xs">
-              <Award size={22} />
-            </div>
-            <div>
-              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Made in India</div>
-              <p className="text-xs font-medium text-slate-500 mt-0.5">Crafted with Care</p>
-            </div>
-          </div>
-
         </div>
-
-        {/* 
-        ===================================================================
-        Option B — Configurable Numeric Stats Block (Post-Launch Alternate)
-        Uncomment this block and import LAUNCH_NUMERIC_STATS from '@/data/stats' 
-        once real verified launch numbers are available.
-        ===================================================================
-        {/*
-        <div className="mt-12 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
-              <Users size={22} />
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.happyCustomers}</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Happy Customers</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
-              <Shield size={22} />
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.bottlesSold}</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Bottles Sold</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100 shadow-2xs">
-              <Leaf size={22} />
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.customerSatisfaction}</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Satisfaction</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100 shadow-2xs">
-              <Award size={22} />
-            </div>
-            <div>
-              <div className="text-2xl font-extrabold text-[#0B2545]">{LAUNCH_NUMERIC_STATS.retailPartners}</div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Retail Partners</p>
-            </div>
-          </div>
-        </div>
-        */}
 
       </div>
     </section>

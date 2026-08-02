@@ -1,10 +1,8 @@
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useAuth } from "@/context/AuthContext";
-import { useProductStore } from "@/context/ProductStoreContext";
 import Link from "next/link";
-import { Star, Heart, ShoppingBag, Eye, Trash2 } from "lucide-react";
+import { Star, Heart, ShoppingBag, Eye } from "lucide-react";
 import { useState } from "react";
 import QuickViewModal from "./QuickViewModal";
 
@@ -13,8 +11,6 @@ import ProductImage from "./ProductImage";
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { isAdmin } = useAuth();
-  const { deleteProduct } = useProductStore();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   const isFav = isInWishlist(product.id);
@@ -107,29 +103,14 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
 
-          {/* ADD TO CART button & ADMIN DELETE button */}
-          <div className="mt-4 flex items-center gap-2">
+          {/* ADD TO CART button */}
+          <div className="mt-4">
             <button
               onClick={() => addToCart(product)}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-extrabold uppercase tracking-wider text-white transition hover:bg-[#1a3899] active:scale-98 shadow-sm shadow-blue-600/20"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-extrabold uppercase tracking-wider text-white transition hover:bg-[#1a3899] active:scale-98 shadow-sm shadow-blue-600/20"
             >
               <ShoppingBag size={15} /> Add to Cart
             </button>
-
-            {isAdmin && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
-                    deleteProduct(product.id);
-                  }
-                }}
-                className="flex items-center justify-center gap-1 rounded-xl bg-rose-50 border border-rose-200 px-3 py-3.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition shadow-2xs"
-                title="Delete Product (Admin)"
-              >
-                <Trash2 size={16} />
-              </button>
-            )}
           </div>
         </div>
       </div>

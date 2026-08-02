@@ -3,16 +3,19 @@ export type ProductCategory =
   | "Laundry Care"
   | "Dish Care"
   | "Floor Care"
+  | "Toilet Care"
   | "Toilet & Bath"
-  | "Multi-Surface";
+  | "Multi-Surface"
+  | (string & {});
 
 export type ProductSpec = {
-  volume: string;
-  scent: string;
-  shelfLife: string;
-  origin: string;
-  formulation: string;
-  usageInstructions: string;
+  volume?: string;
+  scent?: string;
+  shelfLife?: string;
+  origin?: string;
+  formulation?: string;
+  usageInstructions?: string;
+  [key: string]: string | undefined;
 };
 
 export type Review = {
@@ -40,11 +43,12 @@ export type Product = {
   specifications: ProductSpec;
   inStock: boolean;
   stockCount: number;
+  sku?: string;
   isFeatured?: boolean;
   isBestSeller?: boolean;
   isNewArrival?: boolean;
   tags: string[];
-  reviews: Review[];
+  reviews?: Review[];
 };
 
 export type CartItem = {

@@ -87,11 +87,11 @@ export default function WhyChooseUs() {
 
           {/* Right Column: Lifestyle Product Image */}
           <div className="lg:col-span-4">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#EBF3FB] to-white aspect-4/3 lg:aspect-square border border-slate-200/80 shadow-md p-6 flex items-center justify-center">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#EBF3FB] to-white aspect-4/3 lg:aspect-square border border-slate-200/80 shadow-md p-2 flex items-center justify-center">
               <img
-                src="/images/matrin-hero-lineup.png"
-                alt="Matrin Product Lineup"
-                className="h-full w-auto object-contain transition-transform duration-700 hover:scale-105 drop-shadow-xl"
+                src="/images/matrin-lifestyle-clean.png"
+                alt="Matrin Product Lineup Lifestyle"
+                className="h-full w-full object-cover rounded-2xl transition-transform duration-700 hover:scale-105 drop-shadow-md"
               />
             </div>
           </div>

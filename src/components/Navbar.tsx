@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const { cartCount, openCartDrawer } = useCart();
   const { wishlistCount } = useWishlist();
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const { products } = useProductStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -109,17 +109,19 @@ export default function Navbar() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 lg:py-5 h-16 sm:h-20 lg:h-[84px]">
           
-          {/* Large Brand Logo (50px Max-Height Fitting Spacious 70-90px Nav Spec) */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
-            <img
-              src="/images/matrin-logo-clean.webp"
-              alt="MATRIN"
-              className="h-9 sm:h-11 lg:h-[50px] max-h-[52px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
-            />
-          </Link>
+          {/* Brand Logo & Desktop Navigation Wrapper */}
+          <div className="flex items-center gap-8 lg:gap-14">
+            {/* Large Brand Logo */}
+            <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
+              <img
+                src="/images/matrin-logo-clean.webp"
+                alt="MATRIN"
+                className="h-9 sm:h-11 lg:h-[50px] max-h-[52px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
+              />
+            </Link>
 
-          {/* Desktop Navigation Links (16px Bold Font Size Spec) */}
-          <div className="hidden items-center gap-6 lg:gap-8 lg:flex">
+            {/* Desktop Navigation Links */}
+            <div className="hidden items-center gap-6 lg:gap-8 lg:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isDropdownActive = activeDropdown === link.name;
@@ -226,9 +228,10 @@ export default function Navbar() {
               );
             })}
           </div>
+          </div>
 
           {/* Right Action Bar (Tablet & Desktop) */}
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-4 md:flex ml-6 lg:ml-12">
             
             {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">

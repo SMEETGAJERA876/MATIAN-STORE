@@ -66,11 +66,11 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             {/* Product Details Content */}
             <div className="flex flex-col justify-between p-6 md:p-8">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-800">
                   {product.category}
                 </span>
 
-                <h3 className="mt-1 font-serif text-2xl font-normal text-[#0A2E4E]">
+                <h3 className="mt-1 font-sans text-2xl font-extrabold text-[#0A2E4E]">
                   {product.name}
                 </h3>
 
@@ -78,14 +78,14 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 <div className="mt-2 flex items-center gap-2">
                   <div className="flex items-center text-amber-500">
                     <Star size={15} className="fill-amber-400 text-amber-400" />
-                    <span className="ml-1 font-bold text-xs text-slate-800">
+                    <span className="ml-1 font-bold text-xs text-slate-900">
                       {product.rating}
                     </span>
                   </div>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] font-semibold text-slate-700">
                     ({product.reviewCount} reviews)
                   </span>
-                  <span className="text-[11px] font-medium text-emerald-700 flex items-center gap-1 ml-auto">
+                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 ml-auto">
                     <Check size={12} /> In Stock
                   </span>
                 </div>
@@ -102,16 +102,16 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                   )}
                 </div>
 
-                <p className="mt-3 text-xs text-slate-600 font-light leading-relaxed line-clamp-3">
+                <p className="mt-3 text-xs sm:text-sm text-slate-900 font-medium leading-relaxed">
                   {product.description}
                 </p>
 
                 {/* Specs Pill */}
-                <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
-                  <span className="rounded-md bg-[#F5F1EB] px-3 py-1 font-medium text-slate-700 border border-[#EFEAE4]">
+                <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                  <span className="rounded-lg bg-slate-200/80 px-3 py-1.5 font-bold text-slate-900 border border-slate-300">
                     Volume: {product.specifications.volume}
                   </span>
-                  <span className="rounded-md bg-[#F5F1EB] px-3 py-1 font-medium text-slate-700 border border-[#EFEAE4]">
+                  <span className="rounded-lg bg-slate-200/80 px-3 py-1.5 font-bold text-slate-900 border border-slate-300">
                     Scent: {product.specifications.scent}
                   </span>
                 </div>

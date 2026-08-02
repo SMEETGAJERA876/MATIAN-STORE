@@ -24,7 +24,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function LoginScreen() {
-  const { login, quickAdminLogin, quickUserLogin, register } = useAuth();
+  const { login, quickUserLogin, register } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -203,23 +203,17 @@ export default function LoginScreen() {
                     <span className="text-[10px] text-slate-400 font-normal">Click for 1-Click Login</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 pt-0.5">
-                    <button
-                      type="button"
-                      onClick={quickAdminLogin}
-                      className="p-2 rounded-xl bg-white border border-amber-200 text-left hover:bg-amber-50 transition"
-                    >
-                      <span className="font-bold text-amber-950 text-xs block">👑 Admin</span>
-                      <span className="text-[10px] text-slate-500 font-mono">user: admin</span>
-                    </button>
-
+                  <div className="pt-0.5">
                     <button
                       type="button"
                       onClick={quickUserLogin}
-                      className="p-2 rounded-xl bg-white border border-blue-200 text-left hover:bg-blue-50 transition"
+                      className="w-full p-2.5 rounded-xl bg-white border border-blue-200 text-left hover:bg-blue-50 transition flex items-center justify-between"
                     >
-                      <span className="font-bold text-blue-950 text-xs block">👤 Customer</span>
-                      <span className="text-[10px] text-slate-500 font-mono">user: user</span>
+                      <div>
+                        <span className="font-bold text-blue-950 text-xs block">👤 Demo Customer Login</span>
+                        <span className="text-[10px] text-slate-500 font-mono">user: user@matrin.com</span>
+                      </div>
+                      <span className="text-xs font-bold text-[#1E40AF]">1-Click Login &rarr;</span>
                     </button>
                   </div>
                 </div>
@@ -301,7 +295,7 @@ export default function LoginScreen() {
                   <div className="flex justify-end pt-0.5">
                     <button
                       type="button"
-                      onClick={quickAdminLogin}
+                      onClick={() => toast("Password reset link will be sent to your email.", { icon: "📧" })}
                       className="text-xs font-semibold text-[#1E40AF] hover:underline"
                     >
                       Forgot Password?

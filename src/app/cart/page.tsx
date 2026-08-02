@@ -83,7 +83,7 @@ export default function CartPage() {
 
     const result = validateCoupon(couponInput, subtotal);
     if (!result.valid) {
-      toast.error(result.message);
+      toast.error(result.message || "Invalid coupon code.");
       return;
     }
 
