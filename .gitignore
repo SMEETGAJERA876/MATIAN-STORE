@@ -42,6 +42,7 @@ next-env.d.ts
 
 # legacy folders
 Admin Panel for admin/
+src/adminApp/Admin Panel for admin/
 
 # python
 __pycache__/
