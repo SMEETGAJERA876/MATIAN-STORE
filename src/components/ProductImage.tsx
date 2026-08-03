@@ -24,7 +24,7 @@ export default function ProductImage({
   imgClassName = "",
   aspectRatio = "aspect-square",
   fitMode = "cover",
-  fallbackSrc = "/images/matrin-logo-clean.png",
+  fallbackSrc = "/images/MATRIN_LOGO-removebg-preview.png",
   roundedClassName = "rounded-2xl",
   showHoverEffect = true,
   paddingClassName = "p-3",
