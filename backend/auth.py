@@ -2,20 +2,20 @@ import time
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import/jwt
+import jwt
 from pydantic import BaseModel
 
 SECRET_KEY = "MATRIN_SUPER_SECRET_JWT_KEY_2026"
 ALGORITHM = "HS256"
 
-app = FastAPI(-title="MATRIN API Backend", version="1.0.0")
+app = FastAPI(title="MATRIN API Backend", version="1.0.0")
 security = HTTPBearer()
 
-Class UserLoginSchema(BaseModel):
+class UserLoginSchema(BaseModel):
     email: str
     password: str
 
-Class UserResponseSchema(BaseModel):
+class UserResponseSchema(BaseModel):
     id: str
     name: str
     email: str
@@ -34,14 +34,14 @@ def create_jwt_token(user_id: str, email: str, role: str) -> str:
 
 def decode_jwt_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
     except jwt.PyJWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-3 Dependency 1: Verify current logged-in user
+# Dependency 1: Verify current logged-in user
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     token = credentials.credentials
     return decode_jwt_token(token)
@@ -53,6 +53,9 @@ def get_current_admin_user(current_user: dict = Depends(get_current_user)) -> di
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Forbidden: Admin privileges required to access this resource"
+        )
+    return current_user
+
 @app.post("/api/auth/login", response_model=UserResponseSchema)
 def login(data: UserLoginSchema):
     clean_email = data.email.strip().lower()
