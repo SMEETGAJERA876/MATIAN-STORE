@@ -87,32 +87,49 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Top Welcome & Actions Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-extrabold text-matrin-text dark:text-white tracking-tight">
-            Overview
-          </h2>
-          <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-            Real-time performance analytics for your MATRIN store.
+      {/* Top Welcome & FormulaLight Hero Banner */}
+      <div className="bg-gradient-to-r from-[#1D68E8] to-[#1657D9] rounded-3xl p-6 sm:p-8 text-white shadow-soft relative overflow-hidden flex flex-wrap items-center justify-between gap-6">
+        <div className="relative z-10 max-w-xl space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-extrabold uppercase tracking-widest text-white/90 border border-white/20">
+            <span>Every Step Towards Success</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            Rise With MATRIN Store
+          </h1>
+          <p className="text-sm text-blue-100 font-medium leading-relaxed">
+            Designed to boost your online business. Manage your catalog, track customer sales in real-time, and scale your brand effortlessly.
           </p>
+          <div className="pt-2 flex items-center gap-3">
+            <Button
+              variant="primary"
+              className="bg-white text-[#1D68E8] hover:bg-blue-50 font-extrabold border-none shadow-md"
+              icon={<Plus className="w-4 h-4 text-[#1D68E8]" />}
+              onClick={() => setAddProductModalOpen(true)}
+            >
+              Add New Product
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-white/10 text-white border-white/30 hover:bg-white/20 font-bold"
+              icon={<BarChart2 className="w-4 h-4 text-white" />}
+              onClick={() => setActiveModule('sales-reports')}
+            >
+              View Analytics
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            icon={<BarChart2 className="w-4 h-4" />}
-            onClick={() => setActiveModule('sales-reports')}
-          >
-            View Reports
-          </Button>
-          <Button
-            variant="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => setAddProductModalOpen(true)}
-          >
-            Add Product
-          </Button>
+        {/* Decorative Graphic Element */}
+        <div className="relative z-10 hidden lg:flex items-center justify-center p-4 bg-white/10 rounded-2xl border border-white/15 backdrop-blur-md">
+          <div className="text-center px-4 py-2">
+            <div className="text-3xl font-black text-white">{products.length}</div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-blue-100">Live Products</div>
+          </div>
+          <div className="h-10 w-px bg-white/20 mx-3" />
+          <div className="text-center px-4 py-2">
+            <div className="text-3xl font-black text-white">{formatCurrency(totalRevenue)}</div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-blue-100">Total Revenue</div>
+          </div>
         </div>
       </div>
 

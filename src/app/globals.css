@@ -2,55 +2,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F5F3FF;
-  --foreground: #1E1B4B;
-  --primary-blue: #6D28D9;
-  --navy: #1E1B4B;
+  --background: #F4F6F9;
+  --foreground: #0F172A;
+  --primary-blue: #1D68E8;
+  --navy: #0B2545;
   --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .dark {
-  --background: #0E0B19;
-  --foreground: #F5F3FF;
-  --primary-blue: #A78BFA;
-  --navy: #1A152E;
+  --background: #0B132B;
+  --foreground: #F8FAFC;
+  --primary-blue: #3B82F6;
+  --navy: #0F172A;
 }
 
 @theme {
   --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --color-[#0B2545]: #1E1B4B;
-  --color-[#1E40AF]: #6D28D9;
-  --color-[#F8FAFC]: #F5F3FF;
-  --color-matrin-primary: #5B21B6;
-  --color-matrin-primary-dark: #3C0764;
-  --color-matrin-secondary: #7C3AED;
-  --color-matrin-secondary-hover: #6D28D9;
-  --color-matrin-bg: #F5F3FF;
-  --color-matrin-darkbg: #0E0B19;
+  --color-[#0B2545]: #0B2545;
+  --color-[#1E40AF]: #1D68E8;
+  --color-[#F8FAFC]: #F4F6F9;
+  --color-matrin-primary: #1D68E8;
+  --color-matrin-primary-dark: #1657D9;
+  --color-matrin-secondary: #0066FF;
+  --color-matrin-secondary-hover: #0052CC;
+  --color-matrin-bg: #F4F6F9;
+  --color-matrin-darkbg: #0B132B;
   --color-matrin-card: #FFFFFF;
-  --color-matrin-darkcard: #1A152E;
-  --color-matrin-text: #1E1B4B;
-  --color-matrin-darktext: #F5F3FF;
-  --color-matrin-gray: #6B7280;
-  --color-matrin-lightgray: #EDE9FE;
-  --color-matrin-border: #E9D5FF;
-  --color-matrin-darkborder: #2E2652;
+  --color-matrin-darkcard: #152238;
+  --color-matrin-text: #0F172A;
+  --color-matrin-darktext: #F8FAFC;
+  --color-matrin-gray: #64748B;
+  --color-matrin-lightgray: #E2E8F0;
+  --color-matrin-border: #E2E8F0;
+  --color-matrin-darkborder: #233554;
   --color-matrin-success: #10B981;
   --color-matrin-warning: #F59E0B;
   --color-matrin-danger: #EF4444;
 }
 
 @utility shadow-soft {
-  box-shadow: 0 4px 20px -2px rgba(109, 40, 217, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px -2px rgba(29, 104, 232, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 @utility shadow-card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 @utility shadow-elevated {
-  box-shadow: 0 10px 30px -5px rgba(91, 33, 182, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 30px -5px rgba(29, 104, 232, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 @utility shadow-glow {
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 0 20px rgba(0, 102, 255, 0.35);
 }
 
 html {
@@ -80,20 +80,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 58, 237, 0.3);
+  background: rgba(29, 104, 232, 0.3);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 58, 237, 0.5);
+  background: rgba(29, 104, 232, 0.5);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.3);
+  background: rgba(59, 130, 246, 0.3);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.5);
+  background: rgba(59, 130, 246, 0.5);
 }
 
 /* Print Invoice Styles */
@@ -130,7 +130,7 @@ body {
 }
 
 .dark .glass-panel {
-  background: rgba(26, 21, 46, 0.85);
+  background: rgba(21, 34, 56, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
