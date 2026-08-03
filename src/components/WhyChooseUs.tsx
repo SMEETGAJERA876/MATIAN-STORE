@@ -32,30 +32,30 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="bg-white py-16 lg:py-20 border-y border-slate-100" id="why-matrin">
+    <section className="bg-white dark:bg-[#0B132B] py-16 lg:py-20 border-y border-slate-100 dark:border-slate-800" id="why-matrin">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-12 items-center">
           
           {/* Left Column: Headline & Description */}
           <div className="lg:col-span-4 space-y-4">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
               WHY CHOOSE MATRIN?
             </span>
 
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-[#0B2545] tracking-tight leading-tight">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-[#0B2545] dark:text-white tracking-tight leading-tight">
               Cleans Better.
               <br />
-              <span className="text-[#1E40AF]">Cares More.</span>
+              <span className="text-[#1E40AF] dark:text-blue-400">Cares More.</span>
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
               We create products that deliver exceptional cleaning while being safe for your family and the environment.
             </p>
 
             <div className="pt-2">
               <Link
                 href="/about"
-                className="group inline-flex items-center gap-2 rounded-full border-2 border-[#1E40AF] px-6 py-3 text-xs font-bold text-[#1E40AF] hover:bg-[#1E40AF] hover:text-white transition-all active:scale-95 shadow-2xs"
+                className="group inline-flex items-center gap-2 rounded-full border-2 border-[#1E40AF] dark:border-blue-400 px-6 py-3 text-xs font-bold text-[#1E40AF] dark:text-blue-400 hover:bg-[#1E40AF] dark:hover:bg-blue-500 hover:text-white transition-all active:scale-95 shadow-2xs"
               >
                 <span>LEARN MORE</span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -68,16 +68,16 @@ export default function WhyChooseUs() {
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="flex flex-col rounded-3xl bg-slate-50 p-5 border border-slate-200/60 shadow-2xs space-y-3"
+                className="flex flex-col rounded-3xl bg-slate-50 dark:bg-[#152238] p-5 border border-slate-200/60 dark:border-[#233554] shadow-2xs space-y-3"
               >
                 <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${feature.bg} border`}>
                   {feature.icon}
                 </div>
                 <div>
-                  <h3 className="text-xs font-extrabold text-[#0B2545]">
+                  <h3 className="text-xs font-extrabold text-[#0B2545] dark:text-white">
                     {feature.title}
                   </h3>
-                  <p className="mt-1 text-[11px] text-slate-500 font-medium leading-snug">
+                  <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-snug">
                     {feature.description}
                   </p>
                 </div>

@@ -11,9 +11,9 @@ export const MatrinLogo: React.FC<MatrinLogoProps> = ({
 }) => {
   if (variant === 'icon') {
     return (
-      <div className={`w-10 h-10 rounded-xl overflow-hidden bg-white p-1 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 ${className}`}>
+      <div className={`w-10 h-10 rounded-xl overflow-hidden bg-white p-1.5 flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700 ${className}`}>
         <img
-          src="/matrin-logo.png"
+          src="/images/matrin-logo-clean.png"
           alt="MATRIN Logo Icon"
           className="w-full h-full object-contain"
         />
@@ -21,13 +21,25 @@ export const MatrinLogo: React.FC<MatrinLogoProps> = ({
     );
   }
 
+  if (variant === 'white') {
+    return (
+      <div className={`flex items-center select-none ${className}`}>
+        <img
+          src="/images/matrin-logo-white.png"
+          alt="MATRIN Enterprise Logo White"
+          className="h-full w-auto object-contain max-h-9"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`flex items-center select-none ${className}`}>
-      <div className="h-full py-1 px-2 bg-white/95 dark:bg-white rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center">
+      <div className="h-full py-1 px-2 flex items-center justify-center">
         <img
-          src="/matrin-logo.png"
+          src="/images/matrin-logo-clean.png"
           alt="MATRIN Enterprise Logo"
-          className="h-full w-auto object-contain max-h-9"
+          className="h-full w-auto object-contain max-h-10"
         />
       </div>
     </div>

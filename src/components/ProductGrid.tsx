@@ -63,15 +63,15 @@ export default function ProductGrid({
   const sectionTitle = title || (isTeaser ? "Shop Our Most Loved Products" : "Our Products");
 
   return (
-    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 lg:py-16" id="products-grid">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 lg:py-16 rounded-3xl bg-slate-50/60 dark:bg-[#0E172A]/80 border border-slate-200/60 dark:border-slate-800/80 shadow-xs my-6" id="products-grid">
       
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
             {sectionBadge}
           </span>
-          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B2545] tracking-tight">
+          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B2545] dark:text-white tracking-tight">
             {sectionTitle}
           </h2>
         </div>
@@ -79,7 +79,7 @@ export default function ProductGrid({
         {isTeaser && (
           <Link
             href="/products"
-            className="group inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] hover:text-[#1a3899] transition"
+            className="group inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] dark:text-blue-400 hover:text-[#1a3899] dark:hover:text-blue-300 transition"
           >
             <span>VIEW ALL PRODUCTS ({products.length})</span>
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -117,7 +117,7 @@ export default function ProductGrid({
             <div className="mt-10 text-center">
               <Link
                 href="/products"
-                className="group inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 hover:bg-[#1a3899] transition"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#1E40AF] hover:bg-[#1a3899] dark:bg-blue-600 dark:hover:bg-blue-500 px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 transition"
               >
                 <span>View Full Catalog ({products.length} Products)</span>
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -126,11 +126,11 @@ export default function ProductGrid({
           )}
         </>
       ) : (
-        <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-12 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-500 shadow-2xs border border-slate-200/60">
+        <div className="rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-12 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-2xs border border-slate-200/60 dark:border-slate-700">
             <RefreshCw size={24} />
           </div>
-          <h3 className="mt-4 text-xl font-bold text-[#0B2545]">
+          <h3 className="mt-4 text-xl font-bold text-[#0B2545] dark:text-white">
             No products found matching &ldquo;{search}&rdquo;
           </h3>
           <p className="mt-2 text-xs text-slate-500 font-medium">

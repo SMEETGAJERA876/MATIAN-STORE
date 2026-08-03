@@ -58,9 +58,9 @@ export default function Footer() {
           <div className="lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <img
-                src="/images/matrin-logo-clean.webp"
+                src="/images/matrin-logo-white.png"
                 alt="MATRIN"
-                className="h-10 w-auto object-contain brightness-0 invert"
+                className="h-10 sm:h-12 w-auto object-contain"
               />
             </Link>
             <p className="text-xs text-slate-300 font-medium leading-relaxed">

@@ -17,7 +17,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-slate-100 p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white dark:bg-[#152238] border border-slate-100 dark:border-[#233554] p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         
         {/* Product Image Container */}
         <div className="relative w-full">
@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
               e.preventDefault();
               toggleWishlist(product);
             }}
-            className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-xs text-slate-700 transition hover:bg-white hover:text-rose-500 shadow-sm"
+            className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs text-slate-700 dark:text-slate-200 transition hover:bg-white dark:hover:bg-slate-700 hover:text-rose-500 shadow-sm"
             title="Wishlist"
           >
             <Heart size={16} className={isFav ? "fill-rose-500 text-rose-500" : ""} />
@@ -54,7 +54,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="absolute inset-x-0 bottom-3 flex justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-3 z-10">
             <button
               onClick={() => setIsQuickViewOpen(true)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/95 backdrop-blur-xs py-2 text-[11px] font-bold text-[#1E40AF] shadow-md hover:bg-white transition"
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-2 text-[11px] font-bold text-[#1E40AF] dark:text-blue-300 shadow-md hover:bg-white dark:hover:bg-slate-700 transition"
             >
               <Eye size={14} /> Quick View
             </button>
@@ -64,23 +64,23 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Product Information */}
         <div className="mt-4 flex flex-1 flex-col justify-between">
           <div>
-            <div className="text-xs font-extrabold uppercase tracking-wider text-[#1E40AF]">
+            <div className="text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] dark:text-blue-400">
               {product.category}
             </div>
 
             <Link href={`/products/${product.id}`} className="block mt-1">
-              <h3 className="text-base font-extrabold text-[#0B2545] transition hover:text-[#1E40AF] line-clamp-1 leading-snug">
+              <h3 className="text-base font-extrabold text-[#0B2545] dark:text-white transition hover:text-[#1E40AF] dark:hover:text-blue-400 line-clamp-1 leading-snug">
                 {product.name}
               </h3>
             </Link>
 
             {/* Price Callout with Strikethrough Old Price */}
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-xl font-extrabold text-[#1E40AF]">
+              <span className="text-xl font-extrabold text-[#1E40AF] dark:text-blue-400">
                 ₹{product.price}
               </span>
               {product.oldPrice && (
-                <span className="text-xs font-bold text-slate-400 line-through">
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 line-through">
                   ₹{product.oldPrice}
                 </span>
               )}
@@ -93,11 +93,11 @@ export default function ProductCard({ product }: { product: Product }) {
                   <Star
                     key={i}
                     size={14}
-                    className={i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "text-slate-300"}
+                    className={i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"}
                   />
                 ))}
               </div>
-              <span className="text-xs text-slate-500 font-semibold">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                 ({product.reviewCount})
               </span>
             </div>
@@ -107,7 +107,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="mt-4">
             <button
               onClick={() => addToCart(product)}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-extrabold uppercase tracking-wider text-white transition hover:bg-[#1a3899] active:scale-98 shadow-sm shadow-blue-600/20"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] dark:bg-blue-600 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white transition hover:bg-[#1a3899] dark:hover:bg-blue-500 active:scale-98 shadow-sm shadow-blue-600/20"
             >
               <ShoppingBag size={15} /> Add to Cart
             </button>
