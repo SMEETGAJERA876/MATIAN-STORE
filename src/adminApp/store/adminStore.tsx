@@ -275,50 +275,19 @@ const initialCategories: Category[] = [
   { id: 'cat-6', name: 'Fragrance', image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop&q=80', parentCategory: 'Aromatherapy', productCount: 54, revenue: 31500, status: 'Active', topLevel: false, subcategories: ['Nebulizing Oils', 'Room Sprays', 'Reed Diffusers'] },
 ];
 
-const initialOrders: Order[] = [
-  { id: 'ord-1', orderNumber: '#MTR-8902', customerName: 'Jane Doe', customerEmail: 'jane.doe@example.com', customerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', date: '2023-10-24', totalAmount: 425.00, paymentStatus: 'Paid', shippingStatus: 'Delivered', courier: 'FedEx Express', trackingNumber: 'FDX-994102931', shippingAddress: '742 Evergreen Terrace, Springfield, OR 97477', items: [{ productId: 'prod-4', productName: 'MATRIN Pro Dishwashing Hub', sku: 'MTR-DISH-01', quantity: 1, unitPrice: 349.00, totalPrice: 349.00 }] },
-  { id: 'ord-2', orderNumber: '#MTR-8901', customerName: 'Bill Sanders', customerEmail: 'bill.sanders@techsolutions.io', customerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', date: '2023-10-25', totalAmount: 1120.00, paymentStatus: 'Pending', shippingStatus: 'Processing', courier: 'UPS Ground', trackingNumber: '1Z9999999999999999', shippingAddress: '100 Silicon Way, Suite 400, Austin, TX 78701', items: [{ productId: 'prod-1', productName: 'MATRIN X1 Robotic Vacuum & Mop', sku: 'MTR-X1-ROBOT', quantity: 1, unitPrice: 899.00, totalPrice: 899.00 }] },
-];
-
-const initialCustomers: Customer[] = [
-  { id: 'cust-1', name: 'Sarah Jenkins', email: 'sarah.j@enterprise.com', phone: '+1 (555) 234-5678', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', location: 'San Francisco, CA', totalOrders: 42, totalSpent: 4280.00, segment: 'VIP', status: 'Active', joinDate: '2022-01-15', lifetimeValue: 6500.00, recentPurchases: [{ id: 'p1', productName: 'MATRIN Ultra Vacuum', amount: 899.00, date: 'Oct 12, 2023' }] },
-  { id: 'cust-2', name: 'Marcus Chen', email: 'm.chen@techglobal.net', phone: '+1 (555) 876-5432', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', location: 'Austin, TX', totalOrders: 12, totalSpent: 1150.45, segment: 'Returning', status: 'Active', joinDate: '2022-06-20', lifetimeValue: 2400.00, recentPurchases: [{ id: 'p4', productName: 'MATRIN Pro Robot', amount: 899.00, date: 'Oct 25, 2023' }] },
-];
-
-const initialReviews: Review[] = [
-  { id: 'rev-1', customerName: 'Elena Rostova', customerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', productName: 'Luxe Purifier v4', rating: 5, reviewText: 'The air quality sensor is incredibly responsive!', date: 'Oct 24, 2023', status: 'Published', sentiment: 'Positive' },
-];
-
-const initialPromotions: Promotion[] = [
-  { id: 'promo-1', code: 'SUMMER2024', incentiveType: 'Percentage', value: '20%', usageProgress: 420, usageLimit: 500, expiryDate: 'Oct 30, 2024', status: 'Active', revenueAttributed: 28400 },
-];
-
-const initialInventory: InventoryItem[] = [
-  { id: 'inv-1', sku: 'MTR-X1-ROBOT', name: 'MATRIN X1 Robotic Vacuum', category: 'Floor Care', warehouse: 'San Jose Hub', currentStock: 14, reserved: 2, criticalLevel: 5, incoming: 50, outgoing: 12, status: 'Healthy', lastRestocked: '2023-10-15' },
-  { id: 'inv-2', sku: 'MTR-ECO-99', name: 'MATRIN Eco-Clean Refill Bundle', category: 'Eco-Series', warehouse: 'Austin Facility', currentStock: 3, reserved: 1, criticalLevel: 10, incoming: 200, outgoing: 45, status: 'Critical', lastRestocked: '2023-09-20' },
-  { id: 'inv-3', sku: 'MTR-FAB-88', name: 'MATRIN Fabric Care Sanitizer', category: 'Fabric Care', warehouse: 'San Jose Hub', currentStock: 342, reserved: 15, criticalLevel: 30, incoming: 100, outgoing: 80, status: 'Healthy', lastRestocked: '2023-10-01' },
-];
-
-const initialSuppliers: Supplier[] = [
-  { id: 'sup-1', name: 'MATRIN Robotics Division', contactPerson: 'Chen Wei', email: 'c.wei@robotics.matrin.com', phone: '+86 21 8892 1029', category: 'Automation & Hardware', leadTimeDays: 14, status: 'Active' },
-];
-
+const initialOrders: Order[] = [];
+const initialCustomers: Customer[] = [];
+const initialReviews: Review[] = [];
+const initialPromotions: Promotion[] = [];
+const initialInventory: InventoryItem[] = [];
+const initialSuppliers: Supplier[] = [];
 const initialEmployees: Employee[] = [
-  { id: 'emp-1', name: 'Alex Thompson', email: 'alex.t@matrin.com', role: 'Super Admin', department: 'Executive', status: 'Active', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', lastActive: 'Online now' },
+  { id: 'emp-1', name: 'MATRIN Admin', email: 'admin@matrin.com', role: 'Super Admin', department: 'Executive', status: 'Active', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', lastActive: 'Online now' },
 ];
+const initialSupportTickets: SupportTicket[] = [];
+const initialNotifications: NotificationItem[] = [];
+const initialStockLogs: StockMovementLog[] = [];
 
-const initialSupportTickets: SupportTicket[] = [
-  { id: 't-1', ticketNumber: '#TICK-9012', subject: 'Inquiry regarding MATRIN X1 firmware update 2.4', customerName: 'Sarah Jenkins', customerEmail: 'sarah.j@enterprise.com', priority: 'High', status: 'In Progress', category: 'Product Issue', createdAt: '2023-10-25 09:30' },
-];
-
-const initialNotifications: NotificationItem[] = [
-  { id: 'n-1', title: 'Low Stock Alert', description: 'MATRIN Eco-Clean Refill Bundle has dropped to 3 units.', timestamp: '10 minutes ago', type: 'inventory', read: false, priority: 'high' },
-];
-
-const initialStockLogs: StockMovementLog[] = [
-  { id: 'log-1', productName: 'MATRIN X1 Robotic Vacuum', sku: 'MTR-X1-ROBOT', quantityChange: 50, warehouse: 'San Jose Logistics Hub', reason: 'Restock Purchase Order PO-901', timestamp: '2 hours ago', performedBy: 'Alex Thompson (Super Admin)' },
-  { id: 'log-2', productName: 'MATRIN Eco-Clean Refill Bundle', sku: 'MTR-ECO-99', quantityChange: 100, warehouse: 'Austin Distribution Facility', reason: 'Supplier Shipment Received', timestamp: '5 hours ago', performedBy: 'Jessica Taylor (Manager)' },
-];
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 

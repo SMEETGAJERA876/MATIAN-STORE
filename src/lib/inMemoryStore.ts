@@ -78,91 +78,63 @@ export const initialCoupons = [
   },
 ];
 
-export const initialReviews = [
-  {
-    id: "rev_1",
-    productId: 1,
-    productName: "Ultra Liquid Detergent",
-    customerName: "Priya Sharma",
-    customerEmail: "priya@example.com",
-    rating: 5,
-    comment: "Excellent detergent! Clothes smell amazing and stain removal is top notch.",
-    date: "2026-06-15",
-    status: "Approved" as const,
-  },
-  {
-    id: "rev_2",
-    productId: 2,
-    productName: "Dishwash Lemon Gel",
-    customerName: "Rohan V.",
-    customerEmail: "rohan@example.com",
-    rating: 5,
-    comment: "Cuts tough grease instantly and gentle on hands.",
-    date: "2026-06-20",
-    status: "Approved" as const,
-  },
-];
+export const initialReviews: Array<{
+  id: string;
+  productId: number;
+  productName: string;
+  customerName: string;
+  customerEmail: string;
+  rating: number;
+  comment: string;
+  date: string;
+  status: "Approved" | "Pending" | "Flagged";
+}> = [];
 
-export const initialOrders = [
-  {
-    id: "ord_1001",
-    invoiceNumber: "INV-2026-1001",
-    orderDate: "2026-07-28",
-    dueDate: "2026-07-28",
-    customer: {
-      fullName: "Rohan Sharma",
-      email: "user@matrin.com",
-      phone: "9876543210",
-      addressLine: "Flat 402, Green Acres Apt, Bandra West",
-      city: "Mumbai",
-      state: "Maharashtra",
-      pincode: "400050",
-    },
-    items: [
-      {
-        product: {
-          id: 1,
-          name: "Ultra Liquid Detergent",
-          price: 299,
-          image: "/images/products/detergent.webp",
-          category: "Laundry Care",
-        },
-        quantity: 2,
-      },
-    ],
-    subtotal: 598,
-    discountAmount: 50,
-    appliedCoupon: "CLEAN50",
-    shippingFee: 0,
-    taxAmount: 107,
-    totalAmount: 548,
-    paymentMethod: "upi",
-    paymentStatus: "Paid" as const,
-    orderStatus: "Processing" as const,
-    transactionId: "TXN-88291034",
-  },
-];
+export const initialOrders: Array<{
+  id: string;
+  invoiceNumber: string;
+  orderDate: string;
+  dueDate: string;
+  customer: {
+    fullName: string;
+    email: string;
+    phone: string;
+    addressLine: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  items: Array<{
+    product: {
+      id: number;
+      name: string;
+      price: number;
+      image: string;
+      category: string;
+    };
+    quantity: number;
+  }>;
+  subtotal: number;
+  discountAmount: number;
+  appliedCoupon?: string;
+  shippingFee: number;
+  taxAmount: number;
+  totalAmount: number;
+  paymentMethod: string;
+  paymentStatus: "Paid" | "Pending" | "Failed";
+  orderStatus: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  transactionId?: string;
+}> = [];
 
-export const initialNotifications = [
-  {
-    id: "notif_1",
-    title: "New Order Received",
-    message: "Order #INV-2026-1001 was placed by Rohan Sharma (₹548)",
-    timestamp: new Date().toISOString(),
-    type: "order" as const,
-    isRead: false,
-    link: "/admin/orders",
-  },
-  {
-    id: "notif_2",
-    title: "Stock Alert",
-    message: "Floor Cleaner Rose stock is low (8 units remaining)",
-    timestamp: new Date().toISOString(),
-    type: "inventory" as const,
-    isRead: false,
-    link: "/admin/inventory",
-  },
-];
+export const initialNotifications: Array<{
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  type: "order" | "inventory" | "system" | "customer";
+  isRead: boolean;
+  link?: string;
+}> = [];
 
 export const initialSettings = {
   siteTitle: "MATRIN - Pure Cleaning, Better Living",
