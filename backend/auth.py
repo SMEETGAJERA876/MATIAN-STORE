@@ -5,18 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-
-# Compatible JWT import (supports both python-jose and PyJWT)
-try:
-    from jose import jwt, JWTError
-    ExpiredSignatureError = JWTError
-except ImportError:
-    try:
-        import jwt
-        JWTError = jwt.PyJWTError
-        ExpiredSignatureError = jwt.ExpiredSignatureError
-    except ImportError:
-        raise ImportError("Neither 'python-jose' nor 'PyJWT' is installed. Please run `pip install python-jose` or `pip install PyJWT`")
+from jose import jwt, JWTError
 
 SECRET_KEY = os.getenv("JWT_SECRET", "MATRIN_SUPER_SECRET_JWT_KEY_2026")
 ALGORITHM = "HS256"
@@ -63,10 +52,8 @@ def decode_jwt_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
