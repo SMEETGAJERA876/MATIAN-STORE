@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Plus,
   Package,
@@ -11,83 +11,74 @@ import {
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Modal } from '../ui/Modal';
 import { DataTable, Column } from '../ui/DataTable';
 import { useAdminStore } from '../../store/adminStore';
 import { Product } from '../../types';
-import { formatCurrency, generateSKU, generateBarcode } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 export const ProductsView: React.FC = () => {
   const {
     products,
-    addProduct,
     deleteProduct,
-    bulkDeleteProducts,
-    isAddProductModalOpen,
     setAddProductModalOpen,
     addToast,
   } = useAdminStore();
 
   const [activeTab, setActiveTab] = useState('all');
 
-  const catalogData = [
-    {
-      id: 'p-1',
-      image: 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=300&auto=format&fit=crop&q=80',
-      name: 'Liquid Detergent 5L',
-      brandSub: 'MATRIN Professional',
-      category: 'Fabric Care',
-      sku: 'MTRN-DET-502',
-      price: 24.99,
-      stock: 840,
-      stockPercentage: 84,
-      status: 'Active',
-    },
-    {
-      id: 'p-2',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&auto=format&fit=crop&q=80',
-      name: 'Eco-Glass Cleaner',
-      brandSub: 'MATRIN Home',
-      category: 'Surface Care',
-      sku: 'MTRN-GLS-101',
-      price: 12.50,
-      stock: 42,
-      stockPercentage: 15,
-      status: 'Active',
-      isLowStock: true,
-    },
-    {
-      id: 'p-3',
-      image: 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=300&auto=format&fit=crop&q=80',
-      name: 'Bio-Sponge Set',
-      brandSub: 'MATRIN Eco',
-      category: 'Utensils',
-      sku: 'MTRN-SPN-221',
-      price: 8.99,
-      stock: 0,
-      stockPercentage: 0,
-      status: 'Draft',
-    },
-    {
-      id: 'p-4',
-      image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=300&auto=format&fit=crop&q=80',
-      name: 'Surface Sanitizer',
-      brandSub: 'MATRIN Professional',
-      category: 'Surface Care',
-      sku: 'MTRN-SAN-904',
-      price: 34.00,
-      stock: 1200,
-      stockPercentage: 100,
-      status: 'Active',
-    },
-  ];
+  // Format product items for DataTable
+  const catalogData = useMemo(() => {
+    return products.map((p) => {
+      const stockVal = Number(p.stock) || 0;
+      const isLow = stockVal > 0 && stockVal <= 10;
+      const isOut = stockVal === 0;
+      const pct = Math.min(100, Math.max(0, Math.round((stockVal / 500) * 100)));
+
+      return {
+        id: p.id,
+        image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=300&auto=format&fit=crop&q=80',
+        name: p.name,
+        brandSub: p.brand || 'MATRIN Enterprise',
+        category: p.category || 'General',
+        sku: p.sku || `MTR-${p.id}`,
+        price: p.price,
+        stock: stockVal,
+        stockPercentage: pct,
+        status: isOut ? 'Out of Stock' : isLow ? 'Low Stock' : 'Active',
+        isLowStock: isLow || isOut,
+      };
+    });
+  }, [products]);
+
+  // Filter items based on selected tab
+  const filteredData = useMemo(() => {
+    if (activeTab === 'in_stock') {
+      return catalogData.filter((item) => item.status === 'Active');
+    }
+    if (activeTab === 'low_stock') {
+      return catalogData.filter((item) => item.status === 'Low Stock');
+    }
+    if (activeTab === 'out_of_stock') {
+      return catalogData.filter((item) => item.status === 'Out of Stock');
+    }
+    return catalogData;
+  }, [catalogData, activeTab]);
 
   const filterTabs = [
-    { id: 'all', label: 'All Products (128)', count: 128 },
-    { id: 'active', label: 'Active (112)', count: 112 },
-    { id: 'draft', label: 'Draft (12)', count: 12 },
-    { id: 'archived', label: 'Archived (4)', count: 4 },
+    { id: 'all', label: `All Products (${catalogData.length})`, count: catalogData.length },
+    { id: 'in_stock', label: `In Stock (${catalogData.filter(p => p.status === 'Active').length})`, count: catalogData.filter(p => p.status === 'Active').length },
+    { id: 'low_stock', label: `Low Stock (${catalogData.filter(p => p.status === 'Low Stock').length})`, count: catalogData.filter(p => p.status === 'Low Stock').length },
+    { id: 'out_of_stock', label: `Out of Stock (${catalogData.filter(p => p.status === 'Out of Stock').length})`, count: catalogData.filter(p => p.status === 'Out of Stock').length },
   ];
+
+  // Dynamic calculations for bottom metric cards
+  const totalStockValue = useMemo(() => {
+    return products.reduce((acc, p) => acc + p.price * (p.stock || 0), 0);
+  }, [products]);
+
+  const lowStockCount = useMemo(() => {
+    return products.filter((p) => (p.stock || 0) <= 10).length;
+  }, [products]);
 
   const columns: Column<typeof catalogData[0]>[] = [
     {
@@ -168,7 +159,7 @@ export const ProductsView: React.FC = () => {
       accessorKey: 'status',
       sortable: true,
       cell: (row) => (
-        <Badge variant={row.status === 'Active' ? 'success' : 'neutral'} dot>
+        <Badge variant={row.status === 'Active' ? 'success' : row.status === 'Low Stock' ? 'warning' : 'neutral'} dot>
           {row.status}
         </Badge>
       ),
@@ -178,14 +169,16 @@ export const ProductsView: React.FC = () => {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <button
-            onClick={() => addToast('info', `Editing ${row.name}`)}
-            className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 transition-colors"
+            onClick={() => addToast('info', `SKU Code: ${row.sku}`)}
+            title="View Barcode / SKU"
+            className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Barcode className="w-4 h-4" />
           </button>
           <button
-            onClick={() => addToast('warning', `Deleted ${row.name}`)}
-            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition-colors"
+            onClick={() => deleteProduct(row.id)}
+            title="Delete Product"
+            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -200,10 +193,10 @@ export const ProductsView: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-extrabold text-matrin-text dark:text-white tracking-tight">
-            Products
+            Products Catalog
           </h2>
           <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-            Manage your product catalog, pricing, and stock levels.
+            Manage your live MATRIN cleaning product inventory, pricing, and stock status.
           </p>
         </div>
 
@@ -211,7 +204,7 @@ export const ProductsView: React.FC = () => {
           <Button
             variant="outline"
             icon={<Download className="w-4 h-4" />}
-            onClick={() => addToast('success', 'Exported products catalog')}
+            onClick={() => addToast('success', 'Exported products catalog to CSV')}
           >
             Export
           </Button>
@@ -225,10 +218,10 @@ export const ProductsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Main DataTable (Matching Reference Image 3) */}
+      {/* Main DataTable */}
       <DataTable
         title="Products Catalog"
-        data={catalogData}
+        data={filteredData}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search product by title, SKU, or category..."
@@ -238,7 +231,7 @@ export const ProductsView: React.FC = () => {
         exportFilename="matrin_products_catalog"
       />
 
-      {/* Bottom Metrics Cards Row (Matching Reference Image 3) */}
+      {/* Bottom Metrics Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card flex items-center gap-4">
           <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950 text-matrin-primary">
@@ -246,7 +239,7 @@ export const ProductsView: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-bold text-matrin-gray">Total Stock Value</div>
-            <div className="text-xl font-extrabold text-matrin-text dark:text-white">$42,390.00</div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white">{formatCurrency(totalStockValue)}</div>
           </div>
         </div>
 
@@ -256,7 +249,7 @@ export const ProductsView: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-bold text-matrin-gray">Unique SKUs</div>
-            <div className="text-xl font-extrabold text-matrin-text dark:text-white">128</div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white">{products.length}</div>
           </div>
         </div>
 
@@ -266,7 +259,7 @@ export const ProductsView: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-bold text-matrin-gray">Low Stock Alerts</div>
-            <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400">12</div>
+            <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400">{lowStockCount}</div>
           </div>
         </div>
       </div>
