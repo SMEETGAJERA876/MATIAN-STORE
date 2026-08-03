@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --brand-primary: #0B3A75;
-    --brand-secondary: #1F5EFF;
-    --brand-bg: #F6F8FC;
+    --brand-primary: #5B21B6;
+    --brand-secondary: #7C3AED;
+    --brand-bg: #F5F3FF;
     --radius: 16px;
   }
 
   body {
-    background-color: #F6F8FC;
+    background-color: #F5F3FF;
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    color: #111827;
+    color: #1E1B4B;
     overflow-x: hidden;
   }
 
   .dark body,
   html.dark body {
-    background-color: #0F172A !important;
-    color: #F9FAFB !important;
+    background-color: #0E0B19 !important;
+    color: #F5F3FF !important;
   }
 }
 
@@ -35,21 +35,21 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.25);
+  background: rgba(124, 58, 237, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.4);
+  background: rgba(124, 58, 237, 0.4);
 }
 
 /* Dark mode scrollbar */
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(167, 139, 250, 0.25);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(167, 139, 250, 0.45);
 }
 
 /* Print CSS for Enterprise Invoices */
@@ -88,7 +88,7 @@
 }
 
 .dark .glass-panel {
-  background: rgba(30, 41, 59, 0.85);
+  background: rgba(26, 21, 46, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

@@ -2,55 +2,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0B2545;
-  --primary-blue: #1E40AF;
-  --navy: #0B2545;
+  --background: #F5F3FF;
+  --foreground: #1E1B4B;
+  --primary-blue: #6D28D9;
+  --navy: #1E1B4B;
   --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .dark {
-  --background: #070F1E;
-  --foreground: #F1F5F9;
-  --primary-blue: #3B82F6;
-  --navy: #0F172A;
+  --background: #0E0B19;
+  --foreground: #F5F3FF;
+  --primary-blue: #A78BFA;
+  --navy: #1A152E;
 }
 
 @theme {
   --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --color-[#0B2545]: #0B2545;
-  --color-[#1E40AF]: #1E40AF;
-  --color-[#F8FAFC]: #F8FAFC;
-  --color-matrin-primary: #0B3A75;
-  --color-matrin-primary-dark: #062247;
-  --color-matrin-secondary: #1F5EFF;
-  --color-matrin-secondary-hover: #0047FF;
-  --color-matrin-bg: #F6F8FC;
-  --color-matrin-darkbg: #0F172A;
+  --color-[#0B2545]: #1E1B4B;
+  --color-[#1E40AF]: #6D28D9;
+  --color-[#F8FAFC]: #F5F3FF;
+  --color-matrin-primary: #5B21B6;
+  --color-matrin-primary-dark: #3C0764;
+  --color-matrin-secondary: #7C3AED;
+  --color-matrin-secondary-hover: #6D28D9;
+  --color-matrin-bg: #F5F3FF;
+  --color-matrin-darkbg: #0E0B19;
   --color-matrin-card: #FFFFFF;
-  --color-matrin-darkcard: #1E293B;
-  --color-matrin-text: #111827;
-  --color-matrin-darktext: #F9FAFB;
+  --color-matrin-darkcard: #1A152E;
+  --color-matrin-text: #1E1B4B;
+  --color-matrin-darktext: #F5F3FF;
   --color-matrin-gray: #6B7280;
-  --color-matrin-lightgray: #F3F4F6;
-  --color-matrin-border: #E5E7EB;
-  --color-matrin-darkborder: #334155;
-  --color-matrin-success: #22C55E;
+  --color-matrin-lightgray: #EDE9FE;
+  --color-matrin-border: #E9D5FF;
+  --color-matrin-darkborder: #2E2652;
+  --color-matrin-success: #10B981;
   --color-matrin-warning: #F59E0B;
   --color-matrin-danger: #EF4444;
 }
 
 @utility shadow-soft {
-  box-shadow: 0 4px 20px -2px rgba(11, 58, 117, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px -2px rgba(109, 40, 217, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 @utility shadow-card {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 @utility shadow-elevated {
-  box-shadow: 0 10px 30px -5px rgba(11, 58, 117, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 10px 30px -5px rgba(91, 33, 182, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 @utility shadow-glow {
-  box-shadow: 0 0 20px rgba(31, 94, 255, 0.25);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
 }
 
 html {
@@ -80,20 +80,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(124, 58, 237, 0.3);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background: rgba(124, 58, 237, 0.5);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.6);
+  background: rgba(167, 139, 250, 0.3);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(71, 85, 105, 0.9);
+  background: rgba(167, 139, 250, 0.5);
 }
 
 /* Print Invoice Styles */
@@ -130,7 +130,7 @@ body {
 }
 
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(26, 21, 46, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
