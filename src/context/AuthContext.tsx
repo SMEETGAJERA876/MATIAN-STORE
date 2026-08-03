@@ -21,22 +21,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const savedUser = localStorage.getItem("matrin_auth_user");
 
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          try {
+            setUser(JSON.parse(savedUser));
+          } catch {
+            // ignore invalid JSON
+          }
         }
         if (savedToken) {
           setToken(savedToken);
         }
 
-        // Verify session via API
-        const res = await fetch("/api/auth/me", {
-          headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
-        });
+        // Set loaded immediately for initial render
+        setIsLoaded(true);
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.user) {
-            setUser(data.user);
-            localStorage.setItem("matrin_auth_user", JSON.stringify(data.user));
+        // Verify session via API if token exists
+        if (savedToken) {
+          const res = await fetch("/api/auth/me", {
+            headers: { Authorization: `Bearer ${savedToken}` },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              setUser(data.user);
+              localStorage.setItem("matrin_auth_user", JSON.stringify(data.user));
+            }
           }
         }
       } catch (e) {
