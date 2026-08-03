@@ -10,8 +10,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
-  // If login route, render standalone view
-  if (pathname === "/admin/login") {
+  // If login route, render standalone view without AdminProvider or RBAC blocking
+  if (pathname?.startsWith("/admin/login")) {
     return <>{children}</>;
   }
 
@@ -35,3 +35,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return <AdminProvider>{children}</AdminProvider>;
 }
+
