@@ -251,9 +251,6 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
   // Fetch initial data from APIs on load
   const refreshStoreData = async () => {
     try {
-      // Auto-seed API DB if empty
-      await fetch("/api/auth/seed", { method: "POST" });
-
       const [resProd, resCat, resOrd, resCpn, resRev, resSet, resNotif, resInv] = await Promise.all([
         fetch("/api/products"),
         fetch("/api/categories"),
