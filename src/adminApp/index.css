@@ -16,6 +16,12 @@
     color: #111827;
     overflow-x: hidden;
   }
+
+  .dark body,
+  html.dark body {
+    background-color: #0F172A !important;
+    color: #F9FAFB !important;
+  }
 }
 
 /* Custom Scrollbars */
