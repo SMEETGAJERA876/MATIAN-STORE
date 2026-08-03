@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Plus,
   Package,
@@ -7,86 +7,62 @@ import {
   Download,
   TrendingUp,
   AlertTriangle,
+  Sparkles,
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Modal } from '../ui/Modal';
 import { DataTable, Column } from '../ui/DataTable';
 import { useAdminStore } from '../../store/adminStore';
 import { Product } from '../../types';
-import { formatCurrency, generateSKU, generateBarcode } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 export const ProductsView: React.FC = () => {
   const {
     products,
-    addProduct,
     deleteProduct,
-    bulkDeleteProducts,
-    isAddProductModalOpen,
     setAddProductModalOpen,
     addToast,
   } = useAdminStore();
 
   const [activeTab, setActiveTab] = useState('all');
 
-  const catalogData = [
-    {
-      id: 'p-1',
-      image: 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=300&auto=format&fit=crop&q=80',
-      name: 'Liquid Detergent 5L',
-      brandSub: 'MATRIN Professional',
-      category: 'Fabric Care',
-      sku: 'MTRN-DET-502',
-      price: 24.99,
-      stock: 840,
-      stockPercentage: 84,
-      status: 'Active',
-    },
-    {
-      id: 'p-2',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&auto=format&fit=crop&q=80',
-      name: 'Eco-Glass Cleaner',
-      brandSub: 'MATRIN Home',
-      category: 'Surface Care',
-      sku: 'MTRN-GLS-101',
-      price: 12.50,
-      stock: 42,
-      stockPercentage: 15,
-      status: 'Active',
-      isLowStock: true,
-    },
-    {
-      id: 'p-3',
-      image: 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=300&auto=format&fit=crop&q=80',
-      name: 'Bio-Sponge Set',
-      brandSub: 'MATRIN Eco',
-      category: 'Utensils',
-      sku: 'MTRN-SPN-221',
-      price: 8.99,
-      stock: 0,
-      stockPercentage: 0,
-      status: 'Draft',
-    },
-    {
-      id: 'p-4',
-      image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=300&auto=format&fit=crop&q=80',
-      name: 'Surface Sanitizer',
-      brandSub: 'MATRIN Professional',
-      category: 'Surface Care',
-      sku: 'MTRN-SAN-904',
-      price: 34.00,
-      stock: 1200,
-      stockPercentage: 100,
-      status: 'Active',
-    },
-  ];
+  // Convert products store array to DataTable format
+  const catalogData = useMemo(() => {
+    return products.map((p) => {
+      const stockVal = p.stock ?? 50;
+      const isLow = stockVal <= 10;
+      return {
+        id: p.id,
+        image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=300&auto=format&fit=crop&q=80',
+        name: p.name,
+        brandSub: p.brand || p.vendor || 'MATRIN Enterprise',
+        category: p.category || 'General',
+        sku: p.sku || `SKU-${p.id}`,
+        price: p.price,
+        stock: stockVal,
+        stockPercentage: Math.min(100, Math.round((stockVal / 100) * 100)),
+        status: p.visibility === 'Published' ? 'Active' : 'Draft',
+        isLowStock: isLow,
+      };
+    });
+  }, [products]);
+
+  // Filter Data based on Active Tab
+  const filteredData = useMemo(() => {
+    if (activeTab === 'active') return catalogData.filter((p) => p.status === 'Active');
+    if (activeTab === 'low_stock') return catalogData.filter((p) => p.isLowStock);
+    if (activeTab === 'draft') return catalogData.filter((p) => p.status === 'Draft');
+    return catalogData;
+  }, [catalogData, activeTab]);
+
+  const activeCount = useMemo(() => catalogData.filter((p) => p.status === 'Active').length, [catalogData]);
+  const lowStockCount = useMemo(() => catalogData.filter((p) => p.isLowStock).length, [catalogData]);
 
   const filterTabs = [
-    { id: 'all', label: 'All Products (128)', count: 128 },
-    { id: 'active', label: 'Active (112)', count: 112 },
-    { id: 'draft', label: 'Draft (12)', count: 12 },
-    { id: 'archived', label: 'Archived (4)', count: 4 },
+    { id: 'all', label: `All Products (${catalogData.length})`, count: catalogData.length },
+    { id: 'active', label: `Active (${activeCount})`, count: activeCount },
+    { id: 'low_stock', label: `Low Stock (${lowStockCount})`, count: lowStockCount },
   ];
 
   const columns: Column<typeof catalogData[0]>[] = [
@@ -99,13 +75,13 @@ export const ProductsView: React.FC = () => {
           <img
             src={row.image}
             alt={row.name}
-            className="w-12 h-12 rounded-xl object-cover ring-1 ring-matrin-border"
+            className="w-11 h-11 rounded-xl object-cover ring-1 ring-matrin-border dark:ring-matrin-darkborder bg-slate-100 dark:bg-slate-800 shrink-0"
           />
           <div>
-            <div className="font-extrabold text-xs text-matrin-text dark:text-white">
+            <div className="font-extrabold text-xs text-matrin-text dark:text-white line-clamp-1">
               {row.name}
             </div>
-            <div className="text-[10px] text-matrin-gray">
+            <div className="text-[10px] text-matrin-gray dark:text-slate-400">
               {row.brandSub}
             </div>
           </div>
@@ -127,7 +103,7 @@ export const ProductsView: React.FC = () => {
       accessorKey: 'sku',
       sortable: true,
       cell: (row) => (
-        <span className="font-mono text-xs font-bold text-matrin-gray">
+        <span className="font-mono text-xs font-bold text-matrin-gray dark:text-slate-400">
           {row.sku}
         </span>
       ),
@@ -157,7 +133,7 @@ export const ProductsView: React.FC = () => {
           <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full ${row.isLowStock ? 'bg-rose-500' : 'bg-matrin-secondary'}`}
-              style={{ width: `${row.stockPercentage}%` }}
+              style={{ width: `${Math.max(5, row.stockPercentage)}%` }}
             />
           </div>
         </div>
@@ -176,16 +152,21 @@ export const ProductsView: React.FC = () => {
     {
       header: 'ACTIONS',
       cell: (row) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
-            onClick={() => addToast('info', `Editing ${row.name}`)}
-            className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 transition-colors"
+            onClick={() => addToast('info', `SKU: ${row.sku}`)}
+            className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="View Details"
           >
             <Barcode className="w-4 h-4" />
           </button>
           <button
-            onClick={() => addToast('warning', `Deleted ${row.name}`)}
-            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition-colors"
+            onClick={() => {
+              deleteProduct(row.id);
+              addToast('warning', `Deleted ${row.name}`);
+            }}
+            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Delete Product"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -194,16 +175,19 @@ export const ProductsView: React.FC = () => {
     },
   ];
 
+  // Dynamic stock calculations
+  const totalStockValue = useMemo(() => products.reduce((sum, p) => sum + (p.price * (p.stock || 1)), 0), [products]);
+
   return (
     <div className="space-y-6 pb-12">
       {/* Top Title Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-extrabold text-matrin-text dark:text-white tracking-tight">
-            Products
+            Products Catalog
           </h2>
           <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-            Manage your product catalog, pricing, and stock levels.
+            Manage your product catalog, pricing, and live inventory.
           </p>
         </div>
 
@@ -211,7 +195,7 @@ export const ProductsView: React.FC = () => {
           <Button
             variant="outline"
             icon={<Download className="w-4 h-4" />}
-            onClick={() => addToast('success', 'Exported products catalog')}
+            onClick={() => addToast('success', 'Exported products catalog to CSV')}
           >
             Export
           </Button>
@@ -225,10 +209,10 @@ export const ProductsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Main DataTable (Matching Reference Image 3) */}
+      {/* Main DataTable */}
       <DataTable
         title="Products Catalog"
-        data={catalogData}
+        data={filteredData}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search product by title, SKU, or category..."
@@ -238,35 +222,35 @@ export const ProductsView: React.FC = () => {
         exportFilename="matrin_products_catalog"
       />
 
-      {/* Bottom Metrics Cards Row (Matching Reference Image 3) */}
+      {/* Bottom Metrics Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950 text-matrin-primary">
+          <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950 text-matrin-primary dark:text-blue-400">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-xs font-bold text-matrin-gray">Total Stock Value</div>
-            <div className="text-xl font-extrabold text-matrin-text dark:text-white">$42,390.00</div>
+            <div className="text-xs font-bold text-matrin-gray dark:text-slate-400">Total Stock Value</div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white">{formatCurrency(totalStockValue)}</div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-xs font-bold text-matrin-gray">Unique SKUs</div>
-            <div className="text-xl font-extrabold text-matrin-text dark:text-white">128</div>
+            <div className="text-xs font-bold text-matrin-gray dark:text-slate-400">Unique SKUs</div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white">{products.length}</div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950 text-rose-600">
+          <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400">
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-xs font-bold text-matrin-gray">Low Stock Alerts</div>
-            <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400">12</div>
+            <div className="text-xs font-bold text-matrin-gray dark:text-slate-400">Low Stock Alerts</div>
+            <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400">{lowStockCount}</div>
           </div>
         </div>
       </div>
