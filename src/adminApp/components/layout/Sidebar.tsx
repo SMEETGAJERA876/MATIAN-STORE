@@ -31,7 +31,6 @@ import {
 import { useAdminStore } from '../../store/adminStore';
 import { ModuleType } from '../../types';
 import { MatrinLogo } from '../ui/MatrinLogo';
-import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
   id: ModuleType;
@@ -41,7 +40,6 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC = () => {
-  const { logout } = useAuth();
   const {
     activeModule,
     setActiveModule,
@@ -89,9 +87,8 @@ export const Sidebar: React.FC = () => {
     { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     addToast('info', 'Logged out of MATRIN Enterprise session');
-    await logout();
   };
 
   const renderNavGroup = (title: string, items: NavItem[]) => (

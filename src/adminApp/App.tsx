@@ -8,7 +8,6 @@ import { CustomerQuickViewDrawer } from './components/layout/CustomerQuickViewDr
 import { OrderInvoiceModal } from './components/layout/OrderInvoiceModal';
 import { AIChatDrawer } from './components/layout/AIChatDrawer';
 import { StockAdjustmentModal } from './components/layout/StockAdjustmentModal';
-import { AddProductModal } from './components/layout/AddProductModal';
 import { ToastsContainer } from './components/ui/Toast';
 
 import { DashboardView } from './components/modules/DashboardView';
@@ -100,7 +99,6 @@ export const MainLayout: React.FC<{ initialModule?: string }> = ({ initialModule
       <OrderInvoiceModal />
       <AIChatDrawer />
       <StockAdjustmentModal />
-      <AddProductModal />
       <ToastsContainer />
     </div>
   );
