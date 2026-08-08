@@ -30,17 +30,17 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="py-16 lg:py-20 bg-white dark:bg-[#0B132B]" id="faq-section">
+    <section className="py-16 lg:py-20 bg-[#F5FAFF] border-t border-[#DCE8F5]" id="faq-section">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         <div className="text-center mb-12 space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#0645B5] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#0645B5] bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 inline-block shadow-2xs">
             QUESTIONS & ANSWERS
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#102A5C] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#102A5C] tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-[#5F6B7A] dark:text-slate-400 font-medium">
+          <p className="text-xs sm:text-sm text-[#5F6B7A] font-medium">
             Have questions about our ingredients, delivery, or usage? We have answers.
           </p>
         </div>

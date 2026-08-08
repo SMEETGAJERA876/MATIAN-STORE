@@ -31,7 +31,7 @@ const reviews = [
 
 export default function CustomerReviews() {
   return (
-    <section className="bg-[#F5FAFF] dark:bg-[#FFFFFF] py-12 lg:py-16" id="reviews">
+    <section className="bg-[#F5FAFF] py-12 lg:py-16" id="reviews">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
         {/* Section Header matching reference image */}
@@ -46,7 +46,7 @@ export default function CustomerReviews() {
           {reviews.map((rev) => (
             <div
               key={rev.id}
-              className="flex items-start gap-4 rounded-2xl bg-white dark:bg-[#152238] p-5 border border-[#DCE8F5] dark:border-[#233554] shadow-xs"
+              className="flex items-start gap-4 rounded-2xl bg-white p-5 border border-[#DCE8F5] shadow-xs"
             >
               <img
                 src={rev.avatar}
@@ -55,7 +55,7 @@ export default function CustomerReviews() {
               />
 
               <div className="space-y-1">
-                <h3 className="font-bold text-[#102A5C] dark:text-white text-xs">
+                <h3 className="font-bold text-[#102A5C] text-xs">
                   {rev.name}
                 </h3>
 
