@@ -24,27 +24,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
     const root = document.documentElement;
-    let effectiveTheme: "light" | "dark" = "light";
-
-    if (theme === "system") {
-      effectiveTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    } else {
-      effectiveTheme = theme;
-    }
-
-    setResolvedTheme(effectiveTheme);
-
-    if (effectiveTheme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-
-    localStorage.setItem("matrin-theme", theme);
-  }, [theme, mounted]);
+    root.classList.remove("dark");
+    setResolvedTheme("light");
+    setThemeState("light");
+    localStorage.setItem("matrin-theme", "light");
+  }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

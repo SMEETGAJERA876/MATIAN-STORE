@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="flex min-h-screen flex-col bg-[#F5FAFF] dark:bg-[#FFFFFF] text-[#12213F] dark:text-[#12213F] antialiased selection:bg-[#0645B5] selection:text-white">
+      <body className="flex min-h-screen flex-col bg-[#F5FAFF] text-[#12213F] antialiased selection:bg-[#0645B5] selection:text-white">
         <ThemeProvider>
           <AuthProvider>
             <ProductStoreProvider>
