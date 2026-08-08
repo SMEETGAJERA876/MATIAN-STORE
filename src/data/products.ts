@@ -3,7 +3,7 @@ import { Product } from "@/types/product";
 export const products: Product[] = [
   {
     id: 1,
-    name: "Ultra Liquid Detergent",
+    name: "Ultra Liquid Detergent (1L)",
     category: "Laundry Care",
     price: 299,
     oldPrice: 399,
@@ -53,7 +53,7 @@ export const products: Product[] = [
   },
   {
     id: 2,
-    name: "Dishwash Lemon",
+    name: "Dishwash Lemon (750ml)",
     category: "Dish Care",
     price: 149,
     oldPrice: 199,
@@ -100,7 +100,7 @@ export const products: Product[] = [
   },
   {
     id: 3,
-    name: "Floor Shine Lavender",
+    name: "Floor Shine Lavender (1L)",
     category: "Floor Care",
     price: 199,
     oldPrice: 249,
@@ -146,7 +146,7 @@ export const products: Product[] = [
   },
   {
     id: 4,
-    name: "Toilet Fresh",
+    name: "Toilet Fresh (750ml)",
     category: "Toilet & Bath",
     price: 179,
     oldPrice: 220,
@@ -192,7 +192,7 @@ export const products: Product[] = [
   },
   {
     id: 5,
-    name: "Bathroom Shield",
+    name: "Bathroom Shield (500ml)",
     category: "Toilet & Bath",
     price: 249,
     oldPrice: 299,
@@ -238,7 +238,7 @@ export const products: Product[] = [
   },
   {
     id: 6,
-    name: "Glass Clear",
+    name: "Glass Clear (500ml)",
     category: "Multi-Surface",
     price: 159,
     oldPrice: 199,
@@ -284,7 +284,7 @@ export const products: Product[] = [
   },
   {
     id: 7,
-    name: "Fabric Soft Rose",
+    name: "Fabric Soft Rose (1L)",
     category: "Laundry Care",
     price: 259,
     oldPrice: 320,
@@ -330,7 +330,7 @@ export const products: Product[] = [
   },
   {
     id: 8,
-    name: "Ultra Concentrate",
+    name: "Ultra Concentrate (2L)",
     category: "Laundry Care",
     price: 499,
     oldPrice: 599,
