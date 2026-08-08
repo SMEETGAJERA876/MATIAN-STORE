@@ -56,11 +56,11 @@ export default function CartDrawerModal() {
             {/* Header */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center border border-blue-100 shadow-2xs">
+                <div className="h-9 w-9 rounded-full bg-blue-50 text-[#0645B5] flex items-center justify-center border border-blue-100 shadow-2xs">
                   <ShoppingBag size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-[#0B2545]">Shopping Cart</h2>
+                  <h2 className="text-base font-extrabold text-[#102A5C]">Shopping Cart</h2>
                   <p className="text-xs font-semibold text-slate-500">{cartCount} items in cart</p>
                 </div>
               </div>
@@ -76,16 +76,16 @@ export default function CartDrawerModal() {
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-3 border-b border-blue-100/60 text-xs">
               {amountNeededForFreeShipping > 0 ? (
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[#0B2545] font-bold text-[11px]">
+                  <div className="flex items-center justify-between text-[#102A5C] font-bold text-[11px]">
                     <div className="flex items-center gap-1.5">
-                      <Truck size={14} className="text-[#1E40AF]" />
+                      <Truck size={14} className="text-[#0645B5]" />
                       <span>Add ₹{amountNeededForFreeShipping} more for FREE Delivery!</span>
                     </div>
                     <span>{Math.round(freeShippingProgress)}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-200/80 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#1E40AF] rounded-full transition-all duration-300"
+                      className="h-full bg-[#0645B5] rounded-full transition-all duration-300"
                       style={{ width: `${freeShippingProgress}%` }}
                     />
                   </div>
@@ -106,7 +106,7 @@ export default function CartDrawerModal() {
                     <ShoppingBag size={32} />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-extrabold text-[#0B2545]">Your Cart is Empty</h3>
+                    <h3 className="text-base font-extrabold text-[#102A5C]">Your Cart is Empty</h3>
                     <p className="text-xs text-slate-500 font-medium max-w-xs">
                       Add eco-friendly cleaning items to your cart and they will show up here!
                     </p>
@@ -114,7 +114,7 @@ export default function CartDrawerModal() {
                   <Link
                     href="/products"
                     onClick={closeCartDrawer}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#0645B5] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
                   >
                     <span>Start Shopping</span>
                     <ArrowRight size={14} />
@@ -137,8 +137,8 @@ export default function CartDrawerModal() {
                       {/* Details & Price */}
                       <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{product.category}</div>
-                        <h4 className="text-xs font-extrabold text-[#0B2545] truncate">{product.name}</h4>
-                        <div className="text-xs font-extrabold text-[#1E40AF] mt-0.5">₹{product.price * quantity}</div>
+                        <h4 className="text-xs font-extrabold text-[#102A5C] truncate">{product.name}</h4>
+                        <div className="text-xs font-extrabold text-[#0645B5] mt-0.5">₹{product.price * quantity}</div>
 
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-2 mt-2">
@@ -188,9 +188,9 @@ export default function CartDrawerModal() {
                       {shippingFee === 0 ? "FREE" : `₹${shippingFee}`}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm font-extrabold text-[#0B2545] pt-2 border-t border-slate-200/80">
+                  <div className="flex justify-between text-sm font-extrabold text-[#102A5C] pt-2 border-t border-slate-200/80">
                     <span>Total</span>
-                    <span className="text-[#1E40AF]">₹{total}</span>
+                    <span className="text-[#0645B5]">₹{total}</span>
                   </div>
                 </div>
 
@@ -204,7 +204,7 @@ export default function CartDrawerModal() {
                   </Link>
                   <button
                     onClick={handleCheckoutClick}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#1E40AF] py-3 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0645B5] py-3 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
                   >
                     <span>Checkout</span>
                     <ArrowRight size={14} />

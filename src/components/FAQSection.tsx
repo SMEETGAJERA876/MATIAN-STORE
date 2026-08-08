@@ -34,13 +34,13 @@ export default function FAQSection() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         <div className="text-center mb-12 space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#0645B5] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
             QUESTIONS & ANSWERS
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B2545] dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#102A5C] dark:text-white tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <p className="text-xs sm:text-sm text-[#5F6B7A] dark:text-slate-400 font-medium">
             Have questions about our ingredients, delivery, or usage? We have answers.
           </p>
         </div>
@@ -51,17 +51,17 @@ export default function FAQSection() {
             return (
               <div
                 key={idx}
-                className="overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-[#152238] transition shadow-2xs"
+                className="overflow-hidden rounded-3xl border border-[#DCE8F5] dark:border-slate-800 bg-slate-50/60 dark:bg-[#152238] transition shadow-2xs"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="flex w-full items-center justify-between p-6 text-left text-base font-extrabold text-[#0B2545] dark:text-white hover:text-[#1E40AF] dark:hover:text-blue-400 transition"
+                  className="flex w-full items-center justify-between p-6 text-left text-base font-extrabold text-[#102A5C] dark:text-white hover:text-[#0645B5] dark:hover:text-blue-400 transition"
                 >
                   <span className="pr-4">{faq.question}</span>
                   <ChevronDown
                     size={20}
                     className={`shrink-0 transition-transform duration-300 text-slate-400 ${
-                      isOpen ? "rotate-180 text-[#1E40AF] dark:text-blue-400" : ""
+                      isOpen ? "rotate-180 text-[#0645B5] dark:text-blue-400" : ""
                     }`}
                   />
                 </button>
@@ -74,7 +74,7 @@ export default function FAQSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-6 pb-6 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300 font-medium border-t border-slate-200/60 dark:border-slate-800 pt-4">
+                      <div className="px-6 pb-6 text-xs sm:text-sm leading-relaxed text-[#5F6B7A] dark:text-slate-300 font-medium border-t border-[#DCE8F5] dark:border-slate-800 pt-4">
                         {faq.answer}
                       </div>
                     </motion.div>

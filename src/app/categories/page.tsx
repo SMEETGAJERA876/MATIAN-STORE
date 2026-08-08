@@ -125,19 +125,19 @@ export default function CategoriesPage() {
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#0B2545] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#102A5C] tracking-tight">
               All Categories
             </h1>
             <nav className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-500">
-              <Link href="/" className="hover:text-[#1E40AF]">Home</Link>
+              <Link href="/" className="hover:text-[#0645B5]">Home</Link>
               <ChevronRight size={14} className="text-slate-400" />
-              <span className="text-[#1E40AF]">Categories</span>
+              <span className="text-[#0645B5]">Categories</span>
             </nav>
           </div>
 
           {/* Right Callout Badge Box */}
           <div className="flex items-center gap-3 rounded-2xl bg-white/90 p-4 shadow-sm border border-slate-200/80 backdrop-blur-md max-w-md">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+            <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center shrink-0 border border-blue-100">
               <ShieldCheck size={20} />
             </div>
             <p className="text-xs font-semibold text-slate-700 leading-snug">
@@ -159,7 +159,7 @@ export default function CategoriesPage() {
                 onClick={() => setSelectedPill(pill.id)}
                 className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                   isSelected
-                    ? "bg-[#1E40AF] text-white shadow-md shadow-blue-600/20"
+                    ? "bg-[#0645B5] text-white shadow-md shadow-blue-600/20"
                     : "bg-slate-50 text-slate-700 hover:bg-slate-100"
                 }`}
               >
@@ -194,7 +194,7 @@ export default function CategoriesPage() {
               {/* Card Content Body */}
               <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-[#0B2545] group-hover:text-[#1E40AF] transition-colors">
+                  <h3 className="text-xl font-bold text-[#102A5C] group-hover:text-[#0645B5] transition-colors">
                     {cat.title}
                   </h3>
                   <p className="mt-2 text-xs text-slate-500 font-medium leading-relaxed">
@@ -209,7 +209,7 @@ export default function CategoriesPage() {
 
                   <Link
                     href={cat.href}
-                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#1E40AF] px-4 py-1.5 text-xs font-bold text-[#1E40AF] transition-all hover:bg-[#1E40AF] hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] px-4 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white"
                   >
                     <span>Shop Now</span>
                     <ArrowRight size={13} />
@@ -230,17 +230,17 @@ export default function CategoriesPage() {
               <Leaf size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Plant Based Ingredients</h4>
+              <h4 className="text-xs font-extrabold text-[#102A5C]">Plant Based Ingredients</h4>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Safe for your family and environment.</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+            <div className="h-10 w-10 rounded-2xl bg-blue-50 text-[#0645B5] flex items-center justify-center shrink-0 border border-blue-100">
               <ShieldCheck size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Safe & Gentle</h4>
+              <h4 className="text-xs font-extrabold text-[#102A5C]">Safe & Gentle</h4>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Tough on stains, gentle on hands.</p>
             </div>
           </div>
@@ -250,7 +250,7 @@ export default function CategoriesPage() {
               <FlaskConical size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Powerful Formula</h4>
+              <h4 className="text-xs font-extrabold text-[#102A5C]">Powerful Formula</h4>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Advanced cleaning with lasting freshness.</p>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function CategoriesPage() {
               <Sparkles size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Eco Friendly</h4>
+              <h4 className="text-xs font-extrabold text-[#102A5C]">Eco Friendly</h4>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Sustainable products for a better tomorrow.</p>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function CategoriesPage() {
               <Award size={20} />
             </div>
             <div>
-              <h4 className="text-xs font-extrabold text-[#0B2545]">Built for Every Home</h4>
+              <h4 className="text-xs font-extrabold text-[#102A5C]">Built for Every Home</h4>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Formulated for Indian household needs.</p>
             </div>
           </div>

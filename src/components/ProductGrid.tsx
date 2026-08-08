@@ -111,7 +111,7 @@ export default function ProductGrid({
             <div className="mt-10 text-center">
               <Link
                 href="/products"
-                className="group inline-flex items-center gap-2 rounded-full bg-[#1E40AF] hover:bg-[#1a3899] dark:bg-blue-600 dark:hover:bg-blue-500 px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 transition"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#0645B5] hover:bg-[#043694] dark:bg-blue-600 dark:hover:bg-blue-500 px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 transition"
               >
                 <span>View Full Catalog ({products.length} Products)</span>
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -124,7 +124,7 @@ export default function ProductGrid({
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-2xs border border-slate-200/60 dark:border-slate-700">
             <RefreshCw size={24} />
           </div>
-          <h3 className="mt-4 text-xl font-bold text-[#0B2545] dark:text-white">
+          <h3 className="mt-4 text-xl font-bold text-[#102A5C] dark:text-white">
             No products found matching &ldquo;{search}&rdquo;
           </h3>
           <p className="mt-2 text-xs text-slate-500 font-medium">
@@ -135,7 +135,7 @@ export default function ProductGrid({
               setSearch("");
               setCategory("All");
             }}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-[#1a3899] transition"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#0645B5] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-[#043694] transition"
           >
             Reset Filters
           </button>

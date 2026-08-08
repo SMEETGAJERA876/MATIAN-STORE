@@ -88,10 +88,10 @@ export default function LoginScreen() {
           {/* Hero Content & Product Lineup */}
           <div className="relative z-10 my-auto space-y-6 max-w-lg">
             <div className="space-y-2">
-              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#0B2545] leading-tight">
+              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#102A5C] leading-tight">
                 Pure Cleaning.
               </h1>
-              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#1E40AF] leading-tight">
+              <h1 className="font-sans text-4xl lg:text-5xl font-extrabold text-[#0645B5] leading-tight">
                 Better Living.
               </h1>
             </div>
@@ -122,7 +122,7 @@ export default function LoginScreen() {
               </div>
 
               <div className="flex flex-col items-center gap-1">
-                <div className="h-7 w-7 rounded-full bg-blue-50 text-[#1E40AF] flex items-center justify-center border border-blue-100">
+                <div className="h-7 w-7 rounded-full bg-blue-50 text-[#0645B5] flex items-center justify-center border border-blue-100">
                   <ShieldCheck size={14} />
                 </div>
                 <span>Safe for Your Family</span>
@@ -157,7 +157,7 @@ export default function LoginScreen() {
           <div className="flex items-center justify-end">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0645B5] transition"
             >
               <ArrowLeft size={14} />
               <span>Back to Home</span>
@@ -183,7 +183,7 @@ export default function LoginScreen() {
 
               {/* Title & Subtitle */}
               <div className="text-center space-y-1">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B2545] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#102A5C] tracking-tight">
                   {mode === "login" ? "Welcome Back!" : "Create Account"}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium">
@@ -196,7 +196,7 @@ export default function LoginScreen() {
               {/* Preset 1-Click Credentials Box */}
               {process.env.NODE_ENV === "development" && (
                 <div className="rounded-2xl bg-blue-50/60 p-3.5 border border-blue-100 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#1E40AF]">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#0645B5]">
                     <span className="flex items-center gap-1.5">
                       <Key size={14} className="text-amber-600" /> Demo Accounts
                     </span>
@@ -213,7 +213,7 @@ export default function LoginScreen() {
                         <span className="font-bold text-blue-950 text-xs block">👤 Demo Customer Login</span>
                         <span className="text-[10px] text-slate-500 font-mono">user: user@matrin.com</span>
                       </div>
-                      <span className="text-xs font-bold text-[#1E40AF]">1-Click Login &rarr;</span>
+                      <span className="text-xs font-bold text-[#0645B5]">1-Click Login &rarr;</span>
                     </button>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function LoginScreen() {
                         placeholder="Enter your email address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:ring-1 focus:ring-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export default function LoginScreen() {
                         placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:ring-1 focus:ring-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden"
                       />
                       <button
                         type="button"
@@ -296,7 +296,7 @@ export default function LoginScreen() {
                     <button
                       type="button"
                       onClick={() => toast("Password reset link will be sent to your email.", { icon: "📧" })}
-                      className="text-xs font-semibold text-[#1E40AF] hover:underline"
+                      className="text-xs font-semibold text-[#0645B5] hover:underline"
                     >
                       Forgot Password?
                     </button>
@@ -305,7 +305,7 @@ export default function LoginScreen() {
                   {/* Primary Login Button (Exact Image 2) */}
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
                   >
                     <span>Login</span>
                     <ArrowRight size={16} />
@@ -324,7 +324,7 @@ export default function LoginScreen() {
                       placeholder="Enter your full name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0645B5] focus:outline-hidden"
                     />
                   </div>
 
@@ -338,7 +338,7 @@ export default function LoginScreen() {
                       placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0645B5] focus:outline-hidden"
                     />
                   </div>
 
@@ -352,7 +352,7 @@ export default function LoginScreen() {
                       placeholder="Create a strong password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#1E40AF] focus:outline-hidden"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0645B5] focus:outline-hidden"
                     />
 
                     {/* Real-Time Password Validation Guidance */}
@@ -384,7 +384,7 @@ export default function LoginScreen() {
 
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#1a3899] transition"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#1a3899] transition"
                   >
                     <span>Sign Up</span>
                     <ArrowRight size={16} />
@@ -459,7 +459,7 @@ export default function LoginScreen() {
                     <button
                       type="button"
                       onClick={() => setMode("register")}
-                      className="font-bold text-[#1E40AF] hover:underline"
+                      className="font-bold text-[#0645B5] hover:underline"
                     >
                       Sign Up
                     </button>
@@ -470,7 +470,7 @@ export default function LoginScreen() {
                     <button
                       type="button"
                       onClick={() => setMode("login")}
-                      className="font-bold text-[#1E40AF] hover:underline"
+                      className="font-bold text-[#0645B5] hover:underline"
                     >
                       Sign In
                     </button>
@@ -483,15 +483,15 @@ export default function LoginScreen() {
           {/* Footer Security Badges (Exact Match with Image 2) */}
           <div className="pt-6 border-t border-slate-100 grid grid-cols-3 gap-2 text-center text-[10px] font-semibold text-slate-500">
             <div className="flex items-center justify-center gap-1.5">
-              <Shield size={14} className="text-[#1E40AF]" />
+              <Shield size={14} className="text-[#0645B5]" />
               <span>100% Secure Payments</span>
             </div>
             <div className="flex items-center justify-center gap-1.5">
-              <RefreshCw size={14} className="text-[#1E40AF]" />
+              <RefreshCw size={14} className="text-[#0645B5]" />
               <span>Easy Returns & Refunds</span>
             </div>
             <div className="flex items-center justify-center gap-1.5">
-              <Headphones size={14} className="text-[#1E40AF]" />
+              <Headphones size={14} className="text-[#0645B5]" />
               <span>24/7 Customer Support</span>
             </div>
           </div>

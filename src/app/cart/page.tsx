@@ -158,11 +158,11 @@ export default function CartPage() {
       <main className="min-h-screen bg-[#F8FAFC] py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="rounded-3xl bg-white p-12 border border-slate-100 shadow-sm">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-[#1E40AF]">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-[#0645B5]">
               <ShoppingBag size={40} />
             </div>
 
-            <h1 className="mt-6 text-3xl font-extrabold text-[#0B2545]">
+            <h1 className="mt-6 text-3xl font-extrabold text-[#102A5C]">
               Your Cart is Empty
             </h1>
 
@@ -172,7 +172,7 @@ export default function CartPage() {
 
             <Link
               href="/products"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0645B5] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
             >
               <span>Explore Products</span>
               <ArrowRight size={16} />
@@ -194,18 +194,18 @@ export default function CartPage() {
             </div>
 
             <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-600">ORDER CONFIRMED</span>
-            <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-[#0B2545]">
+            <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-[#102A5C]">
               Thank You for Your Order!
             </h1>
             <p className="mt-2 text-xs md:text-sm text-slate-600 font-medium">
-              Order ID: <strong className="font-mono text-[#1E40AF]">{generatedInvoice.invoiceNumber}</strong>
+              Order ID: <strong className="font-mono text-[#0645B5]">{generatedInvoice.invoiceNumber}</strong>
             </p>
 
             {/* Invoice Callout Card */}
             <div className="my-8 rounded-2xl bg-blue-50/50 p-6 border border-blue-100 text-left space-y-4">
               <div className="flex items-center justify-between border-b border-blue-100 pb-4">
                 <div>
-                  <h4 className="font-extrabold text-[#0B2545] text-sm">Official GST Tax Invoice</h4>
+                  <h4 className="font-extrabold text-[#102A5C] text-sm">Official GST Tax Invoice</h4>
                   <p className="text-xs text-slate-500 font-medium">Issued to {generatedInvoice.customer.fullName}</p>
                 </div>
                 <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
@@ -216,7 +216,7 @@ export default function CartPage() {
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
                   <span className="text-slate-500 font-medium block">Total Order Amount:</span>
-                  <span className="text-xl font-extrabold text-[#1E40AF]">₹{generatedInvoice.totalAmount}</span>
+                  <span className="text-xl font-extrabold text-[#0645B5]">₹{generatedInvoice.totalAmount}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 font-medium block">Payment Method:</span>
@@ -226,7 +226,7 @@ export default function CartPage() {
 
               <button
                 onClick={() => setIsInvoiceModalOpen(true)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#1a3899] transition"
               >
                 <FileText size={18} /> View & Print Official Tax Invoice
               </button>
@@ -263,7 +263,7 @@ export default function CartPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-slate-200/80 gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#0B2545]">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#102A5C]">
               {checkoutStep === "cart" ? "Shopping Cart" : "Checkout & Payment"}
             </h1>
             <p className="mt-1 text-xs text-slate-500 font-medium">
@@ -275,7 +275,7 @@ export default function CartPage() {
             <button
               onClick={() => setCheckoutStep("cart")}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
-                checkoutStep === "cart" ? "bg-[#1E40AF] text-white" : "bg-white text-slate-600 border border-slate-200"
+                checkoutStep === "cart" ? "bg-[#0645B5] text-white" : "bg-white text-slate-600 border border-slate-200"
               }`}
             >
               1. Cart Items
@@ -283,7 +283,7 @@ export default function CartPage() {
             <button
               onClick={() => setCheckoutStep("checkout")}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
-                checkoutStep === "checkout" ? "bg-[#1E40AF] text-white" : "bg-white text-slate-600 border border-slate-200"
+                checkoutStep === "checkout" ? "bg-[#0645B5] text-white" : "bg-white text-slate-600 border border-slate-200"
               }`}
             >
               2. Payment & Address
@@ -300,7 +300,7 @@ export default function CartPage() {
               <>
                 {/* Free Shipping Progress Bar */}
                 <div className="rounded-2xl bg-blue-50/60 p-4 border border-blue-100">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#1E40AF] mb-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#0645B5] mb-2">
                     <span className="flex items-center gap-1.5">
                       <Truck size={16} /> Free Shipping Progress
                     </span>
@@ -313,7 +313,7 @@ export default function CartPage() {
                   <div className="h-2 w-full rounded-full bg-blue-200/50 overflow-hidden">
                     <div
                       style={{ width: `${progressToFreeShipping}%` }}
-                      className="h-full rounded-full bg-[#1E40AF] transition-all duration-500"
+                      className="h-full rounded-full bg-[#0645B5] transition-all duration-500"
                     />
                   </div>
                 </div>
@@ -332,11 +332,11 @@ export default function CartPage() {
                           />
                         </div>
                         <div>
-                          <h3 className="text-base font-bold text-[#0B2545]">
+                          <h3 className="text-base font-bold text-[#102A5C]">
                             {product.name}
                           </h3>
                           <p className="text-xs text-slate-500 font-medium mt-0.5">{product.category}</p>
-                          <span className="text-sm font-extrabold text-[#1E40AF] mt-1 block">
+                          <span className="text-sm font-extrabold text-[#0645B5] mt-1 block">
                             ₹{product.price}
                           </span>
                         </div>
@@ -350,7 +350,7 @@ export default function CartPage() {
                           >
                             -
                           </button>
-                          <span className="w-8 text-center font-bold text-[#0B2545] text-xs">
+                          <span className="w-8 text-center font-bold text-[#102A5C] text-xs">
                             {quantity}
                           </span>
                           <button
@@ -361,7 +361,7 @@ export default function CartPage() {
                           </button>
                         </div>
 
-                        <span className="text-base font-extrabold text-[#0B2545] w-20 text-right">
+                        <span className="text-base font-extrabold text-[#102A5C] w-20 text-right">
                           ₹{product.price * quantity}
                         </span>
 
@@ -383,8 +383,8 @@ export default function CartPage() {
                 
                 {/* 1. Shipping Address */}
                 <div className="rounded-3xl bg-white p-6 md:p-8 border border-slate-100 shadow-2xs">
-                  <div className="flex items-center gap-2 mb-6 text-[#0B2545]">
-                    <MapPin size={20} className="text-[#1E40AF]" />
+                  <div className="flex items-center gap-2 mb-6 text-[#102A5C]">
+                    <MapPin size={20} className="text-[#0645B5]" />
                     <h3 className="text-xl font-bold">Shipping Address</h3>
                   </div>
 
@@ -398,7 +398,7 @@ export default function CartPage() {
                         required
                         value={shippingDetails.fullName}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, fullName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
                       />
                     </div>
 
@@ -411,7 +411,7 @@ export default function CartPage() {
                         required
                         value={shippingDetails.phone}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
                       />
                     </div>
 
@@ -424,7 +424,7 @@ export default function CartPage() {
                         required
                         value={shippingDetails.addressLine}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, addressLine: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
                       />
                     </div>
 
@@ -437,7 +437,7 @@ export default function CartPage() {
                         required
                         value={shippingDetails.city}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
                       />
                     </div>
 
@@ -450,7 +450,7 @@ export default function CartPage() {
                         required
                         value={shippingDetails.pincode}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, pincode: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#1E40AF] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -458,8 +458,8 @@ export default function CartPage() {
 
                 {/* 2. Select Payment Method */}
                 <div className="rounded-3xl bg-white p-6 md:p-8 border border-slate-100 shadow-2xs">
-                  <div className="flex items-center gap-2 mb-6 text-[#0B2545]">
-                    <CreditCard size={20} className="text-[#1E40AF]" />
+                  <div className="flex items-center gap-2 mb-6 text-[#102A5C]">
+                    <CreditCard size={20} className="text-[#0645B5]" />
                     <h3 className="text-xl font-bold">Select Payment Method</h3>
                   </div>
 
@@ -471,7 +471,7 @@ export default function CartPage() {
                       onClick={() => setPaymentMethod("upi")}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
                         paymentMethod === "upi"
-                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
@@ -479,7 +479,7 @@ export default function CartPage() {
                         <QrCode size={20} />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#0B2545]">UPI (GPay / PhonePe / Paytm)</h4>
+                        <h4 className="text-xs font-bold text-[#102A5C]">UPI (GPay / PhonePe / Paytm)</h4>
                         <p className="text-[10px] text-slate-500 font-medium">Instant Zero-Fee Transfer</p>
                       </div>
                     </div>
@@ -489,15 +489,15 @@ export default function CartPage() {
                       onClick={() => setPaymentMethod("card")}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
                         paymentMethod === "card"
-                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-[#1E40AF]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-[#0645B5]">
                         <CreditCard size={20} />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#0B2545]">Credit / Debit Card</h4>
+                        <h4 className="text-xs font-bold text-[#102A5C]">Credit / Debit Card</h4>
                         <p className="text-[10px] text-slate-500 font-medium">Visa, Mastercard, RuPay</p>
                       </div>
                     </div>
@@ -507,7 +507,7 @@ export default function CartPage() {
                       onClick={() => setPaymentMethod("netbanking")}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
                         paymentMethod === "netbanking"
-                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
@@ -515,7 +515,7 @@ export default function CartPage() {
                         <Building size={20} />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#0B2545]">Net Banking</h4>
+                        <h4 className="text-xs font-bold text-[#102A5C]">Net Banking</h4>
                         <p className="text-[10px] text-slate-500 font-medium">All major Indian banks</p>
                       </div>
                     </div>
@@ -525,7 +525,7 @@ export default function CartPage() {
                       onClick={() => setPaymentMethod("cod")}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
                         paymentMethod === "cod"
-                          ? "border-[#1E40AF] bg-blue-50/50 shadow-2xs"
+                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
@@ -533,7 +533,7 @@ export default function CartPage() {
                         <Banknote size={20} />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#0B2545]">Cash on Delivery</h4>
+                        <h4 className="text-xs font-bold text-[#102A5C]">Cash on Delivery</h4>
                         <p className="text-[10px] text-slate-500 font-medium">Pay cash upon delivery</p>
                       </div>
                     </div>
@@ -607,7 +607,7 @@ export default function CartPage() {
 
                   <button
                     type="submit"
-                    className="mt-6 w-full flex items-center justify-center gap-2 rounded-2xl bg-[#1E40AF] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] shadow-md shadow-blue-600/20"
+                    className="mt-6 w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0645B5] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] shadow-md shadow-blue-600/20"
                   >
                     <span>Place Order & Generate Tax Invoice</span>
                     <ArrowRight size={16} />
@@ -621,14 +621,14 @@ export default function CartPage() {
           {/* Right Summary Sidebar */}
           <div className="lg:col-span-4">
             <div className="rounded-3xl bg-white text-slate-800 p-6 shadow-md border border-slate-100 sticky top-24 space-y-6">
-              <h2 className="text-xl font-extrabold text-[#0B2545] border-b border-slate-100 pb-4">
+              <h2 className="text-xl font-extrabold text-[#102A5C] border-b border-slate-100 pb-4">
                 Order Summary
               </h2>
 
               {/* Coupon Form */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 block flex items-center gap-1">
-                  <Tag size={14} className="text-[#1E40AF]" /> Promo Code
+                  <Tag size={14} className="text-[#0645B5]" /> Promo Code
                 </label>
 
                 {appliedCoupon ? (
@@ -651,14 +651,14 @@ export default function CartPage() {
                     />
                     <button
                       type="submit"
-                      className="rounded-xl bg-[#1E40AF] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#1a3899] transition shadow-2xs"
+                      className="rounded-xl bg-[#0645B5] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#1a3899] transition shadow-2xs"
                     >
                       Apply
                     </button>
                   </form>
                 )}
                 <span className="text-[10px] text-slate-400 mt-1 block font-medium">
-                  Tip: Use code <strong className="text-[#1E40AF]">MATRIN10</strong> or <strong className="text-[#1E40AF]">CLEAN50</strong>
+                  Tip: Use code <strong className="text-[#0645B5]">MATRIN10</strong> or <strong className="text-[#0645B5]">CLEAN50</strong>
                 </span>
               </div>
 
@@ -683,21 +683,21 @@ export default function CartPage() {
 
                 <div className="flex justify-between text-slate-600">
                   <span>Shipping Fee</span>
-                  <span className="font-bold text-[#1E40AF]">
+                  <span className="font-bold text-[#0645B5]">
                     {shippingFee === 0 ? <span className="text-emerald-600 font-extrabold">FREE</span> : `₹${shippingFee}`}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-base font-extrabold text-slate-900 pt-4 border-t border-slate-100">
                   <span>Total Amount</span>
-                  <span className="text-[#1E40AF]">₹{total}</span>
+                  <span className="text-[#0645B5]">₹{total}</span>
                 </div>
               </div>
 
               {checkoutStep === "cart" && (
                 <button
                   onClick={() => setCheckoutStep("checkout")}
-                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#1E40AF] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] active:scale-98 shadow-md shadow-blue-600/20"
+                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#0645B5] py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#1a3899] active:scale-98 shadow-md shadow-blue-600/20"
                 >
                   <span>Proceed to Payment</span>
                   <ArrowRight size={16} />

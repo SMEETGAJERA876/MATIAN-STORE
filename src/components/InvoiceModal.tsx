@@ -207,7 +207,7 @@ export default function InvoiceModal({
                     )}
 
                     {/* Informational Tax Breakdown (Included, not added on top) */}
-                    <div className="pl-3 py-1.5 space-y-1 bg-slate-50 rounded-lg border-l-2 border-[#1E40AF]">
+                    <div className="pl-3 py-1.5 space-y-1 bg-slate-50 rounded-lg border-l-2 border-[#0645B5]">
                       <div className="flex justify-between text-[11px] text-slate-600">
                         <span>Of which CGST (9%):</span>
                         <span className="font-mono text-slate-700">₹{cgstIncluded.toFixed(2)}</span>
@@ -228,7 +228,7 @@ export default function InvoiceModal({
                       </span>
                     </div>
 
-                    <div className="flex justify-between text-base font-extrabold text-[#0B2545] pt-3 border-t-2 border-[#0B2545]">
+                    <div className="flex justify-between text-base font-extrabold text-[#102A5C] pt-3 border-t-2 border-[#102A5C]">
                       <span>Grand Total:</span>
                       <span>₹{grandTotal}</span>
                     </div>
