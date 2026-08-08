@@ -24,7 +24,7 @@ export default function ProductImage({
   imgClassName = "",
   aspectRatio = "aspect-square",
   fitMode = "cover",
-  fallbackSrc = "/images/matrin-logo-sticker.webp",
+  fallbackSrc = "/images/matrin-logo-sticker.png",
   roundedClassName = "rounded-2xl",
   showHoverEffect = true,
   paddingClassName = "p-3",

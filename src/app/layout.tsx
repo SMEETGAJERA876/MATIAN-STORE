@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     "Luxury home cleaning products for modern Indian households. Premium liquid detergent, floor cleaner, dish wash, and fabric care.",
   icons: {
-    icon: "/images/matrin-logo-sticker.webp",
+    icon: "/images/matrin-logo-sticker.png",
   },
 };
 
