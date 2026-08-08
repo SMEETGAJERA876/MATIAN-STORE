@@ -38,7 +38,7 @@ export default function InvoiceModal({
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-slate-900/70 backdrop-blur-xs print:p-0 print:bg-white">
-        
+
         {/* Backdrop Click Listener */}
         <div className="fixed inset-0 print:hidden" onClick={onClose} />
 
@@ -79,7 +79,7 @@ export default function InvoiceModal({
 
           {/* Printable Invoice Body */}
           <div className="relative p-8 sm:p-10 font-sans text-slate-800 space-y-8 bg-white print:p-6 overflow-hidden" id="invoice-print-area">
-            
+
             {/* Diagonal Semi-Transparent Demo Watermark */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] rotate-[-30deg] text-4xl sm:text-6xl font-black uppercase text-slate-900 select-none z-0">
               SAMPLE / DEMO INVOICE
@@ -130,9 +130,8 @@ export default function InvoiceModal({
                 </div>
                 <div className="text-xs">
                   <span className="text-slate-500 font-medium">Status:</span>{" "}
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    invoice.paymentStatus === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                  }`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${invoice.paymentStatus === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                    }`}>
                     {invoice.paymentStatus}
                   </span>
                 </div>
