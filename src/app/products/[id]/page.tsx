@@ -409,10 +409,6 @@ export default function ProductDetailsPage() {
                   <span>100% Secure Payments</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <RefreshCw size={16} className="text-[#0645B5]" />
-                  <span>Easy Returns & Refunds</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <Clock size={16} className="text-[#0645B5]" />
                   <span>7 Days Replacement</span>
                 </div>

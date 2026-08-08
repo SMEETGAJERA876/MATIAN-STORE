@@ -481,14 +481,10 @@ export default function LoginScreen() {
           </div>
 
           {/* Footer Security Badges (Exact Match with Image 2) */}
-          <div className="pt-6 border-t border-slate-100 grid grid-cols-3 gap-2 text-center text-[10px] font-semibold text-slate-500">
+          <div className="mt-8 border-t border-slate-100 pt-6 flex items-center justify-around text-xs text-slate-500 font-medium">
             <div className="flex items-center justify-center gap-1.5">
               <Shield size={14} className="text-[#0645B5]" />
               <span>100% Secure Payments</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5">
-              <RefreshCw size={14} className="text-[#0645B5]" />
-              <span>Easy Returns & Refunds</span>
             </div>
             <div className="flex items-center justify-center gap-1.5">
               <Headphones size={14} className="text-[#0645B5]" />
