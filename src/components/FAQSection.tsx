@@ -51,17 +51,17 @@ export default function FAQSection() {
             return (
               <div
                 key={idx}
-                className="overflow-hidden rounded-3xl border border-[#DCE8F5] dark:border-slate-800 bg-slate-50/60 dark:bg-[#152238] transition shadow-2xs"
+                className="overflow-hidden rounded-3xl border border-[#DCE8F5] bg-white transition shadow-2xs"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="flex w-full items-center justify-between p-6 text-left text-base font-extrabold text-[#102A5C] dark:text-white hover:text-[#0645B5] dark:hover:text-blue-400 transition"
+                  className="flex w-full items-center justify-between p-6 text-left text-base font-extrabold text-[#102A5C] hover:text-[#0645B5] transition"
                 >
                   <span className="pr-4">{faq.question}</span>
                   <ChevronDown
                     size={20}
                     className={`shrink-0 transition-transform duration-300 text-slate-400 ${
-                      isOpen ? "rotate-180 text-[#0645B5] dark:text-blue-400" : ""
+                      isOpen ? "rotate-180 text-[#0645B5]" : ""
                     }`}
                   />
                 </button>
@@ -74,7 +74,7 @@ export default function FAQSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-6 pb-6 text-xs sm:text-sm leading-relaxed text-[#5F6B7A] dark:text-slate-300 font-medium border-t border-[#DCE8F5] dark:border-slate-800 pt-4">
+                      <div className="px-6 pb-6 text-xs sm:text-sm leading-relaxed text-[#5F6B7A] font-medium border-t border-[#DCE8F5] pt-4">
                         {faq.answer}
                       </div>
                     </motion.div>

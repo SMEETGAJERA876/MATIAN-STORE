@@ -31,9 +31,9 @@ const reviews = [
 
 export default function CustomerReviews() {
   return (
-    <section className="bg-[#F5FAFF] dark:bg-[#0A1428] py-12 lg:py-16" id="reviews">
+    <section className="bg-[#F5FAFF] dark:bg-[#FFFFFF] py-12 lg:py-16" id="reviews">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        
+
         {/* Section Header matching reference image */}
         <div className="mb-8">
           <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] dark:text-white tracking-tight">
