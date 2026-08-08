@@ -17,13 +17,13 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white dark:bg-[#152238] border border-slate-100 dark:border-[#233554] p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white dark:bg-[#152238] border border-[#DCE8F5] dark:border-[#233554] p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
         
         {/* Product Image Container */}
         <div className="relative w-full">
           
           {/* NEW / Discount Badge matching reference image */}
-          <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0038A8] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
+          <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
             {product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW"}
           </span>
 
@@ -52,7 +52,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="absolute inset-x-0 bottom-2 flex justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-3 z-10">
             <button
               onClick={() => setIsQuickViewOpen(true)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-1.5 text-[11px] font-extrabold text-[#0038A8] dark:text-blue-300 shadow-md hover:bg-white dark:hover:bg-slate-700 transition"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-1.5 text-[11px] font-extrabold text-[#0645B5] dark:text-blue-300 shadow-md hover:bg-white dark:hover:bg-slate-700 transition"
             >
               <Eye size={14} /> Quick View
             </button>
@@ -63,7 +63,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="mt-3 flex flex-1 flex-col justify-between">
           <div>
             <Link href={`/products/${product.id}`} className="block">
-              <h3 className="text-sm font-bold text-[#0A1C3E] dark:text-white transition hover:text-[#0038A8] dark:hover:text-blue-400 line-clamp-1 leading-snug">
+              <h3 className="text-sm font-bold text-[#102A5C] dark:text-white transition hover:text-[#0645B5] dark:hover:text-blue-400 line-clamp-1 leading-snug">
                 {product.name}
               </h3>
             </Link>
@@ -79,14 +79,14 @@ export default function ProductCard({ product }: { product: Product }) {
                   />
                 ))}
               </div>
-              <span className="text-[11px] text-slate-400 dark:text-slate-400 font-medium">
+              <span className="text-[11px] text-[#5F6B7A] dark:text-slate-400 font-medium">
                 ({product.reviewCount})
               </span>
             </div>
 
             {/* Price Callout matching reference image */}
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-lg font-black text-[#0038A8] dark:text-blue-400">
+              <span className="text-lg font-black text-[#0645B5] dark:text-blue-400">
                 ₹{product.price}
               </span>
               {product.oldPrice && (
@@ -101,7 +101,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="mt-3">
             <button
               onClick={() => addToCart(product)}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0038A8] hover:bg-[#002D88] active:bg-[#002075] py-2.5 text-xs font-black uppercase tracking-wider text-white transition shadow-xs"
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0645B5] hover:bg-[#043694] active:bg-[#032970] py-2.5 text-xs font-black uppercase tracking-wider text-white transition shadow-xs"
             >
               Add to Cart
             </button>

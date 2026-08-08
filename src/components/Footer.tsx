@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Phone, Mail, MapPin, Clock } from "lucide-react";
 import { useState, FormEvent } from "react";
 import toast from "react-hot-toast";
 
@@ -18,99 +19,148 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#F0F6FD] text-[#0A1C3E] pt-12 pb-8 border-t border-blue-100">
+    <footer className="bg-[#102A5C] text-white pt-14 pb-8 border-t border-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
-        {/* Footer Navigation Grid matching reference image */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 mb-10 text-xs">
+        {/* Top Newsletter Callout Bar (Exact Match with Reference Image 2) */}
+        <div className="rounded-3xl bg-[#0645B5] p-6 sm:p-8 mb-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Join the Matrin Family
+            </h3>
+            <p className="text-xs sm:text-sm text-blue-100 font-medium">
+              Subscribe to get special offers, cleaning tips and exclusive discounts.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubscribe} className="flex items-center gap-2 w-full md:w-auto max-w-md">
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full sm:w-72 rounded-full bg-white px-4 py-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden shadow-2xs font-medium"
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#102A5C] hover:bg-[#091b3e] px-6 py-3 text-xs font-bold text-white shadow-md transition shrink-0"
+            >
+              <span>Subscribe</span>
+              <ArrowRight size={14} />
+            </button>
+          </form>
+        </div>
+
+        {/* Footer Navigation Columns (Exact Match with Reference Image 2) */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5 mb-12 text-xs">
 
           {/* Brand Column */}
-          <div className="space-y-3">
+          <div className="lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <img
                 src="/images/matrin-logo-sticker.png"
                 alt="MATRIN"
-                className="h-9 sm:h-11 w-auto object-contain"
+                className="h-10 sm:h-12 w-auto object-contain brightness-0 invert"
               />
             </Link>
-            <p className="text-xs text-slate-600 font-medium leading-relaxed max-w-xs">
-              Matrin is committed to making your home cleaner, fresher and healthier with trusted cleaning solutions.
+            <p className="text-xs text-blue-100 font-medium leading-relaxed">
+              Pure cleaning solutions for a better living. Safe for your family, tough on stains and kind to nature.
             </p>
 
-            {/* Social Icons matching reference image */}
-            <div className="flex items-center gap-2 pt-2 text-[#0038A8]">
-              <a href="#" className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center font-bold text-xs hover:bg-[#0038A8] hover:text-white transition">f</a>
-              <a href="#" className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center font-bold text-xs hover:bg-[#0038A8] hover:text-white transition">i</a>
-              <a href="#" className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center font-bold text-xs hover:bg-[#0038A8] hover:text-white transition">y</a>
+            {/* Social Icons */}
+            <div className="flex items-center gap-3 pt-2">
+              {["facebook", "instagram", "youtube", "twitter"].map((soc) => (
+                <a
+                  key={soc}
+                  href="#"
+                  className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-slate-200 hover:bg-[#0645B5] hover:text-white transition"
+                  title={soc}
+                >
+                  <span className="text-[10px] font-bold uppercase">{soc.charAt(0)}</span>
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links Column */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-black text-[#0A1C3E] uppercase tracking-wider">
+          <div className="space-y-4">
+            <h4 className="text-sm font-extrabold uppercase tracking-wider text-white pb-2 border-b border-white/20">
               Quick Links
             </h4>
-            <ul className="space-y-1.5 text-slate-600 font-medium">
-              <li><Link href="/" className="hover:text-[#0038A8] transition">Home</Link></li>
-              <li><Link href="/products" className="hover:text-[#0038A8] transition">Shop</Link></li>
-              <li><Link href="/categories" className="hover:text-[#0038A8] transition">Categories</Link></li>
-              <li><Link href="/products?sale=true" className="hover:text-[#0038A8] transition">Offers</Link></li>
-              <li><Link href="/about" className="hover:text-[#0038A8] transition">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-[#0038A8] transition">Contact</Link></li>
+            <ul className="space-y-2 text-blue-100 font-medium">
+              <li><Link href="/" className="hover:text-white transition">Home</Link></li>
+              <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
+              <li><Link href="/products" className="hover:text-white transition">Products</Link></li>
+              <li><Link href="/categories" className="hover:text-white transition">Categories</Link></li>
+              <li><Link href="/products?sale=true" className="hover:text-white transition">Offers</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
             </ul>
           </div>
 
-          {/* Customer Service Column */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-black text-[#0A1C3E] uppercase tracking-wider">
-              Customer Service
+          {/* Categories Column */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-extrabold uppercase tracking-wider text-white pb-2 border-b border-white/20">
+              Categories
             </h4>
-            <ul className="space-y-1.5 text-slate-600 font-medium">
-              <li><Link href="/login" className="hover:text-[#0038A8] transition">My Account</Link></li>
-              <li><Link href="/contact" className="hover:text-[#0038A8] transition">Track Order</Link></li>
-              <li><Link href="/contact" className="hover:text-[#0038A8] transition">Shipping Policy</Link></li>
-              <li><Link href="/contact" className="hover:text-[#0038A8] transition">Return Policy</Link></li>
-              <li><Link href="/#faq-section" className="hover:text-[#0038A8] transition">FAQ</Link></li>
-              <li><Link href="/contact" className="hover:text-[#0038A8] transition">Privacy Policy</Link></li>
+            <ul className="space-y-2 text-blue-100 font-medium">
+              <li><Link href="/products?category=Laundry Care" className="hover:text-white transition">Detergent</Link></li>
+              <li><Link href="/products?category=Dish Care" className="hover:text-white transition">Dishwash</Link></li>
+              <li><Link href="/products?category=Floor Care" className="hover:text-white transition">Floor Cleaner</Link></li>
+              <li><Link href="/products?category=Toilet Care" className="hover:text-white transition">Toilet Cleaner</Link></li>
+              <li><Link href="/products?category=Multi-Surface" className="hover:text-white transition">Glass Cleaner</Link></li>
+              <li><Link href="/products?category=Dish Care" className="hover:text-white transition">Kitchen Cleaner</Link></li>
             </ul>
           </div>
 
-          {/* Newsletter Column matching reference image */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-black text-[#0A1C3E] uppercase tracking-wider">
-              Newsletter
+          {/* Customer Support Column */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-extrabold uppercase tracking-wider text-white pb-2 border-b border-white/20">
+              Customer Support
             </h4>
-            <p className="text-xs text-slate-600 font-medium leading-relaxed">
-              Subscribe to get special offers and updates.
-            </p>
+            <ul className="space-y-2 text-blue-100 font-medium">
+              <li><Link href="/contact" className="hover:text-white transition">Help Center</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Shipping & Delivery</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Returns & Refunds</Link></li>
+              <li><Link href="/#faq-section" className="hover:text-white transition">FAQ</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Track Order</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Store Locator</Link></li>
+            </ul>
+          </div>
 
-            <form onSubmit={handleSubscribe} className="space-y-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg bg-white border border-slate-200 px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#0038A8] focus:outline-hidden shadow-2xs font-medium"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-[#0038A8] hover:bg-[#002D88] py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-sm transition"
-              >
-                Subscribe
-              </button>
-            </form>
+          {/* Contact Us Column */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-extrabold uppercase tracking-wider text-white pb-2 border-b border-white/20">
+              Contact Us
+            </h4>
+            <div className="space-y-2 text-blue-100 font-medium leading-relaxed">
+              <div className="font-bold text-white text-sm flex items-center gap-2">
+                <Phone size={14} className="text-cyan-300" />
+                <span>+91 98765 43210</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-cyan-300" />
+                <span>support@matrin.com</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <MapPin size={14} className="text-cyan-300 shrink-0 mt-0.5" />
+                <span>Matrin House, Clean City, Mumbai, Maharashtra - 400001</span>
+              </div>
+              <div className="text-[11px] text-blue-200 flex items-center gap-2">
+                <Clock size={13} className="text-cyan-300" />
+                <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        {/* Bottom Copyright & Payment Methods Bar matching reference image */}
-        <div className="pt-6 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-medium gap-3">
-          <div>© 2024 Matrin. All Rights Reserved.</div>
-          <div className="flex items-center gap-4 text-xs font-bold text-slate-700">
-            <span>Payment Methods:</span>
-            <span className="text-[#0038A8] font-black">VISA</span>
-            <span className="text-red-500 font-black">Mastercard</span>
-            <span className="text-emerald-600 font-black">UPI</span>
+        {/* Bottom Copyright & Terms Bar (Exact Match with Reference Image 2) */}
+        <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-blue-200 font-medium gap-3">
+          <div>© 2025 Matrin. All Rights Reserved.</div>
+          <div className="flex items-center gap-4">
+            <Link href="/contact" className="hover:text-white transition">Privacy Policy</Link>
+            <span>|</span>
+            <Link href="/contact" className="hover:text-white transition">Terms & Conditions</Link>
           </div>
         </div>
 

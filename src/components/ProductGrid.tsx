@@ -67,14 +67,14 @@ export default function ProductGrid({
       
       {/* Section Header matching reference image */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl sm:text-2xl font-black text-[#0A1C3E] dark:text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] dark:text-white tracking-tight">
           {sectionTitle}
         </h2>
 
         {isTeaser && (
           <Link
             href="/products"
-            className="group inline-flex items-center gap-1.5 rounded-lg bg-[#EBF4FE] hover:bg-[#DCEFFA] border border-[#0038A8]/30 px-3.5 py-1.5 text-xs font-bold text-[#0038A8] transition"
+            className="group inline-flex items-center gap-1.5 rounded-lg bg-[#EAF5FF] hover:bg-[#DCE8F5] border border-[#DCE8F5] px-3.5 py-1.5 text-xs font-bold text-[#0645B5] transition"
           >
             <span>View All Products</span>
           </Link>

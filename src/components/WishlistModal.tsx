@@ -52,13 +52,13 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
                   <Heart size={18} fill="#E11D48" />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-[#0B2545]">My Wishlist</h2>
-                  <p className="text-xs font-semibold text-slate-500">{wishlistCount} saved items</p>
+                  <h2 className="text-base font-extrabold text-[#102A5C]">My Wishlist</h2>
+                  <p className="text-xs font-semibold text-[#5F6B7A]">{wishlistCount} saved items</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="h-8 w-8 rounded-full bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition border border-slate-200"
+                className="h-8 w-8 rounded-full bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition border border-[#DCE8F5]"
               >
                 <X size={18} />
               </button>
@@ -72,22 +72,22 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
                     <Heart size={32} />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-extrabold text-[#0B2545]">Your Wishlist is Empty</h3>
-                    <p className="text-xs text-slate-500 font-medium max-w-xs">
+                    <h3 className="text-base font-extrabold text-[#102A5C]">Your Wishlist is Empty</h3>
+                    <p className="text-xs text-[#5F6B7A] font-medium max-w-xs">
                       Explore our eco-friendly cleaning lineup and save your favorite items here!
                     </p>
                   </div>
                   <Link
                     href="/products"
                     onClick={onClose}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#0645B5] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#043694] transition active:scale-95"
                   >
                     <span>Explore Products</span>
                     <ArrowRight size={14} />
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-[#DCE8F5]">
                   {wishlist.map((item) => (
                     <div key={item.id} className="py-4 flex items-center gap-4">
                       {/* Product Thumbnail */}
@@ -102,16 +102,16 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{item.category}</div>
-                        <h4 className="text-xs font-extrabold text-[#0B2545] truncate">{item.name}</h4>
-                        <div className="text-xs font-extrabold text-[#1E40AF] mt-1">₹{item.price}</div>
+                        <div className="text-xs font-bold text-[#5F6B7A] uppercase tracking-wider">{item.category}</div>
+                        <h4 className="text-xs font-extrabold text-[#102A5C] truncate">{item.name}</h4>
+                        <div className="text-xs font-extrabold text-[#0645B5] mt-1">₹{item.price}</div>
                       </div>
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleMoveToCart(item)}
-                          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#1E40AF] text-white text-xs font-bold shadow-xs hover:bg-[#1a3899] transition active:scale-95 shrink-0"
+                          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#0645B5] text-white text-xs font-bold shadow-xs hover:bg-[#043694] transition active:scale-95 shrink-0"
                           title="Move to Cart"
                         >
                           <ShoppingBag size={14} />
@@ -133,11 +133,11 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
 
             {/* Footer */}
             {wishlist.length > 0 && (
-              <div className="p-5 border-t border-slate-100 bg-slate-50/80 space-y-3">
+              <div className="p-5 border-t border-[#DCE8F5] bg-slate-50/80 space-y-3">
                 <Link
                   href="/products"
                   onClick={onClose}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3 text-xs font-bold text-white shadow-md hover:bg-[#1a3899] transition active:scale-98"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3 text-xs font-bold text-white shadow-md hover:bg-[#043694] transition active:scale-98"
                 >
                   <span>Continue Shopping</span>
                   <ArrowRight size={14} />

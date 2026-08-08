@@ -51,8 +51,8 @@ export default function ProductDetailsPage() {
   if (!product) {
     return (
       <div className="mx-auto max-w-4xl px-6 py-24 text-center">
-        <h1 className="text-3xl font-bold text-[#0B2545]">Product Not Found</h1>
-        <Link href="/products" className="mt-4 inline-block rounded-full bg-[#1E40AF] px-6 py-3 text-xs font-bold text-white">
+        <h1 className="text-3xl font-bold text-[#102A5C]">Product Not Found</h1>
+        <Link href="/products" className="mt-4 inline-block rounded-full bg-[#0645B5] px-6 py-3 text-xs font-bold text-white">
           Back to Products
         </Link>
       </div>
@@ -89,13 +89,13 @@ export default function ProductDetailsPage() {
         
         {/* Breadcrumb Navigation (Exact Match with Image 3) */}
         <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
-          <Link href="/" className="hover:text-[#1E40AF]">Home</Link>
+          <Link href="/" className="hover:text-[#0645B5]">Home</Link>
           <ChevronRight size={14} className="text-slate-400" />
-          <Link href="/products" className="hover:text-[#1E40AF]">Products</Link>
+          <Link href="/products" className="hover:text-[#0645B5]">Products</Link>
           <ChevronRight size={14} className="text-slate-400" />
-          <Link href="/categories" className="hover:text-[#1E40AF]">{product.category}</Link>
+          <Link href="/categories" className="hover:text-[#0645B5]">{product.category}</Link>
           <ChevronRight size={14} className="text-slate-400" />
-          <span className="text-[#0B2545] font-bold truncate max-w-xs">{product.name}</span>
+          <span className="text-[#102A5C] font-bold truncate max-w-xs">{product.name}</span>
         </nav>
 
         {/* Top Product Layout: 3 Columns (Gallery Visuals, Product Specs, Sticky Purchase Sidebar) */}
@@ -114,7 +114,7 @@ export default function ProductDetailsPage() {
                     onClick={() => setActiveImageIndex(idx)}
                     className={`h-16 w-16 rounded-2xl transition-all duration-200 overflow-hidden bg-[#F4F6FB] border cursor-pointer ${
                       activeImageIndex === idx
-                        ? "ring-2 ring-[#1E40AF] border-[#1E40AF] opacity-100 scale-105"
+                        ? "ring-2 ring-[#0645B5] border-[#0645B5] opacity-100 scale-105"
                         : "border-slate-100 opacity-70 hover:opacity-100 hover:border-slate-300"
                     }`}
                   >
@@ -163,11 +163,11 @@ export default function ProductDetailsPage() {
             {/* 4 Feature Highlights Row Below Main Image (Exact Match with Image 3) */}
             <div className="rounded-2xl bg-white p-4 border border-slate-100 shadow-xs grid grid-cols-2 gap-3 text-[11px]">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100">
+                <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center shrink-0 border border-blue-100">
                   <Droplet size={15} />
                 </div>
                 <div>
-                  <div className="font-extrabold text-[#0B2545]">3X Power Clean</div>
+                  <div className="font-extrabold text-[#102A5C]">3X Power Clean</div>
                   <div className="text-[10px] text-slate-500">Removes tough stains</div>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function ProductDetailsPage() {
                   <Leaf size={15} />
                 </div>
                 <div>
-                  <div className="font-extrabold text-[#0B2545]">Plant Based Formula</div>
+                  <div className="font-extrabold text-[#102A5C]">Plant Based Formula</div>
                   <div className="text-[10px] text-slate-500">Eco-friendly & safe</div>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function ProductDetailsPage() {
                   <Sparkles size={15} />
                 </div>
                 <div>
-                  <div className="font-extrabold text-[#0B2545]">Fabric Protection</div>
+                  <div className="font-extrabold text-[#102A5C]">Fabric Protection</div>
                   <div className="text-[10px] text-slate-500">Gentle on clothes</div>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default function ProductDetailsPage() {
                   <ShieldCheck size={15} />
                 </div>
                 <div>
-                  <div className="font-extrabold text-[#0B2545]">Dermatologically Tested</div>
+                  <div className="font-extrabold text-[#102A5C]">Dermatologically Tested</div>
                   <div className="text-[10px] text-slate-500">Safe for sensitive skin</div>
                 </div>
               </div>
@@ -209,12 +209,12 @@ export default function ProductDetailsPage() {
           <div className="lg:col-span-4 space-y-6">
             <div>
               {/* BEST SELLER Badge */}
-              <span className="inline-block rounded-full bg-[#1E40AF] px-3.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-2xs mb-2">
+              <span className="inline-block rounded-full bg-[#0645B5] px-3.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-2xs mb-2">
                 BEST SELLER
               </span>
 
               {/* Product Title */}
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B2545] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#102A5C] tracking-tight">
                 {product.name}
               </h1>
 
@@ -222,11 +222,11 @@ export default function ProductDetailsPage() {
               <div className="mt-2 flex items-center gap-3 text-xs">
                 <div className="flex items-center gap-1 text-amber-500 font-extrabold">
                   <Star size={14} className="fill-amber-400 text-amber-400" />
-                  <span className="text-[#0B2545]">4.8</span>
+                  <span className="text-[#102A5C]">4.8</span>
                   <span className="text-slate-400 font-normal">(1,256 Reviews)</span>
                 </div>
                 <span className="text-slate-300">|</span>
-                <span className="font-extrabold text-[#1E40AF]">10K+ Sold</span>
+                <span className="font-extrabold text-[#0645B5]">10K+ Sold</span>
               </div>
 
               {/* Short Description */}
@@ -241,7 +241,7 @@ export default function ProductDetailsPage() {
                   <span>Plant Based Ingredients</span>
                 </div>
                 <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
-                  <ShieldCheck size={14} className="text-[#1E40AF]" />
+                  <ShieldCheck size={14} className="text-[#0645B5]" />
                   <span>Safe for Your Family</span>
                 </div>
                 <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 p-2 border border-slate-200/60">
@@ -257,7 +257,7 @@ export default function ProductDetailsPage() {
 
             {/* Fragrance Selector Pills (Matching Image 3) */}
             <div>
-              <label className="block text-xs font-bold text-[#0B2545] mb-2">
+              <label className="block text-xs font-bold text-[#102A5C] mb-2">
                 Fragrance
               </label>
               <div className="flex flex-wrap gap-2">
@@ -271,7 +271,7 @@ export default function ProductDetailsPage() {
                     onClick={() => setSelectedFragrance(frag.name)}
                     className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
                       selectedFragrance === frag.name
-                        ? "border-[#1E40AF] bg-blue-50/60 text-[#1E40AF] ring-1 ring-[#1E40AF]"
+                        ? "border-[#0645B5] bg-blue-50/60 text-[#0645B5] ring-1 ring-[#0645B5]"
                         : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
@@ -285,7 +285,7 @@ export default function ProductDetailsPage() {
             {/* Pricing Callout (Matching Image 3: ₹299 struck ₹399 25% OFF) */}
             <div className="pt-2 border-t border-slate-100">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-extrabold text-[#1E40AF]">
+                <span className="text-3xl font-extrabold text-[#0645B5]">
                   ₹299
                 </span>
                 <span className="text-base font-semibold text-slate-400 line-through">
@@ -302,7 +302,7 @@ export default function ProductDetailsPage() {
 
             {/* Size Selector Pills (Matching Image 3) */}
             <div>
-              <label className="block text-xs font-bold text-[#0B2545] mb-2">
+              <label className="block text-xs font-bold text-[#102A5C] mb-2">
                 Size
               </label>
               <div className="grid grid-cols-4 gap-2">
@@ -312,7 +312,7 @@ export default function ProductDetailsPage() {
                     onClick={() => setSelectedSize(sz)}
                     className={`rounded-xl border py-2 text-xs font-extrabold transition text-center ${
                       selectedSize === sz
-                        ? "border-[#1E40AF] bg-blue-50/60 text-[#1E40AF] ring-1 ring-[#1E40AF]"
+                        ? "border-[#0645B5] bg-blue-50/60 text-[#0645B5] ring-1 ring-[#0645B5]"
                         : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
@@ -330,8 +330,8 @@ export default function ProductDetailsPage() {
             <div className="rounded-3xl bg-white p-5 border border-slate-200/80 shadow-md space-y-4">
               
               {/* Free Delivery Promo Header */}
-              <div className="flex items-center gap-2.5 rounded-2xl bg-blue-50 p-3 border border-blue-100 text-xs font-bold text-[#1E40AF]">
-                <Truck size={18} className="text-[#1E40AF] shrink-0" />
+              <div className="flex items-center gap-2.5 rounded-2xl bg-blue-50 p-3 border border-blue-100 text-xs font-bold text-[#0645B5]">
+                <Truck size={18} className="text-[#0645B5] shrink-0" />
                 <div>
                   <div>Free Delivery</div>
                   <div className="text-[10px] text-slate-500 font-normal">On orders above ₹499</div>
@@ -348,7 +348,7 @@ export default function ProductDetailsPage() {
                   >
                     -
                   </button>
-                  <span className="font-extrabold text-sm text-[#0B2545]">{quantity}</span>
+                  <span className="font-extrabold text-sm text-[#102A5C]">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center"
@@ -361,7 +361,7 @@ export default function ProductDetailsPage() {
               {/* Add to Cart Button (Solid Blue) */}
               <button
                 onClick={() => addToCart(product, quantity)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1E40AF] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
               >
                 <ShoppingBag size={16} />
                 <span>Add to Cart</span>
@@ -370,7 +370,7 @@ export default function ProductDetailsPage() {
               {/* Buy Now Button (Outlined Blue with Lightning) */}
               <button
                 onClick={handleBuyNow}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[#1E40AF] py-3 text-xs font-bold text-[#1E40AF] hover:bg-blue-50 transition active:scale-98"
+                className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[#0645B5] py-3 text-xs font-bold text-[#0645B5] hover:bg-blue-50 transition active:scale-98"
               >
                 <Zap size={16} />
                 <span>Buy Now</span>
@@ -381,7 +381,7 @@ export default function ProductDetailsPage() {
                 <button
                   onClick={() => toggleWishlist(product)}
                   className={`inline-flex items-center gap-1.5 text-xs font-bold transition ${
-                    isFav ? "text-rose-500" : "text-slate-600 hover:text-[#1E40AF]"
+                    isFav ? "text-rose-500" : "text-slate-600 hover:text-[#0645B5]"
                   }`}
                 >
                   <Heart size={15} className={isFav ? "fill-rose-500" : ""} />
@@ -395,7 +395,7 @@ export default function ProductDetailsPage() {
                   <span className="flex items-center gap-1.5">
                     <CheckCircle2 size={15} className="text-emerald-600" /> Estimated Delivery
                   </span>
-                  <button type="button" className="text-[10px] text-[#1E40AF] hover:underline">View Details</button>
+                  <button type="button" className="text-[10px] text-[#0645B5] hover:underline">View Details</button>
                 </div>
                 <p className="text-xs font-extrabold text-slate-800 mt-1">
                   24 - 27 May, 2025
@@ -405,19 +405,19 @@ export default function ProductDetailsPage() {
               {/* Trust Items List (Matching Image 3) */}
               <div className="space-y-2.5 pt-2 text-xs font-semibold text-slate-700">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-[#1E40AF]" />
+                  <ShieldCheck size={16} className="text-[#0645B5]" />
                   <span>100% Secure Payments</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <RefreshCw size={16} className="text-[#1E40AF]" />
+                  <RefreshCw size={16} className="text-[#0645B5]" />
                   <span>Easy Returns & Refunds</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-[#1E40AF]" />
+                  <Clock size={16} className="text-[#0645B5]" />
                   <span>7 Days Replacement</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Headphones size={16} className="text-[#1E40AF]" />
+                  <Headphones size={16} className="text-[#0645B5]" />
                   <span>24/7 Customer Support</span>
                 </div>
               </div>
@@ -447,8 +447,8 @@ export default function ProductDetailsPage() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`pb-3 text-xs sm:text-sm font-bold whitespace-nowrap transition border-b-2 ${
                     activeTab === tab.id
-                      ? "border-[#1E40AF] text-[#1E40AF]"
-                      : "border-transparent text-slate-500 hover:text-[#1E40AF]"
+                      ? "border-[#0645B5] text-[#0645B5]"
+                      : "border-transparent text-slate-500 hover:text-[#0645B5]"
                   }`}
                 >
                   {tab.label}
@@ -467,11 +467,11 @@ export default function ProductDetailsPage() {
                   {/* 4 Feature Icon Badges Box inside tab (Exact Image 3) */}
                   <div className="grid grid-cols-2 gap-4 pt-2">
                     <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 border border-slate-200/60">
-                      <div className="h-9 w-9 rounded-xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center shrink-0">
                         <Droplet size={18} />
                       </div>
                       <div>
-                        <div className="font-extrabold text-[#0B2545] text-xs">Suitable for Load</div>
+                        <div className="font-extrabold text-[#102A5C] text-xs">Suitable for Load</div>
                         <div className="text-[10px] text-slate-500">Top Load & Front Load</div>
                       </div>
                     </div>
@@ -481,7 +481,7 @@ export default function ProductDetailsPage() {
                         <ShieldCheck size={18} />
                       </div>
                       <div>
-                        <div className="font-extrabold text-[#0B2545] text-xs">No Harmful Chemicals</div>
+                        <div className="font-extrabold text-[#102A5C] text-xs">No Harmful Chemicals</div>
                         <div className="text-[10px] text-slate-500">Zero phosphates or parabens</div>
                       </div>
                     </div>
@@ -491,7 +491,7 @@ export default function ProductDetailsPage() {
                         <Sparkles size={18} />
                       </div>
                       <div>
-                        <div className="font-extrabold text-[#0B2545] text-xs">Works in Hard Water</div>
+                        <div className="font-extrabold text-[#102A5C] text-xs">Works in Hard Water</div>
                         <div className="text-[10px] text-slate-500">Fast lather & easy rinse</div>
                       </div>
                     </div>
@@ -501,7 +501,7 @@ export default function ProductDetailsPage() {
                         <Leaf size={18} />
                       </div>
                       <div>
-                        <div className="font-extrabold text-[#0B2545] text-xs">Biodegradable Formula</div>
+                        <div className="font-extrabold text-[#102A5C] text-xs">Biodegradable Formula</div>
                         <div className="text-[10px] text-slate-500">100% Eco-safe wash</div>
                       </div>
                     </div>
@@ -511,9 +511,9 @@ export default function ProductDetailsPage() {
 
               {activeTab === "usage" && (
                 <div className="space-y-2">
-                  <h4 className="font-bold text-[#0B2545]">Machine Wash (Front & Top Load):</h4>
+                  <h4 className="font-bold text-[#102A5C]">Machine Wash (Front & Top Load):</h4>
                   <p>Pour 1 capful (40ml) for standard 4-5 kg wash loads directly into liquid wash tray.</p>
-                  <h4 className="font-bold text-[#0B2545] pt-2">Hand Wash:</h4>
+                  <h4 className="font-bold text-[#102A5C] pt-2">Hand Wash:</h4>
                   <p>Mix 1 capful in 10 liters of water. Soak clothes for 20 mins and rinse thoroughly.</p>
                 </div>
               )}
@@ -538,7 +538,7 @@ export default function ProductDetailsPage() {
 
               {activeTab === "faqs" && (
                 <div className="space-y-2 text-xs">
-                  <p className="font-bold text-[#0B2545]">Is it safe for baby clothes?</p>
+                  <p className="font-bold text-[#102A5C]">Is it safe for baby clothes?</p>
                   <p>Yes, Matrin detergent is non-toxic and hypoallergenic, making it completely safe for infant clothes.</p>
                 </div>
               )}
@@ -550,10 +550,10 @@ export default function ProductDetailsPage() {
           <div className="lg:col-span-4 rounded-3xl bg-white p-6 border border-slate-200/80 shadow-xs space-y-4">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-[#0B2545] text-sm">
+              <h3 className="font-extrabold text-[#102A5C] text-sm">
                 You may also like
               </h3>
-              <Link href="/products" className="text-xs font-bold text-[#1E40AF] hover:underline">
+              <Link href="/products" className="text-xs font-bold text-[#0645B5] hover:underline">
                 View All
               </Link>
             </div>
@@ -589,10 +589,10 @@ export default function ProductDetailsPage() {
                     <ProductImage src={item.image} alt={item.name} fitMode="cover" roundedClassName="rounded-xl" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#0B2545] line-clamp-1 group-hover:text-[#1E40AF] transition-colors">
+                    <h4 className="text-xs font-bold text-[#102A5C] line-clamp-1 group-hover:text-[#0645B5] transition-colors">
                       {item.name}
                     </h4>
-                    <p className="text-xs font-extrabold text-[#1E40AF] mt-1">
+                    <p className="text-xs font-extrabold text-[#0645B5] mt-1">
                       {item.price}
                     </p>
                   </div>

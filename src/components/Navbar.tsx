@@ -71,24 +71,28 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top Announcement Bar */}
-      <div className="bg-[#EAF3FE] px-4 sm:px-6 py-1.5 text-[#0A1C3E] text-[11px] font-semibold border-b border-blue-100/80">
+      {/* Top Announcement Bar (Exact Match with Reference Image) */}
+      <div className="bg-[#0645B5] px-4 sm:px-6 py-2 text-white text-[11px] font-semibold border-b border-white/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#0A1C3E]">
-            <span>Free Delivery on orders above ₹499</span>
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-600 font-medium">Clean Homes, Better Lives.</span>
+          <div className="flex items-center gap-5 text-[11px] sm:text-xs">
+            <div className="flex items-center gap-1.5 font-bold">
+              <Truck size={14} className="text-cyan-200 shrink-0" />
+              <span>Free Delivery on orders above ₹499</span>
+            </div>
+            <div className="hidden lg:flex items-center gap-1.5 text-blue-100 font-medium">
+              <Shield size={14} className="text-cyan-200 shrink-0" />
+              <span>100% Secure Payments</span>
+            </div>
+            <div className="hidden xl:flex items-center gap-1.5 text-blue-100 font-medium">
+              <Sparkles size={14} className="text-cyan-200 shrink-0" />
+              <span>Eco-Friendly Products</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] sm:text-xs text-[#0A1C3E] font-semibold">
-            <a href="tel:+919876543210" className="hover:text-[#0038A8] transition flex items-center gap-1.5">
-              <span>+91 98765 43210</span>
-            </a>
-            <div className="flex items-center gap-2 text-[#0038A8]">
-              <Link href="#" className="hover:opacity-75 transition">f</Link>
-              <Link href="#" className="hover:opacity-75 transition">i</Link>
-              <Link href="#" className="hover:opacity-75 transition">y</Link>
-            </div>
+          <div className="flex items-center gap-4 text-[11px] sm:text-xs text-blue-100 font-medium">
+            <Link href="/contact" className="hover:text-white transition flex items-center gap-1">
+              <span>Store Locator</span>
+            </Link>
           </div>
         </div>
       </div>      {/* Main Navbar Header (Desktop Height 84px - Largest Spacious View) */}
@@ -126,22 +130,22 @@ export default function Navbar() {
                     <Link
                       href={link.href}
                       className={`text-base sm:text-base lg:text-[16px] font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${isActive
-                        ? "text-[#0038A8]"
-                        : "text-slate-800 hover:text-[#0038A8]"
+                        ? "text-[#0645B5]"
+                        : "text-slate-800 hover:text-[#0645B5]"
                         }`}
                     >
                       <span>{link.name}</span>
                       {link.hasDropdown && (
                         <ChevronDown
                           size={15}
-                          className={`text-slate-400 transition-transform duration-200 ${isDropdownActive ? "rotate-180 text-[#0038A8]" : ""
+                          className={`text-slate-400 transition-transform duration-200 ${isDropdownActive ? "rotate-180 text-[#0645B5]" : ""
                             }`}
                         />
                       )}
                       {isActive && (
                         <motion.div
                           layoutId="activeIndicator"
-                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0038A8] rounded-full"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0645B5] rounded-full"
                         />
                       )}
                     </Link>
@@ -159,7 +163,7 @@ export default function Navbar() {
                           >
                             {/* Left Column: Categories List */}
                             <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
-                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#0038A8] mb-3">
+                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#0645B5] mb-3">
                                 Shop by Category
                               </div>
                               {categoryItems.map((cat) => (
@@ -169,9 +173,9 @@ export default function Navbar() {
                                   onClick={() => setActiveDropdown(null)}
                                   className="block p-2 rounded-xl hover:bg-blue-50/80 transition group/item"
                                 >
-                                  <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#0038A8] flex items-center justify-between">
+                                  <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#0645B5] flex items-center justify-between">
                                     <span>{cat.name}</span>
-                                    <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity text-[#0038A8]" />
+                                    <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity text-[#0645B5]" />
                                   </div>
                                   <div className="text-[10px] text-slate-400 font-medium">{cat.desc}</div>
                                 </Link>
@@ -180,9 +184,9 @@ export default function Navbar() {
 
                             {/* Right Column: Featured Products Preview */}
                             <div className="col-span-6 space-y-2">
-                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#0038A8] mb-3 flex items-center justify-between">
+                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#0645B5] mb-3 flex items-center justify-between">
                                 <span>Bestsellers</span>
-                                <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#0038A8] font-bold">
+                                <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#0645B5] font-bold">
                                   View All →
                                 </Link>
                               </div>
@@ -204,7 +208,7 @@ export default function Navbar() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="text-xs font-extrabold text-slate-800 truncate">{product.name}</div>
-                                    <div className="text-[10px] font-bold text-[#0038A8]">₹{product.price}</div>
+                                    <div className="text-[10px] font-bold text-[#0645B5]">₹{product.price}</div>
                                   </div>
                                 </Link>
                               ))}
@@ -229,7 +233,7 @@ export default function Navbar() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 lg:w-60 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-10 py-2 pl-9 pr-4 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#0038A8] focus:outline-hidden transition-all shadow-2xs"
+                className="w-48 lg:w-60 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-10 py-2 pl-9 pr-4 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:outline-hidden transition-all shadow-2xs"
               />
               <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
 
@@ -274,20 +278,20 @@ export default function Navbar() {
             {/* Account Link */}
             <Link
               href="/login"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0038A8] transition-colors p-2 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0645B5] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
             >
               {user ? (
                 <div className="flex items-center gap-2 rounded-full bg-blue-50 py-1.5 px-3 border border-blue-200">
-                  <span className="h-5.5 w-5.5 rounded-full bg-[#0038A8] text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="h-5.5 w-5.5 rounded-full bg-[#0645B5] text-white text-[10px] font-bold flex items-center justify-center">
                     {user.name.charAt(0)}
                   </span>
-                  <span className="text-xs font-bold text-[#0038A8] max-w-[100px] truncate">
+                  <span className="text-xs font-bold text-[#0645B5] max-w-[100px] truncate">
                     {user.name.split(" ")[0]}
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-[#0038A8] transition">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-[#0645B5] transition">
                   <User size={21} />
                   <span className="hidden sm:inline">Sign In</span>
                 </div>
@@ -297,11 +301,11 @@ export default function Navbar() {
             {/* Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0038A8] transition-colors p-2 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0645B5] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Wishlist"
             >
               <Heart size={21} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0038A8] text-[9px] font-extrabold text-white shadow-2xs">
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0645B5] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
             </button>
@@ -309,11 +313,11 @@ export default function Navbar() {
             {/* Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0038A8] transition-colors p-2 rounded-xl hover:bg-slate-50"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0645B5] transition-colors p-2 rounded-xl hover:bg-slate-50"
               title="Cart"
             >
               <ShoppingBag size={21} />
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0038A8] text-[9px] font-extrabold text-white shadow-2xs">
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0645B5] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
             </button>
@@ -325,7 +329,7 @@ export default function Navbar() {
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0038A8] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0645B5] p-2 rounded-xl transition active:scale-95"
               aria-label="Search"
             >
               <Search size={20} />
@@ -334,11 +338,11 @@ export default function Navbar() {
             {/* Mobile Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0038A8] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0645B5] p-2 rounded-xl transition active:scale-95"
               title="Wishlist"
             >
               <Heart size={20} className={wishlistCount > 0 ? "text-rose-500 fill-rose-500" : ""} />
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0038A8] text-[9px] font-extrabold text-white shadow-2xs">
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0645B5] text-[9px] font-extrabold text-white shadow-2xs">
                 {wishlistCount}
               </span>
             </button>
@@ -346,11 +350,11 @@ export default function Navbar() {
             {/* Mobile Cart Button */}
             <button
               onClick={openCartDrawer}
-              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0038A8] p-2 rounded-xl transition active:scale-95"
+              className="min-h-[44px] min-w-[44px] relative flex items-center justify-center text-slate-700 hover:text-[#0645B5] p-2 rounded-xl transition active:scale-95"
               title="Cart"
             >
               <ShoppingBag size={20} />
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0038A8] text-[9px] font-extrabold text-white shadow-2xs">
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0645B5] text-[9px] font-extrabold text-white shadow-2xs">
                 {cartCount}
               </span>
             </button>
@@ -379,7 +383,7 @@ export default function Navbar() {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-[#0038A8] focus:outline-hidden shadow-2xs"
+                  className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-[#0645B5] focus:outline-hidden shadow-2xs"
                 />
                 <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
               </form>
@@ -405,12 +409,12 @@ export default function Navbar() {
                       href={link.href}
                       onClick={() => setIsOpen(false)}
                       className={`min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center justify-between transition ${isActive
-                        ? "bg-blue-50 text-[#0038A8]"
+                        ? "bg-blue-50 text-[#0645B5]"
                         : "text-slate-800 hover:bg-slate-50"
                         }`}
                     >
                       <span>{link.name}</span>
-                      <ArrowRight size={16} className={isActive ? "text-[#0038A8]" : "text-slate-400"} />
+                      <ArrowRight size={16} className={isActive ? "text-[#0645B5]" : "text-slate-400"} />
                     </Link>
                   );
                 })}
@@ -419,7 +423,7 @@ export default function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setIsOpen(false)}
-                    className="min-h-[44px] flex-1 py-3 px-4 rounded-xl bg-[#0038A8] text-white font-bold text-center text-sm shadow-md"
+                    className="min-h-[44px] flex-1 py-3 px-4 rounded-xl bg-[#0645B5] text-white font-bold text-center text-sm shadow-md"
                   >
                     {user ? `Account (${user.name.split(" ")[0]})` : "Sign In"}
                   </Link>

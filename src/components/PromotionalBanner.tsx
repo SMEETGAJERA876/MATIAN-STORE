@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function PromotionalBanner() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-[#003399] via-[#0038A8] to-[#1D68E8] text-white py-10 lg:py-14 my-10 rounded-2xl mx-auto max-w-7xl px-6 lg:px-12 shadow-xl">
+    <section className="relative overflow-hidden bg-gradient-to-r from-[#0645B5] via-[#0b53d4] to-[#1769E0] text-white py-10 lg:py-14 my-10 rounded-2xl mx-auto max-w-7xl px-6 lg:px-12 shadow-xl">
       
       {/* Water splash background FX */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
@@ -30,7 +30,7 @@ export default function PromotionalBanner() {
           <div className="pt-2">
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#0038A8] hover:bg-[#002D88] px-7 py-3 text-xs font-black uppercase tracking-wider text-white border border-white/20 transition-all shadow-md active:scale-95"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#0645B5] hover:bg-[#043694] px-7 py-3 text-xs font-black uppercase tracking-wider text-white border border-white/20 transition-all shadow-md active:scale-95"
             >
               <span>SHOP NOW</span>
               <ArrowRight size={14} />
@@ -42,10 +42,10 @@ export default function PromotionalBanner() {
         <div className="flex items-center gap-6">
           <div className="relative flex items-center justify-center">
             {/* White Circular Badge */}
-            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full bg-white text-[#0038A8] flex flex-col items-center justify-center p-2 shadow-2xl border-4 border-blue-200/50 text-center transform rotate-6">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">UP TO</span>
-              <span className="text-2xl sm:text-3xl font-black leading-none text-[#0038A8]">20%</span>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">OFF</span>
+            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full bg-white text-[#0645B5] flex flex-col items-center justify-center p-2 shadow-2xl border-4 border-blue-200/50 text-center transform rotate-6">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#5F6B7A]">UP TO</span>
+              <span className="text-2xl sm:text-3xl font-black leading-none text-[#0645B5]">20%</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#5F6B7A]">OFF</span>
             </div>
           </div>
         </div>

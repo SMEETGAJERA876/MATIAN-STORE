@@ -31,12 +31,12 @@ const reviews = [
 
 export default function CustomerReviews() {
   return (
-    <section className="bg-[#F8FAFC] dark:bg-[#070F1E] py-12 lg:py-16" id="reviews">
+    <section className="bg-[#F5FAFF] dark:bg-[#0A1428] py-12 lg:py-16" id="reviews">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         
         {/* Section Header matching reference image */}
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-black text-[#0A1C3E] dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] dark:text-white tracking-tight">
             What Our Customers Say
           </h2>
         </div>
@@ -46,16 +46,16 @@ export default function CustomerReviews() {
           {reviews.map((rev) => (
             <div
               key={rev.id}
-              className="flex items-start gap-4 rounded-2xl bg-white dark:bg-[#152238] p-5 border border-slate-100 dark:border-[#233554] shadow-xs"
+              className="flex items-start gap-4 rounded-2xl bg-white dark:bg-[#152238] p-5 border border-[#DCE8F5] dark:border-[#233554] shadow-xs"
             >
               <img
                 src={rev.avatar}
                 alt={rev.name}
-                className="h-12 w-12 rounded-full object-cover shrink-0 border border-slate-200"
+                className="h-12 w-12 rounded-full object-cover shrink-0 border border-[#DCE8F5]"
               />
 
               <div className="space-y-1">
-                <h3 className="font-bold text-[#0A1C3E] dark:text-white text-xs">
+                <h3 className="font-bold text-[#102A5C] dark:text-white text-xs">
                   {rev.name}
                 </h3>
 
@@ -66,7 +66,7 @@ export default function CustomerReviews() {
                   ))}
                 </div>
 
-                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300 font-medium pt-1">
+                <p className="text-xs leading-relaxed text-[#5F6B7A] dark:text-slate-300 font-medium pt-1">
                   {rev.comment}
                 </p>
               </div>
