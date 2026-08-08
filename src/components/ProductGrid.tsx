@@ -67,7 +67,7 @@ export default function ProductGrid({
       
       {/* Section Header matching reference image */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] dark:text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] tracking-tight">
           {sectionTitle}
         </h2>
 
@@ -124,7 +124,7 @@ export default function ProductGrid({
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-2xs border border-slate-200/60 dark:border-slate-700">
             <RefreshCw size={24} />
           </div>
-          <h3 className="mt-4 text-xl font-bold text-[#102A5C] dark:text-white">
+          <h3 className="mt-4 text-xl font-bold text-[#102A5C]">
             No products found matching &ldquo;{search}&rdquo;
           </h3>
           <p className="mt-2 text-xs text-slate-500 font-medium">

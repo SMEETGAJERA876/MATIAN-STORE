@@ -36,7 +36,7 @@ export default function CustomerReviews() {
 
         {/* Section Header matching reference image */}
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-[#102A5C] tracking-tight">
             What Our Customers Say
           </h2>
         </div>

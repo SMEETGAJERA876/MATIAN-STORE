@@ -37,7 +37,7 @@ export default function FAQSection() {
           <span className="text-xs font-extrabold uppercase tracking-widest text-[#0645B5] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
             QUESTIONS & ANSWERS
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#102A5C] dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#102A5C] tracking-tight">
             Frequently Asked Questions
           </h2>
           <p className="text-xs sm:text-sm text-[#5F6B7A] dark:text-slate-400 font-medium">
