@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-[#EAF3FA] via-[#F1F7FC] to-[#E3F0FA] pt-8 pb-14 lg:pt-12 lg:pb-20 border-b border-blue-100/60">
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#EDF7FF] via-[#DCEFFA] to-[#EBF4FC] pt-8 pb-12 lg:pt-12 lg:pb-16 border-b border-blue-100/60">
       
       {/* Background Water Splash FX Accents */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200/40 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200/50 via-transparent to-transparent pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
@@ -17,41 +17,47 @@ export default function Hero() {
           {/* Left Column: Text Content & CTAs */}
           <div className="lg:col-span-5 space-y-6">
             
-            {/* Eyebrow Tag */}
+            {/* Eyebrow Tag matching reference image */}
             <div className="inline-block">
-              <span className="text-xs sm:text-xs font-extrabold uppercase tracking-widest text-[#1E40AF]">
-                PREMIUM CLEANING PRODUCTS
+              <span className="inline-block bg-[#D2E8FD] text-[#0038A8] px-3.5 py-1 rounded-md text-xs font-black uppercase tracking-wider border border-blue-200/60 shadow-2xs">
+                NEW & IMPROVED
               </span>
             </div>
 
-            {/* Main Headline */}
+            {/* Main Headline matching reference image */}
             <div className="space-y-1">
-              <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0B2545] leading-[1.1]">
-                Clean Home.
+              <h1 className="font-sans text-4xl sm:text-5xl lg:text-[52px] font-black tracking-tight text-[#0A1C3E] leading-[1.1]">
+                POWERFUL CLEANING
               </h1>
-              <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0B2545] leading-[1.1]">
-                Better Living.
+              <h1 className="font-sans text-4xl sm:text-5xl lg:text-[52px] font-black tracking-tight text-[#0038A8] leading-[1.1]">
+                YOU CAN TRUST
               </h1>
             </div>
 
-            {/* Subtitle */}
+            {/* Subtitle matching reference image */}
             <p className="text-sm sm:text-base text-slate-600 font-medium max-w-md leading-relaxed">
-              Powerful cleaning. Gentle on hands. Safe for your home and the planet.
+              Matrin brings you superior cleaning with advanced formula for a healthier home.
             </p>
 
-            {/* CTA Button */}
-            <div className="pt-2">
+            {/* CTA Buttons matching reference image */}
+            <div className="pt-2 flex items-center gap-3">
               <Link
                 href="/products"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#0B4B8A] px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-[#083A6D] hover:shadow-blue-900/30 active:scale-95"
+                className="group inline-flex items-center gap-2 rounded-lg bg-[#0038A8] px-7 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-md shadow-blue-900/20 transition-all hover:bg-[#002D88] active:scale-95"
               >
-                <span>SHOP COLLECTION</span>
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                <span>SHOP NOW</span>
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-[#0A1C3E] border border-slate-300 transition-all hover:bg-slate-50 hover:border-slate-400 active:scale-95"
+              >
+                <span>EXPLORE PRODUCTS</span>
               </Link>
             </div>
 
             {/* 3 Key Feature Icons Row */}
-            <div className="pt-6 grid grid-cols-3 gap-2 sm:gap-4 text-xs font-bold text-slate-800 border-t border-blue-200/50">
+            <div className="pt-6 grid grid-cols-3 gap-2 sm:gap-4 text-xs font-bold text-slate-800 border-t border-blue-200/60">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
                   <Leaf size={16} />
@@ -60,7 +66,7 @@ export default function Hero() {
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-blue-100/80 text-[#1E40AF] flex items-center justify-center shrink-0">
+                <div className="h-8 w-8 rounded-full bg-blue-100/80 text-[#0038A8] flex items-center justify-center shrink-0">
                   <ShieldCheck size={16} />
                 </div>
                 <span className="text-[11px] sm:text-xs font-semibold text-slate-700">Safe for Families</span>
@@ -94,39 +100,28 @@ export default function Hero() {
 
         </div>
 
-        {/* Bottom Floating Brand Value Bar */}
-        <div className="mt-10 rounded-3xl bg-white p-6 sm:p-7 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
-              <Users size={22} />
-            </div>
-            <div>
-              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Every Indian Home</div>
-              <p className="text-xs font-medium text-slate-500 mt-0.5">Built for Local Needs</p>
-            </div>
+        {/* Bottom Category Quick Cards Bar (Matching Reference Image "Shop by Category") */}
+        <div className="mt-10 pt-4">
+          <div className="text-sm font-extrabold text-[#0A1C3E] mb-3">Shop by Category</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { name: "Detergent Liquid", icon: "🧴", href: "/products?category=Laundry Care" },
+              { name: "Dish Wash", icon: "🧪", href: "/products?category=Dish Care" },
+              { name: "Floor Cleaner", icon: "🧼", href: "/products?category=Floor Care" },
+              { name: "Toilet Cleaner", icon: "🧽", href: "/products?category=Toilet Care" },
+              { name: "Bathroom Cleaner", icon: "✨", href: "/products?category=Multi-Surface" },
+              { name: "Laundry Care", icon: "👕", href: "/products?category=Laundry Care" },
+            ].map((cat) => (
+              <Link
+                key={cat.name}
+                href={cat.href}
+                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-100 hover:border-[#0038A8]/40 hover:bg-[#F0F6FD] transition-all shadow-2xs group text-center"
+              >
+                <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">{cat.icon}</div>
+                <span className="text-xs font-bold text-slate-800 group-hover:text-[#0038A8]">{cat.name}</span>
+              </Link>
+            ))}
           </div>
-
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
-              <Shield size={22} />
-            </div>
-            <div>
-              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Plant-Based</div>
-              <p className="text-xs font-medium text-slate-500 mt-0.5">Non-Toxic Formulas</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 pt-2 md:pt-0 md:px-4">
-            <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100 shadow-2xs">
-              <Leaf size={22} />
-            </div>
-            <div>
-              <div className="text-sm font-extrabold text-[#0B2545] leading-tight">Dermatologically</div>
-              <p className="text-xs font-medium text-slate-500 mt-0.5">Tested & Gentle</p>
-            </div>
-          </div>
-
         </div>
 
       </div>

@@ -1,46 +1,53 @@
 "use client";
 
-import { ShieldCheck, Truck, Award } from "lucide-react";
+import { Sparkles, Users, Leaf, Truck, ShieldCheck } from "lucide-react";
 
 export default function TrustBadges() {
   const badges = [
     {
-      icon: <Truck className="text-[#1E40AF]" size={22} />,
-      title: "Free Express Delivery",
-      subtitle: "On all orders above ₹499",
-      bg: "bg-blue-50 border-blue-100",
+      icon: <Sparkles className="text-[#0038A8]" size={20} />,
+      title: "Powerful Cleaning",
+      subtitle: "Tough on stains",
     },
     {
-      icon: <ShieldCheck className="text-emerald-600" size={22} />,
-      title: "99.9% Germ Shield",
-      subtitle: "Lab-certified antibacterial formula",
-      bg: "bg-emerald-50 border-emerald-100",
+      icon: <Users className="text-[#0038A8]" size={20} />,
+      title: "Safe for Families",
+      subtitle: "Gentle on hands",
     },
     {
-      icon: <Award className="text-[#1E40AF]" size={22} />,
-      title: "100% Quality Assured",
-      subtitle: "Non-toxic & pet-safe chemistry",
-      bg: "bg-[#EBF3FB] border-blue-100",
+      icon: <Leaf className="text-[#0038A8]" size={20} />,
+      title: "Eco Friendly",
+      subtitle: "Better for environment",
+    },
+    {
+      icon: <Truck className="text-[#0038A8]" size={20} />,
+      title: "Fast Delivery",
+      subtitle: "Across India",
+    },
+    {
+      icon: <ShieldCheck className="text-[#0038A8]" size={20} />,
+      title: "Trusted Brand",
+      subtitle: "Quality you can trust",
     },
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-slate-50/60 py-8">
+    <section className="border-y border-slate-200/60 bg-white py-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {badges.map((badge, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-4 rounded-2xl bg-white p-4 border border-slate-100 shadow-2xs transition-shadow hover:shadow-md"
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition"
             >
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${badge.bg} border shadow-2xs`}>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 border border-blue-100 shadow-2xs">
                 {badge.icon}
               </div>
               <div>
-                <h4 className="text-sm font-extrabold text-[#0B2545]">
+                <h4 className="text-xs font-black text-[#0A1C3E] leading-snug">
                   {badge.title}
                 </h4>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                <p className="text-[11px] text-slate-500 font-medium leading-tight">
                   {badge.subtitle}
                 </p>
               </div>

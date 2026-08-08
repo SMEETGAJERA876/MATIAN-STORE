@@ -60,29 +60,23 @@ export default function ProductGrid({
     : filteredAndSortedProducts;
 
   const sectionBadge = badge || (isTeaser ? "OUR BESTSELLERS" : "FULL CATALOG");
-  const sectionTitle = title || (isTeaser ? "Shop Our Most Loved Products" : "Our Products");
+  const sectionTitle = title || (isTeaser ? "Best Sellers" : "Our Products");
 
   return (
-    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 lg:py-16 rounded-3xl bg-slate-50/60 dark:bg-[#0E172A]/80 border border-slate-200/60 dark:border-slate-800/80 shadow-xs my-6" id="products-grid">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-8 lg:py-12 my-4" id="products-grid">
       
-      {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-        <div>
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
-            {sectionBadge}
-          </span>
-          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B2545] dark:text-white tracking-tight">
-            {sectionTitle}
-          </h2>
-        </div>
+      {/* Section Header matching reference image */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl sm:text-2xl font-black text-[#0A1C3E] dark:text-white tracking-tight">
+          {sectionTitle}
+        </h2>
 
         {isTeaser && (
           <Link
             href="/products"
-            className="group inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] dark:text-blue-400 hover:text-[#1a3899] dark:hover:text-blue-300 transition"
+            className="group inline-flex items-center gap-1.5 rounded-lg bg-[#EBF4FE] hover:bg-[#DCEFFA] border border-[#0038A8]/30 px-3.5 py-1.5 text-xs font-bold text-[#0038A8] transition"
           >
-            <span>VIEW ALL PRODUCTS ({products.length})</span>
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            <span>View All Products</span>
           </Link>
         )}
       </div>

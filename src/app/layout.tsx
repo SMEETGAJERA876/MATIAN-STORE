@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="flex min-h-screen flex-col bg-[#FAF7F2] dark:bg-[#070F1E] text-slate-800 dark:text-slate-100 antialiased selection:bg-[#0B2545] selection:text-white">
+      <body className="flex min-h-screen flex-col bg-[#F4F8FC] dark:bg-[#070F1E] text-slate-800 dark:text-slate-100 antialiased selection:bg-[#0038A8] selection:text-white">
         <ThemeProvider>
           <AuthProvider>
             <ProductStoreProvider>
@@ -34,8 +34,8 @@ export default function RootLayout({
                     position="top-right"
                     toastOptions={{
                       style: {
-                        background: "#0B2545",
-                        color: "#FAF7F2",
+                        background: "#0038A8",
+                        color: "#FFFFFF",
                         borderRadius: "12px",
                         fontSize: "13px",
                         fontFamily: "Inter, sans-serif",

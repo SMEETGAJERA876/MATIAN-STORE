@@ -1,93 +1,74 @@
 "use client";
 
-import { Star, CheckCircle2, Quote } from "lucide-react";
+import { Star } from "lucide-react";
 
 const reviews = [
   {
     id: 1,
-    name: "Rohan Kapoor",
-    role: "Verified Buyer",
+    name: "Riya Sharma",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     comment:
-      "Matrin's Liquid Detergent removed tough oil stains from my cotton shirts on the first wash! The fragrance is subtle yet lasts all week.",
-    product: "Matrin Ultra Liquid Detergent",
-    date: "2 days ago",
+      "Matrin detergent gives amazing results. Clothes look new even after multiple washes!",
   },
   {
     id: 2,
-    name: "Pooja Trivedi",
-    role: "Homemaker",
+    name: "Amit Verma",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     comment:
-      "The Dish Wash is incredibly gentle on hands. Other products dried my skin out, but Matrin cleans grease effortlessly with just a few drops.",
-    product: "Matrin Power Dish Wash",
-    date: "1 week ago",
+      "Best floor cleaner! Long-lasting fragrance and super effective.",
   },
   {
     id: 3,
-    name: "Dr. Suresh Iyer",
-    role: "Verified Buyer",
+    name: "Sneha Patil",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     comment:
-      "Floor cleaner smells so fresh! With pets at home, having a safe antibacterial floor cleaner gives us complete peace of mind.",
-    product: "Matrin Fresh Floor Cleaner",
-    date: "2 weeks ago",
+      "Love the dish wash liquid. Removes grease easily and is gentle on hands.",
   },
 ];
 
 export default function CustomerReviews() {
   return (
-    <section className="bg-[#F8FAFC] dark:bg-[#070F1E] py-16 lg:py-20" id="reviews">
+    <section className="bg-[#F8FAFC] dark:bg-[#070F1E] py-12 lg:py-16" id="reviews">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#1E40AF] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-md border border-blue-100 dark:border-blue-800/60 inline-block">
-            TESTIMONIALS
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B2545] dark:text-white tracking-tight">
-            What Early Customers Are Saying
+        {/* Section Header matching reference image */}
+        <div className="mb-8">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0A1C3E] dark:text-white tracking-tight">
+            What Our Customers Say
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-            Discover why families trust Matrin for superior home care and daily cleaning.
-          </p>
         </div>
 
-        {/* Reviews Cards Grid */}
+        {/* Reviews Cards Grid matching reference image */}
         <div className="grid gap-6 md:grid-cols-3">
           {reviews.map((rev) => (
             <div
               key={rev.id}
-              className="relative flex flex-col justify-between rounded-3xl bg-white dark:bg-[#152238] p-7 border border-slate-100 dark:border-[#233554] shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              className="flex items-start gap-4 rounded-2xl bg-white dark:bg-[#152238] p-5 border border-slate-100 dark:border-[#233554] shadow-xs"
             >
-              <Quote size={36} className="absolute top-6 right-6 text-[#1E40AF]/10 dark:text-blue-400/20" />
+              <img
+                src={rev.avatar}
+                alt={rev.name}
+                className="h-12 w-12 rounded-full object-cover shrink-0 border border-slate-200"
+              />
 
-              <div>
+              <div className="space-y-1">
+                <h3 className="font-bold text-[#0A1C3E] dark:text-white text-xs">
+                  {rev.name}
+                </h3>
+
                 {/* Rating Stars */}
-                <div className="flex items-center gap-1 text-amber-500">
+                <div className="flex items-center gap-0.5 text-amber-500">
                   {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-amber-400 text-amber-400" />
+                    <Star key={i} size={12} className="fill-amber-400 text-amber-400" />
                   ))}
                 </div>
 
-                <p className="mt-4 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-medium italic">
-                  &ldquo;{rev.comment}&rdquo;
+                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300 font-medium pt-1">
+                  {rev.comment}
                 </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <div>
-                  <h3 className="font-extrabold text-[#0B2545] dark:text-white text-xs">
-                    {rev.name}
-                  </h3>
-                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold">
-                    <CheckCircle2 size={13} /> {rev.role}
-                  </div>
-                </div>
-
-                <span className="text-[10px] font-semibold text-slate-400">
-                  {rev.date}
-                </span>
               </div>
             </div>
           ))}

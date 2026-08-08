@@ -1,40 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, ArrowRight, Tag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function PromotionalBanner() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-[#1E40AF] via-[#1d3b9e] to-[#0B2545] text-white py-10 my-12 rounded-3xl mx-auto max-w-7xl px-8 shadow-xl">
-      <div className="relative flex flex-col items-center justify-between gap-6 md:flex-row md:px-4">
-        <div className="flex items-center gap-4 text-center md:text-left">
-          <div className="hidden h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-md md:flex">
-            <Tag size={24} className="text-cyan-300" />
+    <section className="relative overflow-hidden bg-gradient-to-r from-[#003399] via-[#0038A8] to-[#1D68E8] text-white py-10 lg:py-14 my-10 rounded-2xl mx-auto max-w-7xl px-6 lg:px-12 shadow-xl">
+      
+      {/* Water splash background FX */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+
+      <div className="relative flex flex-col md:flex-row items-center justify-between gap-8 z-10">
+        
+        {/* Left Typography */}
+        <div className="space-y-3 text-center md:text-left max-w-lg">
+          <div className="space-y-0.5">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+              CLEAN HOME.
+            </h2>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+              HAPPY HOME.
+            </h2>
           </div>
 
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-cyan-300 border border-white/10 backdrop-blur-md">
-              <Sparkles size={12} /> SPECIAL OFFER
-            </span>
+          <p className="text-xs sm:text-sm text-blue-100 font-medium">
+            Get up to 20% off on your first order.
+          </p>
 
-            <h3 className="mt-2 text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-              Get 10% OFF + Free Express Shipping
-            </h3>
-            <p className="mt-1 text-xs text-blue-100 font-medium">
-              Use promo code <span className="font-bold underline underline-offset-2 text-cyan-300">MATRIN10</span> on orders over ₹499!
-            </p>
+          <div className="pt-2">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#0038A8] hover:bg-[#002D88] px-7 py-3 text-xs font-black uppercase tracking-wider text-white border border-white/20 transition-all shadow-md active:scale-95"
+            >
+              <span>SHOP NOW</span>
+              <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
 
-        <div>
-          <Link
-            href="/products"
-            className="group flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-xs font-extrabold uppercase tracking-wider text-[#1E40AF] transition hover:bg-cyan-50 active:scale-95 shadow-md"
-          >
-            <span>Claim Offer</span>
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-          </Link>
+        {/* Right Product Showcase & Circular Badge matching reference image */}
+        <div className="flex items-center gap-6">
+          <div className="relative flex items-center justify-center">
+            {/* White Circular Badge */}
+            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full bg-white text-[#0038A8] flex flex-col items-center justify-center p-2 shadow-2xl border-4 border-blue-200/50 text-center transform rotate-6">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">UP TO</span>
+              <span className="text-2xl sm:text-3xl font-black leading-none text-[#0038A8]">20%</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">OFF</span>
+            </div>
+          </div>
         </div>
+
       </div>
     </section>
   );
