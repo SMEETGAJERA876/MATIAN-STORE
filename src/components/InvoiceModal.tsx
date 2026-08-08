@@ -89,7 +89,7 @@ export default function InvoiceModal({
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-6 gap-6">
               <div>
                 <img
-                  src="/images/matrin-logo-clean.webp"
+                  src="/images/matrin-logo-sticker.webp"
                   alt="MATRIN"
                   className="h-10 w-auto object-contain mb-2"
                 />

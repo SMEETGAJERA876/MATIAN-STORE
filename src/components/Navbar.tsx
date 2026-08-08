@@ -101,14 +101,13 @@ export default function Navbar() {
         </div>
       </div>      {/* Main Navbar Header (Desktop Height 84px - Largest Spacious View) */}
       <nav
-        className={`transition-all duration-300 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
-            : "bg-white border-b border-slate-100"
-        }`}
+        className={`transition-all duration-300 ${scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80"
+          : "bg-white border-b border-slate-100"
+          }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 lg:py-5 h-16 sm:h-20 lg:h-[84px]">
-          
+
           {/* Brand Logo & Desktop Navigation Wrapper */}
           <div className="flex items-center gap-8 lg:gap-14">
             {/* Large Brand Logo */}
@@ -122,117 +121,115 @@ export default function Navbar() {
 
             {/* Desktop Navigation Links */}
             <div className="hidden items-center gap-6 lg:gap-8 lg:flex">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const isDropdownActive = activeDropdown === link.name;
-              return (
-                <div
-                  key={link.name}
-                  className="relative group py-4"
-                  onMouseEnter={() => link.hasDropdown && setActiveDropdown(link.name)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  <Link
-                    href={link.href}
-                    className={`text-base sm:text-base lg:text-[16px] font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${
-                      isActive
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                const isDropdownActive = activeDropdown === link.name;
+                return (
+                  <div
+                    key={link.name}
+                    className="relative group py-4"
+                    onMouseEnter={() => link.hasDropdown && setActiveDropdown(link.name)}
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`text-base sm:text-base lg:text-[16px] font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${isActive
                         ? "text-[#1E40AF]"
                         : "text-slate-800 hover:text-[#1E40AF]"
-                    }`}
-                  >
-                    <span>{link.name}</span>
-                    {link.hasDropdown && (
-                      <ChevronDown
-                        size={15}
-                        className={`text-slate-400 transition-transform duration-200 ${
-                          isDropdownActive ? "rotate-180 text-[#1E40AF]" : ""
                         }`}
-                      />
-                    )}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E40AF] rounded-full"
-                      />
-                    )}
-                  </Link>
-
-                  {/* Dropdown Menu for Products & Categories */}
-                  {link.hasDropdown && (
-                    <AnimatePresence>
-                      {isDropdownActive && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute top-full left-0 w-[540px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
-                        >
-                          {/* Left Column: Categories List */}
-                          <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
-                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3">
-                              Shop by Category
-                            </div>
-                            {categoryItems.map((cat) => (
-                              <Link
-                                key={cat.name}
-                                href={cat.href}
-                                onClick={() => setActiveDropdown(null)}
-                                className="block p-2 rounded-xl hover:bg-blue-50/80 transition group/item"
-                              >
-                                <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#1E40AF] flex items-center justify-between">
-                                  <span>{cat.name}</span>
-                                  <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity text-[#1E40AF]" />
-                                </div>
-                                <div className="text-[10px] text-slate-400 font-medium">{cat.desc}</div>
-                              </Link>
-                            ))}
-                          </div>
-
-                          {/* Right Column: Featured Products Preview */}
-                          <div className="col-span-6 space-y-2">
-                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3 flex items-center justify-between">
-                              <span>Bestsellers</span>
-                              <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#1E40AF] font-bold">
-                                View All →
-                              </Link>
-                            </div>
-                            {featuredProducts.map((product) => (
-                              <Link
-                                key={product.id}
-                                href={`/products/${product.id}`}
-                                onClick={() => setActiveDropdown(null)}
-                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
-                              >
-                                <div className="h-11 w-11 shrink-0">
-                                  <ProductImage
-                                    src={product.image}
-                                    alt={product.name}
-                                    fitMode="contain"
-                                    paddingClassName="p-1"
-                                    roundedClassName="rounded-xl"
-                                  />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-xs font-extrabold text-slate-800 truncate">{product.name}</div>
-                                  <div className="text-[10px] font-bold text-[#1E40AF]">₹{product.price}</div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </motion.div>
+                    >
+                      <span>{link.name}</span>
+                      {link.hasDropdown && (
+                        <ChevronDown
+                          size={15}
+                          className={`text-slate-400 transition-transform duration-200 ${isDropdownActive ? "rotate-180 text-[#1E40AF]" : ""
+                            }`}
+                        />
                       )}
-                    </AnimatePresence>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E40AF] rounded-full"
+                        />
+                      )}
+                    </Link>
+
+                    {/* Dropdown Menu for Products & Categories */}
+                    {link.hasDropdown && (
+                      <AnimatePresence>
+                        {isDropdownActive && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute top-full left-0 w-[540px] rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 z-50 grid grid-cols-12 gap-5"
+                          >
+                            {/* Left Column: Categories List */}
+                            <div className="col-span-6 space-y-2 border-r border-slate-100 pr-4">
+                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3">
+                                Shop by Category
+                              </div>
+                              {categoryItems.map((cat) => (
+                                <Link
+                                  key={cat.name}
+                                  href={cat.href}
+                                  onClick={() => setActiveDropdown(null)}
+                                  className="block p-2 rounded-xl hover:bg-blue-50/80 transition group/item"
+                                >
+                                  <div className="text-xs font-bold text-slate-800 group-hover/item:text-[#1E40AF] flex items-center justify-between">
+                                    <span>{cat.name}</span>
+                                    <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-opacity text-[#1E40AF]" />
+                                  </div>
+                                  <div className="text-[10px] text-slate-400 font-medium">{cat.desc}</div>
+                                </Link>
+                              ))}
+                            </div>
+
+                            {/* Right Column: Featured Products Preview */}
+                            <div className="col-span-6 space-y-2">
+                              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#1E40AF] mb-3 flex items-center justify-between">
+                                <span>Bestsellers</span>
+                                <Link href="/products" onClick={() => setActiveDropdown(null)} className="text-[10px] text-slate-400 hover:text-[#1E40AF] font-bold">
+                                  View All →
+                                </Link>
+                              </div>
+                              {featuredProducts.map((product) => (
+                                <Link
+                                  key={product.id}
+                                  href={`/products/${product.id}`}
+                                  onClick={() => setActiveDropdown(null)}
+                                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition"
+                                >
+                                  <div className="h-11 w-11 shrink-0">
+                                    <ProductImage
+                                      src={product.image}
+                                      alt={product.name}
+                                      fitMode="contain"
+                                      paddingClassName="p-1"
+                                      roundedClassName="rounded-xl"
+                                    />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-extrabold text-slate-800 truncate">{product.name}</div>
+                                    <div className="text-[10px] font-bold text-[#1E40AF]">₹{product.price}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Right Action Bar (Tablet & Desktop) */}
           <div className="hidden items-center gap-4 md:flex ml-6 lg:ml-12">
-            
+
             {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
               <input

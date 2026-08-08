@@ -78,9 +78,9 @@ export default function LoginScreen() {
           <div className="relative z-10">
             <Link href="/" className="inline-flex items-center gap-2">
               <img
-                src="/images/matrin-logo-clean.webp"
+                src="/images/matrin-logo-sticker.webp"
                 alt="MATRIN"
-                className="h-10 w-auto object-contain"
+                className="h-10 w-auto object-contain brightness-0 invert"
               />
             </Link>
           </div>
@@ -175,7 +175,7 @@ export default function LoginScreen() {
               {/* Centered Brand Logo */}
               <div className="flex justify-center">
                 <img
-                  src="/images/matrin-logo-clean.webp"
+                  src="/images/matrin-logo-sticker.webp"
                   alt="MATRIN"
                   className="h-10 w-auto object-contain"
                 />
