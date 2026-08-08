@@ -171,7 +171,7 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      {/* Category Cards Grid (Exact 2x4 Layout matching Reference Image 1) */}
+      {/* Category Cards Grid (Exact Match with Reference Image) */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredCards.map((cat, idx) => (
@@ -180,36 +180,37 @@ export default function CategoriesPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.05 }}
-              className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white p-4 sm:p-5 border border-[#EAF0F8] shadow-sm hover:shadow-lg transition-all duration-300"
             >
-              {/* Card Banner Artwork */}
-              <div className="relative w-full p-2">
+              {/* Card Banner Image Box Container (Exact bg-[#F0F5FA] Light Blue Box from Reference Image) */}
+              <div className="relative w-full rounded-2xl bg-[#F0F5FA] p-4 sm:p-6 flex items-center justify-center overflow-hidden aspect-4/3 sm:aspect-square mb-4">
                 <ProductImage
                   src={cat.image}
                   alt={cat.title}
-                  fitMode="cover"
+                  fitMode="contain"
+                  roundedClassName="rounded-xl transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
               {/* Card Content Body */}
-              <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
+              <div className="flex flex-col justify-between flex-1 space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-[#102A5C] group-hover:text-[#0645B5] transition-colors">
+                  <h3 className="text-xl font-bold text-[#0645B5] transition-colors">
                     {cat.title}
                   </h3>
-                  <p className="mt-2 text-xs text-slate-500 font-medium leading-relaxed">
+                  <p className="mt-2 text-xs text-[#5F6B7A] font-medium leading-relaxed min-h-[36px]">
                     {cat.description}
                   </p>
                 </div>
 
-                <div className="pt-2 flex items-center justify-between border-t border-slate-100">
-                  <span className="text-xs font-bold text-slate-400">
+                <div className="pt-3 flex items-center justify-between border-t border-slate-100/80">
+                  <span className="text-xs font-bold text-[#8B98A7]">
                     {cat.count}
                   </span>
 
                   <Link
                     href={cat.href}
-                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] px-4 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] bg-white px-4 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white"
                   >
                     <span>Shop Now</span>
                     <ArrowRight size={13} />
