@@ -21,7 +21,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#0A192F] text-white pt-14 pb-8 border-t border-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        
+
         {/* Top Newsletter Callout Bar (Matching Reference Image 2) */}
         <div className="rounded-3xl bg-[#1E40AF] p-6 sm:p-8 mb-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
@@ -53,12 +53,12 @@ export default function Footer() {
 
         {/* Footer Navigation Columns */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5 mb-12 text-xs">
-          
+
           {/* Brand Column */}
           <div className="lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <img
-                src="/images/matrin-logo-sticker.webp"
+                src="/images/matrin-logo-sticker.png"
                 alt="MATRIN"
                 className="h-10 sm:h-12 w-auto object-contain brightness-0 invert"
               />

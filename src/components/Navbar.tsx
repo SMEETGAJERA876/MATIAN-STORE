@@ -113,7 +113,7 @@ export default function Navbar() {
             {/* Large Brand Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
               <img
-                src="/images/matrin-logo-sticker.webp"
+                src="/images/matrin-logo-sticker.png"
                 alt="MATRIN"
                 className="h-9 sm:h-11 lg:h-[50px] max-h-[52px] w-auto object-contain transition-transform duration-300 group-hover:scale-103"
               />
