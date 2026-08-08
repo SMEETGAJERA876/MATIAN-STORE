@@ -5,32 +5,32 @@ import { ArrowRight } from "lucide-react";
 
 export default function PromotionalBanner() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-[#0645B5] via-[#0b53d4] to-[#1769E0] text-white py-10 lg:py-14 my-10 rounded-2xl mx-auto max-w-7xl px-6 lg:px-12 shadow-xl">
+    <section className="relative overflow-hidden bg-white text-[#102A5C] py-10 lg:py-14 my-10 rounded-3xl mx-auto max-w-7xl px-6 lg:px-12 border border-[#EAF0F8] shadow-md">
       
-      {/* Water splash background FX */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+      {/* Soft background glow FX */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#EAF5FF]/60 via-white to-[#EAF5FF]/30 pointer-events-none" />
 
       <div className="relative flex flex-col md:flex-row items-center justify-between gap-8 z-10">
         
         {/* Left Typography */}
         <div className="space-y-3 text-center md:text-left max-w-lg">
           <div className="space-y-0.5">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#102A5C] tracking-tight leading-none">
               CLEAN HOME.
             </h2>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0645B5] tracking-tight leading-none">
               HAPPY HOME.
             </h2>
           </div>
 
-          <p className="text-xs sm:text-sm text-blue-100 font-medium">
-            Get up to 20% off on your first order.
+          <p className="text-xs sm:text-sm text-[#5F6B7A] font-medium">
+            Get up to 20% off on your first order with code <strong className="text-[#0645B5]">MATRIN20</strong>
           </p>
 
           <div className="pt-2">
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#0645B5] hover:bg-[#043694] px-7 py-3 text-xs font-black uppercase tracking-wider text-white border border-white/20 transition-all shadow-md active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0645B5] hover:bg-[#043694] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all shadow-md active:scale-95"
             >
               <span>SHOP NOW</span>
               <ArrowRight size={14} />
@@ -38,11 +38,11 @@ export default function PromotionalBanner() {
           </div>
         </div>
 
-        {/* Right Product Showcase & Circular Badge matching reference image */}
+        {/* Right Circular Offer Badge */}
         <div className="flex items-center gap-6">
           <div className="relative flex items-center justify-center">
-            {/* White Circular Badge */}
-            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full bg-white text-[#0645B5] flex flex-col items-center justify-center p-2 shadow-2xl border-4 border-blue-200/50 text-center transform rotate-6">
+            {/* Ice Blue Circular Badge */}
+            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full bg-[#EAF5FF] text-[#0645B5] flex flex-col items-center justify-center p-2 shadow-lg border-4 border-[#0645B5]/20 text-center transform rotate-6">
               <span className="text-[10px] font-black uppercase tracking-wider text-[#5F6B7A]">UP TO</span>
               <span className="text-2xl sm:text-3xl font-black leading-none text-[#0645B5]">20%</span>
               <span className="text-[10px] font-black uppercase tracking-wider text-[#5F6B7A]">OFF</span>
