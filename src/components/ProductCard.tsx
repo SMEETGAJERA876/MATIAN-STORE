@@ -17,11 +17,11 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#EAF5FF] dark:bg-[#152238] border border-[#DCE8F5] dark:border-[#233554] p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-        
+      <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#152238] dark:bg-[#233554] border border-[#233554] dark:border-[#1A2A44] p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+
         {/* Product Image Box Container (Clean White Box inside Ice-Blue Card Container) */}
         <div className="relative w-full rounded-2xl bg-white dark:bg-[#1A2A44] p-4 sm:p-5 flex items-center justify-center overflow-hidden aspect-square mb-3 shadow-2xs">
-          
+
           {/* NEW / Discount Badge matching reference image */}
           <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
             {product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW"}
