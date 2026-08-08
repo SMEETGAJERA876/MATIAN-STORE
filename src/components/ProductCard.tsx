@@ -18,7 +18,6 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <>
       <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#26354D] p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-
         {/* Product Image Box Container (Clean White Box inside Ice-Blue Card Container) */}
         <div className="relative w-full rounded-2xl bg-white dark:bg-[#1A2A44] p-4 sm:p-5 flex items-center justify-center overflow-hidden aspect-square mb-3 shadow-2xs">
 
