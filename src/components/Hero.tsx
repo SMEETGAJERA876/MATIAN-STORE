@@ -100,30 +100,6 @@ export default function Hero() {
 
         </div>
 
-        {/* Bottom Category Quick Cards Bar (Matching Reference Image "Shop by Category") */}
-        <div className="mt-10 pt-4">
-          <div className="text-sm font-extrabold text-[#102A5C] mb-3">Shop by Category</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[
-              { name: "Detergent Liquid", icon: "🧴", href: "/products?category=Laundry Care" },
-              { name: "Dish Wash", icon: "🧪", href: "/products?category=Dish Care" },
-              { name: "Floor Cleaner", icon: "🧼", href: "/products?category=Floor Care" },
-              { name: "Toilet Cleaner", icon: "🧽", href: "/products?category=Toilet Care" },
-              { name: "Bathroom Cleaner", icon: "✨", href: "/products?category=Multi-Surface" },
-              { name: "Laundry Care", icon: "👕", href: "/products?category=Laundry Care" },
-            ].map((cat) => (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-[#DCE8F5] hover:border-[#0645B5]/40 hover:bg-[#EAF5FF] transition-all shadow-2xs group text-center"
-              >
-                <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">{cat.icon}</div>
-                <span className="text-xs font-bold text-[#12213F] group-hover:text-[#0645B5]">{cat.name}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
       </div>
     </section>
   );
