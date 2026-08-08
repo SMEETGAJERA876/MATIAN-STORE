@@ -10,9 +10,9 @@
 }
 
 .dark {
-  --background: #0A1428;
-  --foreground: #F5FAFF;
-  --primary-blue: #1769E0;
+  --background: #FFFFFF;
+  --foreground: #12213F;
+  --primary-blue: #0645B5;
   --navy: #102A5C;
 }
 
@@ -43,12 +43,15 @@
 @utility shadow-soft {
   box-shadow: 0 4px 20px -2px rgba(6, 69, 181, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
+
 @utility shadow-card {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
+
 @utility shadow-elevated {
   box-shadow: 0 10px 30px -5px rgba(6, 69, 181, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
+
 @utility shadow-glow {
   box-shadow: 0 0 20px rgba(6, 69, 181, 0.35);
 }
@@ -102,12 +105,19 @@ body {
     background: #ffffff !important;
     color: #000000 !important;
   }
-  aside, header, footer, button, .no-print {
+
+  aside,
+  header,
+  footer,
+  button,
+  .no-print {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
   }
+
   .printable-area {
     position: absolute;
     left: 0;
@@ -136,11 +146,21 @@ body {
 }
 
 /* Base Typography Enhancement */
-p, span, input, button, select, textarea {
+p,
+span,
+input,
+button,
+select,
+textarea {
   letter-spacing: -0.005em;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   letter-spacing: -0.02em;
   font-weight: 800;
 }
