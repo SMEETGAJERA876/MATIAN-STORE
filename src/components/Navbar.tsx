@@ -46,7 +46,7 @@ export default function Navbar() {
     { name: "Laundry Care", desc: "Detergent Liquid & Softener", href: "/products?category=Laundry Care" },
     { name: "Dish Care", desc: "Dishwash Gel & Paste", href: "/products?category=Dish Care" },
     { name: "Floor Care", desc: "Disinfectant Cleaner", href: "/products?category=Floor Care" },
-    { name: "Toilet Care", desc: "Power Cleaner Gel", href: "/products?category=Toilet Care" },
+    { name: "Toilet Care", desc: "Power Cleaner Gel", href: "/products?category=Toilet %26 Bath" },
     { name: "Multi-Surface", desc: "Glass & Surface Cleaner", href: "/products?category=Multi-Surface" },
   ];
 

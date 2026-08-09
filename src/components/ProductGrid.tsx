@@ -24,14 +24,20 @@ export default function ProductGrid({
   const { products } = useProductStore();
   const searchParams = useSearchParams();
   const initialQuery = searchParams ? searchParams.get("search") || "" : "";
+  const initialCategory = searchParams ? (searchParams.get("category") as ProductCategory) || "All" : "All";
+
   const [search, setSearch] = useState(initialQuery);
-  const [category, setCategory] = useState<ProductCategory>("All");
+  const [category, setCategory] = useState<ProductCategory>(initialCategory);
   const [sortBy, setSortBy] = useState<SortOption>("featured");
 
   useEffect(() => {
     const q = searchParams ? searchParams.get("search") : null;
+    const cat = searchParams ? searchParams.get("category") : null;
     if (q !== null) {
       setSearch(q);
+    }
+    if (cat !== null) {
+      setCategory(cat as ProductCategory);
     }
   }, [searchParams]);
 

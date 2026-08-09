@@ -103,12 +103,12 @@ export default function Footer() {
               Categories
             </h4>
             <ul className="space-y-2 text-blue-100 font-medium">
-              <li><Link href="/products?category=Laundry Care" className="hover:text-white transition">Detergent</Link></li>
-              <li><Link href="/products?category=Dish Care" className="hover:text-white transition">Dishwash</Link></li>
-              <li><Link href="/products?category=Floor Care" className="hover:text-white transition">Floor Cleaner</Link></li>
-              <li><Link href="/products?category=Toilet Care" className="hover:text-white transition">Toilet Cleaner</Link></li>
-              <li><Link href="/products?category=Multi-Surface" className="hover:text-white transition">Glass Cleaner</Link></li>
-              <li><Link href="/products?category=Dish Care" className="hover:text-white transition">Kitchen Cleaner</Link></li>
+              <li><Link href="/products?category=Laundry Care&search=Detergent" className="hover:text-white transition">Detergent</Link></li>
+              <li><Link href="/products?category=Dish Care&search=Dishwash" className="hover:text-white transition">Dishwash</Link></li>
+              <li><Link href="/products?category=Floor Care&search=Floor" className="hover:text-white transition">Floor Cleaner</Link></li>
+              <li><Link href="/products?category=Toilet %26 Bath&search=Toilet" className="hover:text-white transition">Toilet Cleaner</Link></li>
+              <li><Link href="/products?category=Multi-Surface&search=Glass" className="hover:text-white transition">Glass Cleaner</Link></li>
+              <li><Link href="/products?category=Dish Care&search=Dishwash" className="hover:text-white transition">Kitchen Cleaner</Link></li>
             </ul>
           </div>
 
