@@ -177,7 +177,8 @@ export default function CartPage() {
     setGeneratedInvoice(newInvoice);
     setCheckoutStep("success");
     setIsProcessingPayment(false);
-    toast.success("Payment Successful! Razorpay Invoice Generated.", { icon: "💳", duration: 5000 });
+    clearCart();
+    toast.success("Payment Successful! Tax Invoice Generated.", { icon: "💳", duration: 5000 });
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
