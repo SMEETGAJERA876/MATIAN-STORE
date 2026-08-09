@@ -67,11 +67,37 @@ export default function CartPage() {
   // Payment method state
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
   const [upiSubMode, setUpiSubMode] = useState<"vpa" | "qr">("vpa");
-  const [upiId, setUpiId] = useState("user@upi");
+  const [upiId, setUpiId] = useState("smeet@okaxis");
   const [cardNumber, setCardNumber] = useState("4532 •••• •••• 8892");
   const [cardExpiry, setCardExpiry] = useState("12/28");
   const [cardCvv, setCardCvv] = useState("•••");
   const [selectedBank, setSelectedBank] = useState("HDFC Bank");
+
+  // UPI Verification state
+  const [isUpiVerified, setIsUpiVerified] = useState<boolean | null>(null);
+  const [isVerifyingUpi, setIsVerifyingUpi] = useState(false);
+  const [upiAccountName, setUpiAccountName] = useState("");
+
+  const handleVerifyUpiId = (targetVpa?: string) => {
+    const vpaToTest = targetVpa !== undefined ? targetVpa : upiId;
+    if (!vpaToTest || !vpaToTest.includes("@") || vpaToTest.split("@")[0].length < 2 || vpaToTest.split("@")[1].length < 2) {
+      setIsUpiVerified(false);
+      setIsVerifyingUpi(false);
+      toast.error("Please enter a valid UPI ID (e.g. smeet@okaxis)", { id: "upi_verify" });
+      return;
+    }
+
+    setIsVerifyingUpi(true);
+    setIsUpiVerified(null);
+
+    setTimeout(() => {
+      setIsVerifyingUpi(false);
+      setIsUpiVerified(true);
+      const name = user?.name || "Smeet Gajera";
+      setUpiAccountName(name);
+      toast.success(`UPI ID Verified: ${name}`, { icon: "✅", id: "upi_verify" });
+    }, 500);
+  };
 
   // Generated Invoice state
   const [generatedInvoice, setGeneratedInvoice] = useState<OrderInvoice | null>(null);
@@ -658,32 +684,80 @@ export default function CartPage() {
                       {upiSubMode === "vpa" ? (
                         <div className="space-y-3">
                           <label className="block text-xs font-bold text-slate-700">Enter UPI ID / VPA</label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={upiId}
-                              onChange={(e) => setUpiId(e.target.value)}
-                              placeholder="e.g. smeet@okaxis / 9876543210@paytm"
-                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-mono text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
-                            />
-                            <span className="absolute right-3 top-2.5 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                              ✓ Verified
-                            </span>
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <input
+                                type="text"
+                                value={upiId}
+                                onChange={(e) => {
+                                  setUpiId(e.target.value);
+                                  setIsUpiVerified(null);
+                                }}
+                                placeholder="e.g. smeet@okaxis / 9876543210@paytm"
+                                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-xs font-mono text-slate-800 focus:outline-hidden transition ${
+                                  isUpiVerified === true
+                                    ? "border-emerald-500 focus:border-emerald-500 shadow-xs"
+                                    : isUpiVerified === false
+                                    ? "border-rose-400 focus:border-rose-500 shadow-xs"
+                                    : "border-slate-200 focus:border-[#0645B5]"
+                                }`}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleVerifyUpiId()}
+                              disabled={isVerifyingUpi}
+                              className="px-4 py-2.5 rounded-xl bg-[#0645B5] text-white text-xs font-bold hover:bg-[#1a3899] transition shadow-2xs disabled:opacity-50 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                            >
+                              {isVerifyingUpi ? (
+                                <>
+                                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                  <span>Verifying...</span>
+                                </>
+                              ) : (
+                                <span>Verify VPA</span>
+                              )}
+                            </button>
                           </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {["user@okaxis", "9876543210@paytm", "user@ybl", "user@upi"].map((vpa) => (
+
+                          {/* Dynamic Verification Status */}
+                          {isUpiVerified === true && (
+                            <div className="flex items-center justify-between rounded-xl bg-emerald-50 p-2.5 text-xs text-emerald-800 border border-emerald-200/80 animate-in fade-in duration-200">
+                              <div className="flex items-center gap-1.5 font-bold">
+                                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                                <span>UPI Handle Verified</span>
+                              </div>
+                              <div className="text-[11px] font-semibold text-emerald-700">
+                                Account Name: <span className="font-extrabold text-emerald-900">{upiAccountName}</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {isUpiVerified === false && (
+                            <div className="flex items-center gap-1.5 rounded-xl bg-rose-50 p-2.5 text-xs font-bold text-rose-700 border border-rose-200 animate-in fade-in duration-200">
+                              <X size={15} className="text-rose-600 shrink-0" />
+                              <span>Invalid UPI ID format. Must contain '@' (e.g. smeet@okaxis)</span>
+                            </div>
+                          )}
+
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            <span className="text-[10px] font-extrabold uppercase text-slate-400 self-center mr-1">Quick Select:</span>
+                            {["smeet@okaxis", "9876543210@paytm", "smeet@ybl", "smeet@upi"].map((vpa) => (
                               <button
                                 key={vpa}
                                 type="button"
-                                onClick={() => setUpiId(vpa)}
-                                className="text-[10px] font-bold text-slate-600 bg-white hover:bg-blue-50 hover:text-[#0645B5] px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                                onClick={() => {
+                                  setUpiId(vpa);
+                                  handleVerifyUpiId(vpa);
+                                }}
+                                className="text-[10px] font-bold text-slate-600 bg-white hover:bg-blue-50 hover:text-[#0645B5] px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer"
                               >
                                 {vpa}
                               </button>
                             ))}
                           </div>
-                          <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-                            <span>⚡ Collect request will be sent to your GPay / PhonePe / Paytm app via Razorpay.</span>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            ⚡ Enter your registered VPA handle and click <strong className="text-[#0645B5]">Verify VPA</strong> before paying.
                           </p>
                         </div>
                       ) : (
