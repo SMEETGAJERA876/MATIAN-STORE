@@ -49,12 +49,6 @@ export default function InvoiceModal({
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl bg-white border border-[#EFEAE4] shadow-2xl print:shadow-none print:border-none print:rounded-none print:max-w-none print:w-full my-auto"
         >
-          {/* Top Demo Disclaimer Warning Banner */}
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-amber-900 text-[11px] font-extrabold tracking-wide flex items-center justify-center gap-2">
-            <AlertTriangle size={14} className="text-amber-600 shrink-0" />
-            <span>SAMPLE / DEMO INVOICE — Not a Valid Tax Document</span>
-          </div>
-
           {/* Action Bar Header (Hidden in Print) */}
           <div className="flex items-center justify-between bg-[#0A2E4E] p-4 text-white print:hidden">
             <div className="flex items-center gap-2">
@@ -79,11 +73,6 @@ export default function InvoiceModal({
 
           {/* Printable Invoice Body */}
           <div className="relative p-8 sm:p-10 font-sans text-slate-800 space-y-8 bg-white print:p-6 overflow-hidden" id="invoice-print-area">
-
-            {/* Diagonal Semi-Transparent Demo Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] rotate-[-30deg] text-4xl sm:text-6xl font-black uppercase text-slate-900 select-none z-0">
-              SAMPLE / DEMO INVOICE
-            </div>
 
             {/* Invoice Top Header */}
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-6 gap-6">
