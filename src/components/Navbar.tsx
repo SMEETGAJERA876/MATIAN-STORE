@@ -37,7 +37,7 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Products", href: "/products", hasDropdown: true },
     { name: "Categories", href: "/categories", hasDropdown: true },
-    { name: "Offers", href: "/products?sale=true" },
+    { name: "Offers", href: "/offers" },
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
