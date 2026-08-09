@@ -121,7 +121,6 @@ export default function Footer() {
               <li><Link href="/contact" className="hover:text-white transition">Help Center</Link></li>
               <li><Link href="/contact" className="hover:text-white transition">Shipping & Delivery</Link></li>
               <li><Link href="/#faq-section" className="hover:text-white transition">FAQ</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition">Track Order</Link></li>
               <li><Link href="/contact" className="hover:text-white transition">Store Locator</Link></li>
             </ul>
           </div>
