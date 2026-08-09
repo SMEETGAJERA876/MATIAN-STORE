@@ -247,20 +247,7 @@ export default function CartPage() {
           name: shippingDetails.fullName,
           email: shippingDetails.email,
           contact: shippingDetails.phone,
-          method: paymentMethod === "upi" ? "upi" : undefined,
-          vpa: paymentMethod === "upi" && upiId ? upiId : undefined,
         },
-        config: paymentMethod === "upi" ? {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay via UPI / QR Code",
-                instruments: [{ method: "upi" }]
-              }
-            },
-            sequence: ["block.upi"]
-          }
-        } : undefined,
         theme: {
           color: "#0645B5",
         },
