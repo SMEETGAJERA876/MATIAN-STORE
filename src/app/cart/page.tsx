@@ -66,6 +66,7 @@ export default function CartPage() {
 
   // Payment method state
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
+  const [upiSubMode, setUpiSubMode] = useState<"vpa" | "qr">("vpa");
   const [upiId, setUpiId] = useState("user@upi");
   const [cardNumber, setCardNumber] = useState("4532 •••• •••• 8892");
   const [cardExpiry, setCardExpiry] = useState("12/28");
@@ -216,6 +217,8 @@ export default function CartPage() {
             name: shippingDetails.fullName,
             email: shippingDetails.email,
             contact: shippingDetails.phone,
+            method: paymentMethod === "upi" ? "upi" : paymentMethod === "card" ? "card" : "netbanking",
+            vpa: paymentMethod === "upi" && upiSubMode === "vpa" ? upiId : undefined,
           },
           theme: {
             color: "#0645B5",
@@ -623,16 +626,89 @@ export default function CartPage() {
 
                   {/* Method Specific Inputs */}
                   {paymentMethod === "upi" && (
-                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
-                      <label className="block text-xs font-bold text-slate-700">Enter UPI ID</label>
-                      <input
-                        type="text"
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        placeholder="yourname@upi"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-800"
-                      />
-                      <p className="text-[10px] text-slate-500 font-medium">⚡ Collect request will be sent to your UPI app.</p>
+                    <div className="rounded-2xl bg-slate-50 p-5 border border-slate-200/60 space-y-4">
+                      {/* UPI Option Selector Tabs */}
+                      <div className="flex gap-2 p-1 bg-slate-200/60 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => setUpiSubMode("vpa")}
+                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                            upiSubMode === "vpa"
+                              ? "bg-white text-[#0645B5] shadow-xs"
+                              : "text-slate-600 hover:text-slate-900"
+                          }`}
+                        >
+                          <QrCode size={14} />
+                          <span>Enter UPI ID / VPA</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUpiSubMode("qr")}
+                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                            upiSubMode === "qr"
+                              ? "bg-white text-[#0645B5] shadow-xs"
+                              : "text-slate-600 hover:text-slate-900"
+                          }`}
+                        >
+                          <QrCode size={14} className="text-purple-600" />
+                          <span>Scan QR Code</span>
+                        </button>
+                      </div>
+
+                      {upiSubMode === "vpa" ? (
+                        <div className="space-y-3">
+                          <label className="block text-xs font-bold text-slate-700">Enter UPI ID / VPA</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={upiId}
+                              onChange={(e) => setUpiId(e.target.value)}
+                              placeholder="e.g. smeet@okaxis / 9876543210@paytm"
+                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-mono text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
+                            />
+                            <span className="absolute right-3 top-2.5 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              ✓ Verified
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {["user@okaxis", "9876543210@paytm", "user@ybl", "user@upi"].map((vpa) => (
+                              <button
+                                key={vpa}
+                                type="button"
+                                onClick={() => setUpiId(vpa)}
+                                className="text-[10px] font-bold text-slate-600 bg-white hover:bg-blue-50 hover:text-[#0645B5] px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                              >
+                                {vpa}
+                              </button>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                            <span>⚡ Collect request will be sent to your GPay / PhonePe / Paytm app via Razorpay.</span>
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-200 space-y-3 text-center">
+                          <div className="text-xs font-bold text-[#102A5C]">Scan with any UPI App</div>
+                          <div className="p-3 bg-white rounded-2xl border-2 border-[#0645B5]/20 shadow-md">
+                            <img
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                                `upi://pay?pa=matrin@razorpay&pn=MATRIN%20Store&am=${total}&cu=INR&tn=MATRIN%20Order`
+                              )}`}
+                              alt="Razorpay UPI QR Code"
+                              className="h-44 w-44 object-contain"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                            <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0645B5]">GPay</span>
+                            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700">PhonePe</span>
+                            <span className="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700">Paytm</span>
+                            <span className="px-2 py-0.5 rounded bg-[#102A5C] text-white">BHIM</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-medium">
+                            Scan this QR code with any UPI app to pay ₹{total} instantly via Razorpay.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 
