@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { ArrowRight, Phone, Mail, MapPin, Clock, Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 import { useState, FormEvent } from "react";
 import toast from "react-hot-toast";
 
@@ -146,6 +146,49 @@ export default function Footer() {
               <div className="text-[11px] text-blue-200 flex items-center gap-2">
                 <Clock size={13} className="text-cyan-300" />
                 <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
+              </div>
+            </div>
+
+            {/* Follow Us Social Icons */}
+            <div className="pt-2">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-white mb-2">Follow Us</div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="h-8 w-8 rounded-full bg-white/10 text-cyan-200 flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition border border-white/20 shadow-2xs"
+                >
+                  <Instagram size={15} />
+                </a>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="h-8 w-8 rounded-full bg-white/10 text-cyan-200 flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition border border-white/20 shadow-2xs"
+                >
+                  <Facebook size={15} />
+                </a>
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                  className="h-8 w-8 rounded-full bg-white/10 text-cyan-200 flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition border border-white/20 shadow-2xs"
+                >
+                  <Twitter size={15} />
+                </a>
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Youtube"
+                  className="h-8 w-8 rounded-full bg-white/10 text-cyan-200 flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition border border-white/20 shadow-2xs"
+                >
+                  <Youtube size={15} />
+                </a>
               </div>
             </div>
           </div>

@@ -17,6 +17,10 @@ import {
   Sparkles,
   ArrowRight,
   ExternalLink,
+  Instagram,
+  Facebook,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -285,18 +289,45 @@ export default function ContactPage() {
               </div>
 
               {/* Follow Us Section */}
-              <div className="pt-2 border-t border-slate-100">
+              <div className="pt-3 border-t border-slate-100">
                 <div className="text-xs font-extrabold text-[#102A5C] mb-3">Follow Us</div>
                 <div className="flex items-center gap-3">
-                  {["facebook", "instagram", "youtube", "twitter", "linkedin"].map((soc) => (
-                    <a
-                      key={soc}
-                      href="#"
-                      className="h-9 w-9 rounded-full bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs capitalize text-xs font-bold"
-                    >
-                      {soc.charAt(0).toUpperCase()}
-                    </a>
-                  ))}
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                    className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs border border-blue-100/80"
+                  >
+                    <Instagram size={18} />
+                  </a>
+                  <a
+                    href="https://facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                    className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs border border-blue-100/80"
+                  >
+                    <Facebook size={18} />
+                  </a>
+                  <a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Twitter"
+                    className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs border border-blue-100/80"
+                  >
+                    <Twitter size={18} />
+                  </a>
+                  <a
+                    href="https://youtube.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Youtube"
+                    className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs border border-blue-100/80"
+                  >
+                    <Youtube size={18} />
+                  </a>
                 </div>
               </div>
             </div>
