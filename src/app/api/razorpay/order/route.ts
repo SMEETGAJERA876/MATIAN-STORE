@@ -6,11 +6,27 @@ export async function POST(req: Request) {
     const { amount, currency = "INR", receipt } = await req.json();
 
     if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount specified" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Invalid amount specified" }, { status: 400 });
     }
 
-    const key_id = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TI7pYn8TINBomI";
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || "SGxSxvaUR1ioGJ1hyHeCthyf";
+    const key_id = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (
+      !key_id ||
+      !key_secret ||
+      key_id.includes("YOUR_KEY_ID") ||
+      key_secret.includes("YOUR_RAZORPAY_LIVE_SECRET")
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Razorpay Live credentials (RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET) are not configured in environment variables (.env.local). Please set your live Razorpay credentials to accept real payments.",
+        },
+        { status: 400 }
+      );
+    }
 
     try {
       const instance = new Razorpay({
@@ -37,21 +53,23 @@ export async function POST(req: Request) {
         keyId: key_id,
       });
     } catch (sdkError: any) {
-      console.warn("Razorpay SDK order creation warning:", sdkError?.message || sdkError);
-      return NextResponse.json({
-        success: false,
-        amount: Math.round(amount * 100),
-        currency: "INR",
-        keyId: key_id,
-      });
+      console.error("Razorpay SDK order creation error:", sdkError?.message || sdkError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: sdkError?.message || "Failed to create order with Razorpay Gateway",
+        },
+        { status: 500 }
+      );
     }
   } catch (error: any) {
     console.error("Razorpay Order Route Error:", error);
-    return NextResponse.json({
-      success: false,
-      amount: 1000,
-      currency: "INR",
-      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TI7pYn8TINBomI",
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error?.message || "Internal server error creating payment order",
+      },
+      { status: 500 }
+    );
   }
 }

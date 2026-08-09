@@ -139,7 +139,7 @@ export default function CartPage() {
     });
   };
 
-  const completeOrder = (paymentId: string) => {
+  const completeOrder = (paymentId: string, status: "Paid" | "Cash on Delivery" = "Paid") => {
     if (appliedCoupon) {
       applyCouponRedemption(appliedCoupon);
     }
@@ -169,7 +169,7 @@ export default function CartPage() {
       taxAmount: tax,
       totalAmount: total,
       paymentMethod,
-      paymentStatus: "Paid",
+      paymentStatus: status,
       transactionId: paymentId,
     };
 
@@ -178,7 +178,12 @@ export default function CartPage() {
     setCheckoutStep("success");
     setIsProcessingPayment(false);
     clearCart();
-    toast.success("Payment Successful! Tax Invoice Generated.", { icon: "💳", duration: 5000 });
+    toast.success(
+      status === "Cash on Delivery"
+        ? "Order Placed Successfully! Cash on Delivery selected."
+        : "Payment Verified & Order Placed Successfully!",
+      { icon: "💳", duration: 5000 }
+    );
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -189,57 +194,113 @@ export default function CartPage() {
       return;
     }
 
-    setIsProcessingPayment(true);
-    toast.loading("Initiating Razorpay Gateway...", { id: "razorpay_loader" });
+    if (paymentMethod === "cod") {
+      setIsProcessingPayment(true);
+      completeOrder(`COD_${Date.now()}`, "Cash on Delivery");
+      return;
+    }
 
-    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TI7pYn8TINBomI";
+    setIsProcessingPayment(true);
+    toast.loading("Creating Razorpay Payment Order...", { id: "razorpay_loader" });
 
     try {
-      const scriptLoaded = await loadRazorpayScript();
+      // 1. Call backend API to create real Razorpay Order
+      const res = await fetch("/api/razorpay/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          receipt: `rcpt_${Date.now()}`,
+        }),
+      });
+
+      const orderData = await res.json();
       toast.dismiss("razorpay_loader");
 
-      if (scriptLoaded && (window as any).Razorpay) {
-        const options: any = {
-          key: keyId,
-          amount: Math.round(total * 100),
-          currency: "INR",
-          name: "MATRIN Store",
-          description: "Order Payment",
-          image: "/images/matrin-logo-sticker.png",
-          prefill: {
-            name: shippingDetails.fullName,
-            email: shippingDetails.email,
-            contact: shippingDetails.phone,
-            method: paymentMethod === "upi" ? "upi" : "card",
-            vpa: paymentMethod === "upi" && upiSubMode === "vpa" ? upiId : undefined,
-          },
-          theme: {
-            color: "#0645B5",
-          },
-          modal: {
-            ondismiss: function () {
-              setIsProcessingPayment(false);
-              toast.error("Payment window closed.");
-            },
-          },
-          handler: function (response: any) {
-            completeOrder(response.razorpay_payment_id || `PAY_RZP_${Math.floor(10000000 + Math.random() * 90000000)}`);
-          },
-        };
-
-        const rzp = new (window as any).Razorpay(options);
-        
-        rzp.on("payment.failed", function () {
-          completeOrder(`PAY_TEST_${Math.floor(10000000 + Math.random() * 90000000)}`);
-        });
-
-        rzp.open();
-      } else {
-        completeOrder(`PAY_RZP_${Math.floor(10000000 + Math.random() * 90000000)}`);
+      if (!res.ok || !orderData.success || !orderData.id) {
+        setIsProcessingPayment(false);
+        toast.error(
+          orderData.error ||
+            "Failed to initiate Razorpay order. Please check Razorpay live key configuration in .env.local"
+        );
+        return;
       }
+
+      // 2. Load Razorpay Checkout JS script
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded || !(window as any).Razorpay) {
+        setIsProcessingPayment(false);
+        toast.error("Unable to load Razorpay Checkout SDK. Please check your internet connection.");
+        return;
+      }
+
+      // 3. Open Razorpay Modal with real Order ID and Key ID
+      const options: any = {
+        key: orderData.keyId,
+        order_id: orderData.id,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "MATRIN Store",
+        description: "Order Payment",
+        image: "/images/matrin-logo-sticker.png",
+        prefill: {
+          name: shippingDetails.fullName,
+          email: shippingDetails.email,
+          contact: shippingDetails.phone,
+        },
+        theme: {
+          color: "#0645B5",
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessingPayment(false);
+            toast.error("Payment cancelled by user.");
+          },
+        },
+        handler: async function (response: any) {
+          toast.loading("Verifying payment signature...", { id: "razorpay_verify" });
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            toast.dismiss("razorpay_verify");
+
+            if (verifyRes.ok && verifyData.success) {
+              completeOrder(response.razorpay_payment_id, "Paid");
+            } else {
+              setIsProcessingPayment(false);
+              toast.error(verifyData.error || "Payment signature verification failed.");
+            }
+          } catch {
+            toast.dismiss("razorpay_verify");
+            setIsProcessingPayment(false);
+            toast.error("Server error during payment verification.");
+          }
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+
+      rzp.on("payment.failed", function (response: any) {
+        setIsProcessingPayment(false);
+        toast.error(
+          response?.error?.description || "Payment transaction failed. Please try again."
+        );
+      });
+
+      rzp.open();
     } catch {
       toast.dismiss("razorpay_loader");
-      completeOrder(`PAY_RZP_${Math.floor(10000000 + Math.random() * 90000000)}`);
+      setIsProcessingPayment(false);
+      toast.error("An unexpected error occurred while launching payment gateway.");
     }
   };
 
@@ -716,11 +777,9 @@ export default function CartPage() {
                           <div className="text-xs font-bold text-[#102A5C]">Scan with any UPI App</div>
                           <div className="p-3 bg-white rounded-2xl border-2 border-[#0645B5]/20 shadow-md">
                             <img
-                              src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                                `upi://pay?pa=matrin@razorpay&pn=MATRIN%20Store&am=${total}&cu=INR&tn=MATRIN%20Order`
-                              )}`}
-                              alt="Razorpay UPI QR Code"
-                              className="h-44 w-44 object-contain"
+                              src="/images/custom-upi-qr.png"
+                              alt="UPI QR Code"
+                              className="h-48 w-48 object-contain rounded-lg"
                             />
                           </div>
                           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
@@ -730,7 +789,7 @@ export default function CartPage() {
                             <span className="px-2 py-0.5 rounded bg-[#102A5C] text-white">BHIM</span>
                           </div>
                           <p className="text-[10px] text-slate-400 font-medium">
-                            Scan this QR code with any UPI app to pay ₹{total} instantly via Razorpay.
+                            Scan this QR code with any UPI app to pay ₹{total} instantly.
                           </p>
                         </div>
                       )}
