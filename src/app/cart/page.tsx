@@ -71,7 +71,6 @@ export default function CartPage() {
   const [cardNumber, setCardNumber] = useState("4532 •••• •••• 8892");
   const [cardExpiry, setCardExpiry] = useState("12/28");
   const [cardCvv, setCardCvv] = useState("•••");
-  const [selectedBank, setSelectedBank] = useState("HDFC Bank");
 
   // UPI Verification state
   const [isUpiVerified, setIsUpiVerified] = useState<boolean | null>(null);
@@ -243,7 +242,7 @@ export default function CartPage() {
             name: shippingDetails.fullName,
             email: shippingDetails.email,
             contact: shippingDetails.phone,
-            method: paymentMethod === "upi" ? "upi" : paymentMethod === "card" ? "card" : "netbanking",
+            method: paymentMethod === "upi" ? "upi" : "card",
             vpa: paymentMethod === "upi" && upiSubMode === "vpa" ? upiId : undefined,
           },
           theme: {
@@ -593,7 +592,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Options */}
-                  <div className="grid gap-3 sm:grid-cols-3 mb-6">
+                  <div className="grid gap-3 sm:grid-cols-2 mb-6">
                     
                     {/* UPI Option */}
                     <div
@@ -628,24 +627,6 @@ export default function CartPage() {
                       <div>
                         <h4 className="text-xs font-bold text-[#102A5C]">Credit / Debit Card</h4>
                         <p className="text-[10px] text-slate-500 font-medium">Visa, Mastercard, RuPay</p>
-                      </div>
-                    </div>
-
-                    {/* Net Banking */}
-                    <div
-                      onClick={() => setPaymentMethod("netbanking")}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
-                        paymentMethod === "netbanking"
-                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
-                          : "border-slate-200 hover:border-slate-300 bg-white"
-                      }`}
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                        <Building size={20} />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#102A5C]">Net Banking</h4>
-                        <p className="text-[10px] text-slate-500 font-medium">All major Indian banks</p>
                       </div>
                     </div>
                   </div>
@@ -817,23 +798,6 @@ export default function CartPage() {
                           />
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === "netbanking" && (
-                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
-                      <label className="block text-xs font-bold text-slate-700">Select Your Bank</label>
-                      <select
-                        value={selectedBank}
-                        onChange={(e) => setSelectedBank(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs text-slate-800"
-                      >
-                        <option value="HDFC Bank">HDFC Bank</option>
-                        <option value="ICICI Bank">ICICI Bank</option>
-                        <option value="State Bank of India">State Bank of India (SBI)</option>
-                        <option value="Axis Bank">Axis Bank</option>
-                        <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
-                      </select>
                     </div>
                   )}
 
