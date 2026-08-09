@@ -664,145 +664,31 @@ export default function CartPage() {
 
                   {/* Method Specific Inputs */}
                   {paymentMethod === "upi" && (
-                    <div className="rounded-2xl bg-slate-50 p-5 border border-slate-200/60 space-y-4">
-                      {/* UPI Option Selector Tabs */}
-                      <div className="flex gap-2 p-1 bg-slate-200/60 rounded-xl">
-                        <button
-                          type="button"
-                          onClick={() => setUpiSubMode("vpa")}
-                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                            upiSubMode === "vpa"
-                              ? "bg-white text-[#0645B5] shadow-xs"
-                              : "text-slate-600 hover:text-slate-900"
-                          }`}
-                        >
-                          <QrCode size={14} />
-                          <span>Enter UPI ID / VPA</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setUpiSubMode("qr")}
-                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                            upiSubMode === "qr"
-                              ? "bg-white text-[#0645B5] shadow-xs"
-                              : "text-slate-600 hover:text-slate-900"
-                          }`}
-                        >
-                          <QrCode size={14} className="text-purple-600" />
-                          <span>Scan QR Code</span>
-                        </button>
+                    <div className="rounded-2xl bg-gradient-to-b from-blue-50/60 to-white p-6 border border-blue-100/80 space-y-4 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        <div className="h-12 w-12 rounded-2xl bg-blue-100 text-[#0645B5] flex items-center justify-center shadow-xs">
+                          <QrCode size={24} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-[#102A5C]">Instant Live UPI & Scannable QR Code</h4>
+                          <p className="text-xs text-slate-500 mt-1 max-w-md">
+                            Click <strong className="text-[#0645B5]">Pay ₹{total} with Razorpay</strong> below to open the secure payment gateway. Pay seamlessly via Google Pay, PhonePe, Paytm, or scan the live dynamic QR code.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                          <span className="px-3 py-1 rounded-lg bg-blue-50 text-[#0645B5] text-xs font-bold border border-blue-200/60">Google Pay</span>
+                          <span className="px-3 py-1 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200/60">PhonePe</span>
+                          <span className="px-3 py-1 rounded-lg bg-cyan-50 text-cyan-700 text-xs font-bold border border-cyan-200/60">Paytm</span>
+                          <span className="px-3 py-1 rounded-lg bg-[#102A5C] text-white text-xs font-bold">BHIM UPI</span>
+                          <span className="px-3 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200/60">CRED</span>
+                        </div>
+
+                        <p className="text-xs text-emerald-700 font-bold bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200/80 inline-flex items-center gap-1.5 mt-2">
+                          <CheckCircle2 size={16} className="text-emerald-600" />
+                          <span>100% Instant & Secure Payment via Razorpay Live Gateway</span>
+                        </p>
                       </div>
-
-                      {upiSubMode === "vpa" ? (
-                        <div className="space-y-3">
-                          <label className="block text-xs font-bold text-slate-700">Enter UPI ID / VPA</label>
-                          <div className="flex gap-2">
-                            <div className="relative flex-1">
-                              <input
-                                type="text"
-                                value={upiId}
-                                onChange={(e) => {
-                                  setUpiId(e.target.value);
-                                  setIsUpiVerified(null);
-                                }}
-                                placeholder="e.g. smeet@okaxis / 9876543210@paytm"
-                                className={`w-full rounded-xl border bg-white px-4 py-2.5 text-xs font-mono text-slate-800 focus:outline-hidden transition ${
-                                  isUpiVerified === true
-                                    ? "border-emerald-500 focus:border-emerald-500 shadow-xs"
-                                    : isUpiVerified === false
-                                    ? "border-rose-400 focus:border-rose-500 shadow-xs"
-                                    : "border-slate-200 focus:border-[#0645B5]"
-                                }`}
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleVerifyUpiId()}
-                              disabled={isVerifyingUpi}
-                              className="px-4 py-2.5 rounded-xl bg-[#0645B5] text-white text-xs font-bold hover:bg-[#1a3899] transition shadow-2xs disabled:opacity-50 shrink-0 flex items-center gap-1.5 cursor-pointer"
-                            >
-                              {isVerifyingUpi ? (
-                                <>
-                                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                  <span>Verifying...</span>
-                                </>
-                              ) : (
-                                <span>Verify VPA</span>
-                              )}
-                            </button>
-                          </div>
-
-                          {/* Dynamic Verification Status */}
-                          {isUpiVerified === true && (
-                            <div className="flex items-center justify-between rounded-xl bg-emerald-50 p-2.5 text-xs text-emerald-800 border border-emerald-200/80 animate-in fade-in duration-200">
-                              <div className="flex items-center gap-1.5 font-bold">
-                                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
-                                <span>UPI Handle Verified</span>
-                              </div>
-                              <div className="text-[11px] font-semibold text-emerald-700">
-                                Account Name: <span className="font-extrabold text-emerald-900">{upiAccountName}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          {isUpiVerified === false && (
-                            <div className="flex items-center gap-1.5 rounded-xl bg-rose-50 p-2.5 text-xs font-bold text-rose-700 border border-rose-200 animate-in fade-in duration-200">
-                              <X size={15} className="text-rose-600 shrink-0" />
-                              <span>Invalid UPI ID format. Must contain '@' (e.g. smeet@okaxis)</span>
-                            </div>
-                          )}
-
-                          <div className="flex flex-wrap gap-1.5 pt-1">
-                            <span className="text-[10px] font-extrabold uppercase text-slate-400 self-center mr-1">Quick Select:</span>
-                            {["smeet@okaxis", "9876543210@paytm", "smeet@ybl", "smeet@upi"].map((vpa) => (
-                              <button
-                                key={vpa}
-                                type="button"
-                                onClick={() => {
-                                  setUpiId(vpa);
-                                  handleVerifyUpiId(vpa);
-                                }}
-                                className="text-[10px] font-bold text-slate-600 bg-white hover:bg-blue-50 hover:text-[#0645B5] px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer"
-                              >
-                                {vpa}
-                              </button>
-                            ))}
-                          </div>
-                          <p className="text-[10px] text-slate-500 font-medium">
-                            ⚡ Enter your registered VPA handle and click <strong className="text-[#0645B5]">Verify VPA</strong> before paying.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-blue-50/50 to-white rounded-xl border border-blue-100 space-y-4 text-center">
-                          <div className="h-12 w-12 rounded-full bg-blue-100/80 flex items-center justify-center text-[#0645B5] shadow-xs">
-                            <QrCode size={24} />
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-[#102A5C]">Instant Live Dynamic UPI QR Code</div>
-                            <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                              Click below to open the secure Razorpay Live Gateway. It automatically generates a real-time valid QR code for your exact order amount (₹{total}).
-                            </p>
-                          </div>
-                          <button
-                            type="submit"
-                            disabled={isProcessingPayment}
-                            className="w-full py-3.5 px-4 bg-[#0645B5] hover:bg-[#1a3899] text-white font-bold text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                          >
-                            <QrCode size={16} />
-                            <span>{isProcessingPayment ? "Opening Razorpay..." : `Open Live Scannable QR Code (Pay ₹${total})`}</span>
-                          </button>
-                          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold text-slate-600 pt-1">
-                            <span className="px-2.5 py-1 rounded-md bg-blue-50 text-[#0645B5] border border-blue-200/50">GPay</span>
-                            <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200/50">PhonePe</span>
-                            <span className="px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/50">Paytm</span>
-                            <span className="px-2.5 py-1 rounded-md bg-[#102A5C] text-white">BHIM</span>
-                            <span className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200/50">CRED</span>
-                          </div>
-                          <p className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200/60">
-                            ✓ 100% Verified Merchant Payment via Razorpay Gateway
-                          </p>
-                        </div>
-                      )}
                     </div>
                   )}
 
