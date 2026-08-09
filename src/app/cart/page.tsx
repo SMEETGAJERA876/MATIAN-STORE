@@ -463,7 +463,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Options */}
-                  <div className="grid gap-3 sm:grid-cols-2 mb-6">
+                  <div className="grid gap-3 sm:grid-cols-3 mb-6">
                     
                     {/* UPI Option */}
                     <div
