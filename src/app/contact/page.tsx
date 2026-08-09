@@ -324,9 +324,12 @@ export default function ContactPage() {
                     aria-label="YouTube"
                     className="h-10 w-10 rounded-xl bg-blue-50 text-[#0645B5] flex items-center justify-center hover:bg-[#0645B5] hover:text-white transition shadow-2xs border border-blue-100/80"
                   >
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                      <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#fff"/>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M21.58 7.19a2.71 2.71 0 0 0-1.9-1.9C17.99 4.75 12 4.75 12 4.75s-5.99 0-7.68.54a2.71 2.71 0 0 0-1.9 1.9C1.88 8.88 1.88 12 1.88 12s0 3.12.54 4.81a2.71 2.71 0 0 0 1.9 1.9c1.69.54 7.68.54 7.68.54s5.99 0 7.68-.54a2.71 2.71 0 0 0 1.9-1.9c.54-1.69.54-4.81.54-4.81s0-3.12-.54-4.81z"
+                        fill="currentColor"
+                      />
+                      <polygon points="9.75,8.75 15.25,12 9.75,15.25" fill="#F8FAFC" />
                     </svg>
                   </a>
 
