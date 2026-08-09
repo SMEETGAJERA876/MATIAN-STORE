@@ -9,24 +9,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Invalid amount specified" }, { status: 400 });
     }
 
-    const key_id = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-    const key_secret = process.env.RAZORPAY_KEY_SECRET;
-
-    if (
-      !key_id ||
-      !key_secret ||
-      key_id.includes("YOUR_KEY_ID") ||
-      key_secret.includes("YOUR_RAZORPAY_LIVE_SECRET")
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Razorpay Live credentials (RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET) are not configured in environment variables (.env.local). Please set your live Razorpay credentials to accept real payments.",
-        },
-        { status: 400 }
-      );
-    }
+    const key_id = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_live_TNhJXLJJ1UaUVi";
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || "Uf0ZSovuCggEz8ObWt0c0ClR";
 
     try {
       const instance = new Razorpay({
