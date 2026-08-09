@@ -664,31 +664,31 @@ export default function CartPage() {
 
                   {/* Method Specific Inputs */}
                   {paymentMethod === "upi" && (
-                    <div className="rounded-2xl bg-gradient-to-b from-blue-50/60 to-white p-6 border border-blue-100/80 space-y-4 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-3">
-                        <div className="h-12 w-12 rounded-2xl bg-blue-100 text-[#0645B5] flex items-center justify-center shadow-xs">
-                          <QrCode size={24} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-[#102A5C]">Instant Live UPI & Scannable QR Code</h4>
-                          <p className="text-xs text-slate-500 mt-1 max-w-md">
-                            Click <strong className="text-[#0645B5]">Pay ₹{total} with Razorpay</strong> below to open the secure payment gateway. Pay seamlessly via Google Pay, PhonePe, Paytm, or scan the live dynamic QR code.
-                          </p>
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                          <span className="px-3 py-1 rounded-lg bg-blue-50 text-[#0645B5] text-xs font-bold border border-blue-200/60">Google Pay</span>
-                          <span className="px-3 py-1 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200/60">PhonePe</span>
-                          <span className="px-3 py-1 rounded-lg bg-cyan-50 text-cyan-700 text-xs font-bold border border-cyan-200/60">Paytm</span>
-                          <span className="px-3 py-1 rounded-lg bg-[#102A5C] text-white text-xs font-bold">BHIM UPI</span>
-                          <span className="px-3 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200/60">CRED</span>
-                        </div>
-
-                        <p className="text-xs text-emerald-700 font-bold bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200/80 inline-flex items-center gap-1.5 mt-2">
-                          <CheckCircle2 size={16} className="text-emerald-600" />
-                          <span>100% Instant & Secure Payment via Razorpay Live Gateway</span>
-                        </p>
+                    <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-center shadow-2xs">
+                      <div className="text-xs font-extrabold uppercase tracking-wider text-[#102A5C]">
+                        Scan to Pay with any UPI App
                       </div>
+
+                      {/* Google Pay / UPI QR Code Image */}
+                      <div className="p-3 bg-white rounded-2xl border-2 border-[#0645B5]/20 shadow-md">
+                        <img
+                          src="/images/custom-upi-qr.png"
+                          alt="Google Pay UPI QR Code"
+                          className="h-52 w-52 object-contain rounded-xl"
+                        />
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <span className="px-2.5 py-1 rounded-md bg-blue-50 text-[#0645B5] text-xs font-bold border border-blue-200/50">GPay</span>
+                        <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200/50">PhonePe</span>
+                        <span className="px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-700 text-xs font-bold border border-cyan-200/50">Paytm</span>
+                        <span className="px-2.5 py-1 rounded-md bg-[#102A5C] text-white text-xs font-bold">BHIM</span>
+                        <span className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200/50">CRED</span>
+                      </div>
+
+                      <p className="text-xs text-slate-500 font-medium">
+                        Scan this QR code with any UPI app to pay <strong className="text-[#0645B5]">₹{total}</strong> or click below to launch payment gateway.
+                      </p>
                     </div>
                   )}
 
