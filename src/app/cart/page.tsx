@@ -20,7 +20,6 @@ import {
   CreditCard,
   QrCode,
   Building,
-  Banknote,
   FileText,
   Printer,
   Sparkles,
@@ -517,24 +516,6 @@ export default function CartPage() {
                       <div>
                         <h4 className="text-xs font-bold text-[#102A5C]">Net Banking</h4>
                         <p className="text-[10px] text-slate-500 font-medium">All major Indian banks</p>
-                      </div>
-                    </div>
-
-                    {/* Cash on Delivery */}
-                    <div
-                      onClick={() => setPaymentMethod("cod")}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
-                        paymentMethod === "cod"
-                          ? "border-[#0645B5] bg-blue-50/50 shadow-2xs"
-                          : "border-slate-200 hover:border-slate-300 bg-white"
-                      }`}
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                        <Banknote size={20} />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#102A5C]">Cash on Delivery</h4>
-                        <p className="text-[10px] text-slate-500 font-medium">Pay cash upon delivery</p>
                       </div>
                     </div>
                   </div>
