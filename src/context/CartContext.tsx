@@ -119,20 +119,82 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const shippingFee = subtotal === 0 ? 0 : subtotal >= 499 ? 0 : 50;
 
-  const discountAmount = appliedCoupon === "MATRIN10" ? Math.round(subtotal * 0.1) : 0;
+  const COUPON_RULES: Record<string, { code: string; discountType: "percentage" | "fixed"; discountValue: number; minSpend: number; description: string }> = {
+    FESTIVAL10: {
+      code: "FESTIVAL10",
+      discountType: "percentage",
+      discountValue: 10,
+      minSpend: 1500,
+      description: "10% Festival Discount on orders above ₹1,500",
+    },
+    FESTIVE5: {
+      code: "FESTIVE5",
+      discountType: "percentage",
+      discountValue: 5,
+      minSpend: 800,
+      description: "5% Festive Savings on orders above ₹800",
+    },
+    SUPER15: {
+      code: "SUPER15",
+      discountType: "percentage",
+      discountValue: 15,
+      minSpend: 2500,
+      description: "15% Mega Household Saver on orders above ₹2,500",
+    },
+    MATRIN20: {
+      code: "MATRIN20",
+      discountType: "percentage",
+      discountValue: 20,
+      minSpend: 499,
+      description: "20% Welcome Discount on orders above ₹499",
+    },
+    MATRIN10: {
+      code: "MATRIN10",
+      discountType: "percentage",
+      discountValue: 10,
+      minSpend: 299,
+      description: "10% Discount on orders above ₹299",
+    },
+    CLEAN50: {
+      code: "CLEAN50",
+      discountType: "fixed",
+      discountValue: 50,
+      minSpend: 199,
+      description: "Flat ₹50 OFF on all orders",
+    },
+  };
+
+  const activeRule = appliedCoupon ? COUPON_RULES[appliedCoupon] : null;
+
+  let discountAmount = 0;
+  if (activeRule && subtotal >= activeRule.minSpend) {
+    if (activeRule.discountType === "percentage") {
+      discountAmount = Math.round((subtotal * activeRule.discountValue) / 100);
+    } else if (activeRule.discountType === "fixed") {
+      discountAmount = activeRule.discountValue;
+    }
+  }
 
   const total = Math.max(0, subtotal - discountAmount + shippingFee);
 
   const applyCoupon = (code: string) => {
     const cleanCode = code.trim().toUpperCase();
-    if (cleanCode === "MATRIN10") {
-      setAppliedCoupon("MATRIN10");
-      toast.success("Coupon MATRIN10 applied! 10% OFF", { icon: "🎉" });
-      return true;
-    } else {
-      toast.error("Invalid coupon code. Try MATRIN10");
+    const rule = COUPON_RULES[cleanCode];
+
+    if (!rule) {
+      toast.error("Invalid coupon code. Try FESTIVAL10, FESTIVE5, SUPER15, or MATRIN20");
       return false;
     }
+
+    if (subtotal < rule.minSpend) {
+      toast.error(`Minimum order value of ₹${rule.minSpend} required for coupon ${rule.code}`);
+      return false;
+    }
+
+    setAppliedCoupon(rule.code);
+    const savingsMsg = rule.discountType === "percentage" ? `${rule.discountValue}% OFF` : `₹${rule.discountValue} OFF`;
+    toast.success(`Coupon ${rule.code} applied! Saved ${savingsMsg}`, { icon: "🎉" });
+    return true;
   };
 
   const removeCoupon = () => {
