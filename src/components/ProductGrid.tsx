@@ -44,12 +44,28 @@ export default function ProductGrid({
   const filteredAndSortedProducts = useMemo(() => {
     return products
       .filter((product) => {
-        const matchesCategory =
-          category === "All" || product.category === category;
+        let matchesCategory = category === "All";
+        if (!matchesCategory) {
+          const catLower = category.toLowerCase();
+          const prodCatLower = product.category.toLowerCase();
+          matchesCategory =
+            prodCatLower === catLower ||
+            prodCatLower.includes(catLower) ||
+            catLower.includes(prodCatLower) ||
+            (catLower.includes("laundry") && prodCatLower.includes("laundry")) ||
+            (catLower.includes("dish") && prodCatLower.includes("dish")) ||
+            (catLower.includes("floor") && prodCatLower.includes("floor")) ||
+            (catLower.includes("toilet") && prodCatLower.includes("toilet")) ||
+            (catLower.includes("surface") && prodCatLower.includes("surface"));
+        }
+
+        const searchLower = search.toLowerCase();
         const matchesSearch =
-          product.name.toLowerCase().includes(search.toLowerCase()) ||
-          product.description.toLowerCase().includes(search.toLowerCase()) ||
-          product.category.toLowerCase().includes(search.toLowerCase());
+          search === "" ||
+          product.name.toLowerCase().includes(searchLower) ||
+          product.description.toLowerCase().includes(searchLower) ||
+          product.category.toLowerCase().includes(searchLower);
+
         return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
