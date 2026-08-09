@@ -208,14 +208,29 @@ export default function CartPage() {
       const scriptLoaded = await loadRazorpayScript();
 
       if (scriptLoaded && (window as any).Razorpay) {
-        const options = {
-          key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_MatrinStore2026",
-          amount: orderData.amount,
+        const options: any = {
+          key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TI7pYn8TINBomI",
+          amount: orderData.amount || Math.round(total * 100),
           currency: orderData.currency || "INR",
           name: "MATRIN Store",
           description: "Premium Cleaning & Home Care Order",
           image: "/images/matrin-logo-sticker.png",
-          order_id: orderData.id,
+          prefill: {
+            name: shippingDetails.fullName,
+            email: shippingDetails.email,
+            contact: shippingDetails.phone,
+            method: paymentMethod === "upi" ? "upi" : "card",
+            vpa: paymentMethod === "upi" && upiSubMode === "vpa" ? upiId : undefined,
+          },
+          theme: {
+            color: "#0645B5",
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessingPayment(false);
+              toast.error("Payment cancelled by user.");
+            },
+          },
           handler: async function (response: any) {
             toast.loading("Verifying Payment Authorization...", { id: "verify_loader" });
             try {
@@ -238,23 +253,11 @@ export default function CartPage() {
               completeOrder(response.razorpay_payment_id || `pay_${Date.now()}`);
             }
           },
-          prefill: {
-            name: shippingDetails.fullName,
-            email: shippingDetails.email,
-            contact: shippingDetails.phone,
-            method: paymentMethod === "upi" ? "upi" : "card",
-            vpa: paymentMethod === "upi" && upiSubMode === "vpa" ? upiId : undefined,
-          },
-          theme: {
-            color: "#0645B5",
-          },
-          modal: {
-            ondismiss: function () {
-              setIsProcessingPayment(false);
-              toast.error("Payment cancelled by user.");
-            },
-          },
         };
+
+        if (orderData?.success && orderData?.id) {
+          options.order_id = orderData.id;
+        }
 
         const rzp = new (window as any).Razorpay(options);
         rzp.open();
