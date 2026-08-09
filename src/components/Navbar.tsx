@@ -275,28 +275,7 @@ export default function Navbar() {
               )}
             </form>
 
-            {/* Account Link */}
-            <Link
-              href="/login"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0645B5] transition-colors p-2 rounded-xl hover:bg-slate-50"
-              title={user ? `Logged in as ${user.name}` : "Sign In / Account"}
-            >
-              {user ? (
-                <div className="flex items-center gap-2 rounded-full bg-blue-50 py-1.5 px-3 border border-blue-200">
-                  <span className="h-5.5 w-5.5 rounded-full bg-[#0645B5] text-white text-[10px] font-bold flex items-center justify-center">
-                    {user.name.charAt(0)}
-                  </span>
-                  <span className="text-xs font-bold text-[#0645B5] max-w-[100px] truncate">
-                    {user.name.split(" ")[0]}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-[#0645B5] transition">
-                  <User size={21} />
-                  <span className="hidden sm:inline">Sign In</span>
-                </div>
-              )}
-            </Link>
+
 
             {/* Wishlist Button */}
             <button
@@ -419,15 +398,7 @@ export default function Navbar() {
                   );
                 })}
 
-                <div className="pt-3 border-t border-slate-100 mt-2 flex items-center gap-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="min-h-[44px] flex-1 py-3 px-4 rounded-xl bg-[#0645B5] text-white font-bold text-center text-sm shadow-md"
-                  >
-                    {user ? `Account (${user.name.split(" ")[0]})` : "Sign In"}
-                  </Link>
-                </div>
+
               </div>
             </motion.div>
           )}
