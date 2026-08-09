@@ -247,7 +247,20 @@ export default function CartPage() {
           name: shippingDetails.fullName,
           email: shippingDetails.email,
           contact: shippingDetails.phone,
+          method: paymentMethod === "upi" ? "upi" : undefined,
+          vpa: paymentMethod === "upi" && upiId ? upiId : undefined,
         },
+        config: paymentMethod === "upi" ? {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI / QR Code",
+                instruments: [{ method: "upi" }]
+              }
+            },
+            sequence: ["block.upi"]
+          }
+        } : undefined,
         theme: {
           color: "#0645B5",
         },
@@ -780,10 +793,18 @@ export default function CartPage() {
                           <div>
                             <div className="text-sm font-bold text-[#102A5C]">Instant Live Dynamic UPI QR Code</div>
                             <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                              Click <strong className="text-[#0645B5]">Pay ₹{total} with Razorpay</strong> below to open the secure Razorpay Live Gateway. It automatically generates a real-time valid QR code for your exact order amount.
+                              Click below to open the secure Razorpay Live Gateway. It automatically generates a real-time valid QR code for your exact order amount (₹{total}).
                             </p>
                           </div>
-                          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold text-slate-600">
+                          <button
+                            type="submit"
+                            disabled={isProcessingPayment}
+                            className="w-full py-3.5 px-4 bg-[#0645B5] hover:bg-[#1a3899] text-white font-bold text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                          >
+                            <QrCode size={16} />
+                            <span>{isProcessingPayment ? "Opening Razorpay..." : `Open Live Scannable QR Code (Pay ₹${total})`}</span>
+                          </button>
+                          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold text-slate-600 pt-1">
                             <span className="px-2.5 py-1 rounded-md bg-blue-50 text-[#0645B5] border border-blue-200/50">GPay</span>
                             <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200/50">PhonePe</span>
                             <span className="px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/50">Paytm</span>
