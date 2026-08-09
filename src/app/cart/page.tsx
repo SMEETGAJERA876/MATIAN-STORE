@@ -773,23 +773,25 @@ export default function CartPage() {
                           </p>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-200 space-y-3 text-center">
-                          <div className="text-xs font-bold text-[#102A5C]">Scan with any UPI App</div>
-                          <div className="p-3 bg-white rounded-2xl border-2 border-[#0645B5]/20 shadow-md">
-                            <img
-                              src="/images/custom-upi-qr.png"
-                              alt="UPI QR Code"
-                              className="h-48 w-48 object-contain rounded-lg"
-                            />
+                        <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-blue-50/50 to-white rounded-xl border border-blue-100 space-y-4 text-center">
+                          <div className="h-12 w-12 rounded-full bg-blue-100/80 flex items-center justify-center text-[#0645B5] shadow-xs">
+                            <QrCode size={24} />
                           </div>
-                          <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                            <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0645B5]">GPay</span>
-                            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700">PhonePe</span>
-                            <span className="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700">Paytm</span>
-                            <span className="px-2 py-0.5 rounded bg-[#102A5C] text-white">BHIM</span>
+                          <div>
+                            <div className="text-sm font-bold text-[#102A5C]">Instant Live Dynamic UPI QR Code</div>
+                            <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                              Click <strong className="text-[#0645B5]">Pay ₹{total} with Razorpay</strong> below to open the secure Razorpay Live Gateway. It automatically generates a real-time valid QR code for your exact order amount.
+                            </p>
                           </div>
-                          <p className="text-[10px] text-slate-400 font-medium">
-                            Scan this QR code with any UPI app to pay ₹{total} instantly.
+                          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold text-slate-600">
+                            <span className="px-2.5 py-1 rounded-md bg-blue-50 text-[#0645B5] border border-blue-200/50">GPay</span>
+                            <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200/50">PhonePe</span>
+                            <span className="px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/50">Paytm</span>
+                            <span className="px-2.5 py-1 rounded-md bg-[#102A5C] text-white">BHIM</span>
+                            <span className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200/50">CRED</span>
+                          </div>
+                          <p className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200/60">
+                            ✓ 100% Verified Merchant Payment via Razorpay Gateway
                           </p>
                         </div>
                       )}
