@@ -295,7 +295,7 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section with Real Embedded Google Map & Graceful Fallback */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-12">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-12 scroll-mt-24" id="map">
         <div className="relative overflow-hidden rounded-3xl bg-slate-100 h-80 sm:h-96 border border-slate-200 shadow-sm flex items-center p-6 sm:p-10">
           
           {/* TODO: Replace with your real Google Maps Embed URL or lat/long when available */}
