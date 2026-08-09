@@ -43,10 +43,33 @@ export default function ProductDetailsPage() {
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [selectedFragrance, setSelectedFragrance] = useState("Lavender Fresh");
-  const [selectedSize, setSelectedSize] = useState("2 L");
+  const [selectedSize, setSelectedSize] = useState("1 L");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"details" | "usage" | "ingredients" | "reviews" | "faqs">("details");
+
+  const SIZE_DETAILS: Record<string, { price: number; oldPrice: number; discount: string }> = {
+    "500 ml": { price: 169, oldPrice: 219, discount: "23% OFF" },
+    "1 L": { price: 299, oldPrice: 399, discount: "25% OFF" },
+    "2 L": { price: 499, oldPrice: 649, discount: "23% OFF" },
+    "5 L": { price: 999, oldPrice: 1299, discount: "23% OFF" },
+  };
+
+  const currentSizeInfo = SIZE_DETAILS[selectedSize] || {
+    price: product ? product.price : 299,
+    oldPrice: product ? product.oldPrice : 399,
+    discount: product ? `${product.discountPercentage}% OFF` : "25% OFF",
+  };
+
+  const baseName = product ? product.name.replace(/\s*\([^)]*\)/g, "").trim() : "Liquid Detergent";
+  const currentTitle = `${baseName} (${selectedSize})`;
+
+  const customVariantProduct = product ? {
+    ...product,
+    name: currentTitle,
+    price: currentSizeInfo.price,
+    oldPrice: currentSizeInfo.oldPrice,
+  } : product;
 
   if (!product) {
     return (
@@ -69,9 +92,20 @@ export default function ProductDetailsPage() {
     "/images/products/toilet-cleaner.webp",
   ];
 
+  const handleSizeChange = (sz: string) => {
+    setSelectedSize(sz);
+    const info = SIZE_DETAILS[sz] || { price: product.price };
+    toast.success(`Switched to ${sz} packing variant (₹${info.price})`, { icon: "🧴" });
+  };
+
   const handleBuyNow = () => {
-    addToCart(product, quantity);
+    addToCart(customVariantProduct, quantity);
     router.push("/cart");
+  };
+
+  const handleAddToCart = () => {
+    addToCart(customVariantProduct, quantity);
+    toast.success(`Added ${quantity}x ${currentTitle} to your cart!`, { icon: "🛒" });
   };
 
   const handlePrevImage = () => {
@@ -215,7 +249,7 @@ export default function ProductDetailsPage() {
 
               {/* Product Title */}
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#102A5C] tracking-tight">
-                {product.name}
+                {currentTitle}
               </h1>
 
               {/* Rating & Sales count (Exact Match with Image 3) */}
@@ -282,17 +316,17 @@ export default function ProductDetailsPage() {
               </div>
             </div>
 
-            {/* Pricing Callout (Matching Image 3: ₹299 struck ₹399 25% OFF) */}
+            {/* Pricing Callout (Matching Image 3: Dynamic Price per selected size) */}
             <div className="pt-2 border-t border-slate-100">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-extrabold text-[#0645B5]">
-                  ₹299
+                  ₹{currentSizeInfo.price}
                 </span>
                 <span className="text-base font-semibold text-slate-400 line-through">
-                  ₹399
+                  ₹{currentSizeInfo.oldPrice}
                 </span>
                 <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-extrabold text-emerald-800">
-                  25% OFF
+                  {currentSizeInfo.discount}
                 </span>
               </div>
               <p className="text-[11px] font-semibold text-slate-400 mt-1">
@@ -309,7 +343,7 @@ export default function ProductDetailsPage() {
                 {["500 ml", "1 L", "2 L", "5 L"].map((sz) => (
                   <button
                     key={sz}
-                    onClick={() => setSelectedSize(sz)}
+                    onClick={() => handleSizeChange(sz)}
                     className={`rounded-xl border py-2 text-xs font-extrabold transition text-center ${
                       selectedSize === sz
                         ? "border-[#0645B5] bg-blue-50/60 text-[#0645B5] ring-1 ring-[#0645B5]"
@@ -360,7 +394,7 @@ export default function ProductDetailsPage() {
 
               {/* Add to Cart Button (Solid Blue) */}
               <button
-                onClick={() => addToCart(product, quantity)}
+                onClick={handleAddToCart}
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
               >
                 <ShoppingBag size={16} />
