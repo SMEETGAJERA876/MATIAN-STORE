@@ -179,13 +179,22 @@ export async function appendOrderToGoogleSheet(
 
     const houseFlatNo = customer.houseFlatNo || "";
     const streetArea = customer.streetArea || "";
+    const addressType = customer.addressType || "Home";
+    const baseCity = customer.city || "Ahmedabad";
+
+    const formattedAddressStr = [houseFlatNo, streetArea, baseCity]
+      .filter(Boolean)
+      .join(", ");
+
     const fullAddress =
       customer.addressLine ||
-      [houseFlatNo, streetArea, customer.city, customer.state, customer.pincode]
+      [houseFlatNo, streetArea, baseCity, customer.state, customer.pincode]
         .filter(Boolean)
         .join(", ") ||
       "N/A";
-    const addressType = customer.addressType || "Home";
+
+    // Combine address & address type into city string as fallback for 13-column sheets
+    const cityWithAddress = `${formattedAddressStr || baseCity} [${addressType}]`;
 
     const payload: GoogleSheetsOrderPayload = {
       customerId: custId,
@@ -194,9 +203,10 @@ export async function appendOrderToGoogleSheet(
       email: customer.email || "N/A",
       houseFlatNo: houseFlatNo || "N/A",
       streetArea: streetArea || "N/A",
-      fullAddress,
+      fullAddress: `${fullAddress} [${addressType}]`,
       addressType,
-      city: customer.city || "N/A",
+      address: cityWithAddress,
+      city: cityWithAddress,
       state: customer.state || "Gujarat",
       pincode: customer.pincode || "380015",
       orderId: order.invoiceNumber || order.id || "ORD1001",
