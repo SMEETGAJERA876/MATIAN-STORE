@@ -56,22 +56,22 @@ export default function CartPage() {
   // Checkout step state: "cart" | "checkout" | "success"
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout" | "success">("checkout");
 
-  // Shipping details state
+  // Shipping details state (Pre-filled with default test data)
   const [shippingDetails, setShippingDetails] = useState<ShippingAddress>({
-    fullName: user?.name || "Rohan Sharma",
+    fullName: user?.name || "Rahul Patel",
     phone: "9876543210",
-    email: user?.email || "customer@matrin.com",
-    houseFlatNo: "Flat 402",
-    streetArea: "Green Acres Apt, Bandra West",
-    addressLine: "Flat 402, Green Acres Apt, Bandra West",
-    city: "Mumbai",
-    state: "Maharashtra",
-    pincode: "400050",
+    email: user?.email || "rahul@example.com",
+    houseFlatNo: "Flat 102",
+    streetArea: "Navrangpura",
+    addressLine: "Flat 102, Navrangpura",
+    city: "Ahmedabad",
+    state: "Gujarat",
+    pincode: "380015",
     addressType: "Home",
   });
 
-  // Payment method state
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
+  // Payment method state (Default to Instant Test Mode)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("test");
   const [upiSubMode, setUpiSubMode] = useState<"vpa" | "qr">("vpa");
   const [upiId, setUpiId] = useState("smeet@okaxis");
   const [cardNumber, setCardNumber] = useState("4532 •••• •••• 8892");
