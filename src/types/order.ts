@@ -1,6 +1,6 @@
 import { CartItem } from "@/types/product";
 
-export type PaymentMethod = "upi" | "card" | "netbanking" | "cod";
+export type PaymentMethod = "upi" | "card" | "netbanking" | "cod" | "test";
 
 export interface ShippingAddress {
   fullName: string;
