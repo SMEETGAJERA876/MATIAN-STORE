@@ -54,7 +54,7 @@ export default function CartPage() {
   const [couponInput, setCouponInput] = useState("");
 
   // Checkout step state: "cart" | "checkout" | "success"
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout" | "success">("cart");
+  const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout" | "success">("checkout");
 
   // Shipping details state
   const [shippingDetails, setShippingDetails] = useState<ShippingAddress>({
