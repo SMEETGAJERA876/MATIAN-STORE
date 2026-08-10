@@ -180,35 +180,28 @@ export async function appendOrderToGoogleSheet(
     const houseFlatNo = customer.houseFlatNo || "";
     const streetArea = customer.streetArea || "";
     const addressType = customer.addressType || "Home";
-    const baseCity = customer.city || "Ahmedabad";
+    const baseCity = customer.city || "Surat";
 
-    const formattedAddressStr = [houseFlatNo, streetArea, baseCity]
-      .filter(Boolean)
-      .join(", ");
-
-    const fullAddress =
+    const formattedAddressStr =
+      [houseFlatNo, streetArea].filter(Boolean).join(", ") ||
       customer.addressLine ||
-      [houseFlatNo, streetArea, baseCity, customer.state, customer.pincode]
-        .filter(Boolean)
-        .join(", ") ||
       "N/A";
 
-    // Combine address & address type into city string as fallback for 13-column sheets
-    const cityWithAddress = `${formattedAddressStr || baseCity} [${addressType}]`;
+    const addressWithDetails = `${formattedAddressStr} [${addressType}]`;
 
     const payload: GoogleSheetsOrderPayload = {
       customerId: custId,
       name: customer.fullName || customer.name || "Customer",
       mobile: customer.phone || "N/A",
       email: customer.email || "N/A",
+      address: addressWithDetails,
       houseFlatNo: houseFlatNo || "N/A",
       streetArea: streetArea || "N/A",
-      fullAddress: `${fullAddress} [${addressType}]`,
+      fullAddress: `${formattedAddressStr}, ${baseCity}, ${customer.state || "Gujarat"} - ${customer.pincode || "395007"} [${addressType}]`,
       addressType,
-      address: cityWithAddress,
-      city: cityWithAddress,
+      city: baseCity,
       state: customer.state || "Gujarat",
-      pincode: customer.pincode || "380015",
+      pincode: customer.pincode || "395007",
       orderId: order.invoiceNumber || order.id || "ORD1001",
       product: productsSummary,
       qty: totalQty,
