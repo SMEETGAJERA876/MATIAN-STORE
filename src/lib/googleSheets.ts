@@ -1,27 +1,25 @@
 /**
  * Google Sheets Integration Utility for MATRIN Store
  * 
- * Supports data collection via:
- * 1. Google Apps Script Webhook (Recommended: no service account overhead)
- * 2. Custom webhook / API proxy endpoints
+ * Data payload matches exact table format:
+ * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  */
 
 export interface GoogleSheetsOrderPayload {
-  timestamp: string;
+  customerId: string;
+  name: string;
+  mobile: string;
+  email: string;
+  city: string;
+  state: string;
+  pincode: string;
   orderId: string;
-  invoiceNumber: string;
-  orderDate: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  shippingAddress: string;
-  itemsSummary: string;
-  totalAmount: number;
-  paymentMethod: string;
-  paymentStatus: string;
-  orderStatus: string;
-  transactionId?: string;
-  source: string;
+  product: string;
+  qty: number;
+  total: string;
+  payment: string;
+  status: string;
+  [key: string]: unknown;
 }
 
 export interface GoogleSheetsCustomPayload {
@@ -33,6 +31,24 @@ export interface GoogleSheetsCustomPayload {
   message?: string;
   data?: Record<string, unknown>;
   [key: string]: unknown;
+}
+
+/**
+ * Helper to generate or retrieve Customer ID (e.g. CUST001)
+ */
+function getCustomerId(customer: any, orderId: string): string {
+  if (customer.customerId || customer.id) {
+    return String(customer.customerId || customer.id);
+  }
+  // Generate deterministic CUST number from email or orderId
+  const seed = customer.email || orderId || "default";
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+  const custNum = (Math.abs(hash) % 900) + 100;
+  return `CUST${custNum}`;
 }
 
 /**
@@ -77,7 +93,6 @@ export async function sendToGoogleSheetsWebhook(
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
-      // Apps Script web apps often return redirects (302) or text responses
       redirect: "follow",
     });
 
@@ -101,7 +116,8 @@ export async function sendToGoogleSheetsWebhook(
 }
 
 /**
- * Format and append an Order to Google Sheets
+ * Format and append an Order to Google Sheets in exact user-requested format:
+ * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  */
 export async function appendOrderToGoogleSheet(
   order: any,
@@ -111,45 +127,43 @@ export async function appendOrderToGoogleSheet(
     const customer = order.customer || {};
     const items = Array.isArray(order.items) ? order.items : [];
 
-    const itemsSummary = items
-      .map(
-        (item: any) =>
-          `${item.product?.name || item.name || "Product"} (x${item.quantity || 1}) - ₹${
-            item.product?.price || item.price || 0
-          }`
-      )
-      .join("; ");
+    const custId = getCustomerId(customer, order.id || "");
 
-    const formattedAddress = [
-      customer.addressType ? `[${customer.addressType}]` : null,
-      customer.houseFlatNo,
-      customer.streetArea || customer.addressLine,
-      customer.city,
-      customer.state,
-      customer.pincode,
-    ]
-      .filter(Boolean)
-      .join(", ");
+    const productsSummary = items
+      .map((item: any) => item.product?.name || item.name || "Product")
+      .join(", ") || "General Item";
+
+    const totalQty = items.reduce(
+      (sum: number, item: any) => sum + (item.quantity || 1),
+      0
+    ) || 1;
+
+    const rawTotal = Number(order.totalAmount || 0);
+    const formattedTotal = `₹${rawTotal}`;
+
+    let paymentMethod = (order.paymentMethod || "UPI").toString().toUpperCase();
+    if (paymentMethod === "COD") paymentMethod = "COD";
+    if (paymentMethod === "CARD") paymentMethod = "Card";
+
+    const orderStatus = order.orderStatus || order.paymentStatus || "Processing";
 
     const payload: GoogleSheetsOrderPayload = {
-      timestamp: new Date().toISOString(),
-      orderId: order.id || "",
-      invoiceNumber: order.invoiceNumber || "",
-      orderDate: order.orderDate || new Date().toISOString().split("T")[0],
-      customerName: customer.fullName || customer.name || "Customer",
-      customerEmail: customer.email || "N/A",
-      customerPhone: customer.phone || "N/A",
-      shippingAddress: formattedAddress || "N/A",
-      itemsSummary: itemsSummary || "No items listed",
-      totalAmount: Number(order.totalAmount || 0),
-      paymentMethod: order.paymentMethod || "N/A",
-      paymentStatus: order.paymentStatus || "Paid",
-      orderStatus: order.orderStatus || "Processing",
-      transactionId: order.transactionId || "",
-      source: "MATRIN Store E-Commerce",
+      customerId: custId,
+      name: customer.fullName || customer.name || "Customer",
+      mobile: customer.phone || "N/A",
+      email: customer.email || "N/A",
+      city: customer.city || "N/A",
+      state: customer.state || "Gujarat",
+      pincode: customer.pincode || "380015",
+      orderId: order.invoiceNumber || order.id || "ORD1001",
+      product: productsSummary,
+      qty: totalQty,
+      total: formattedTotal,
+      payment: paymentMethod,
+      status: orderStatus,
     };
 
-    return await sendToGoogleSheetsWebhook(payload as any, webhookUrl);
+    return await sendToGoogleSheetsWebhook(payload as Record<string, unknown>, webhookUrl);
   } catch (err: unknown) {
     const error = err as Error;
     console.error("[GoogleSheets] Failed formatting order payload:", error);
@@ -165,8 +179,19 @@ export async function appendCustomDataToGoogleSheet(
   webhookUrl?: string
 ): Promise<{ success: boolean; error?: string }> {
   const payload = {
-    timestamp: new Date().toISOString(),
-    formType: customData.formType || "Lead Collection",
+    customerId: customData.customerId || "CUST001",
+    name: customData.name || "N/A",
+    mobile: customData.mobile || customData.phone || "N/A",
+    email: customData.email || "N/A",
+    city: customData.city || "N/A",
+    state: customData.state || "N/A",
+    pincode: customData.pincode || "N/A",
+    orderId: customData.orderId || "ORD1001",
+    product: customData.product || customData.message || "Enquiry",
+    qty: customData.qty || 1,
+    total: customData.total || "₹0",
+    payment: customData.payment || "N/A",
+    status: customData.status || "Submitted",
     ...customData,
   };
 

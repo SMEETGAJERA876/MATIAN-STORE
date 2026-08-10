@@ -15,7 +15,11 @@ export async function GET() {
     success: true,
     status,
     scriptTemplate: `/**
- * MATRIN Store - Google Sheets Automation Script
+ * MATRIN Store - Google Sheets Data Collection Script
+ * 
+ * Target Format:
+ * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
+ *
  * Paste this script into Extensions > Apps Script in your Google Sheet.
  * Deploy as Web App (Execute as: Me, Access: Anyone).
  */
@@ -24,33 +28,40 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
     
-    // Auto-create headers on row 1 if sheet is empty
+    // Auto-create exact headers on row 1 if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
-        "Timestamp", "Order ID", "Invoice #", "Order Date",
-        "Customer Name", "Customer Email", "Customer Phone",
-        "Shipping Address", "Items Summary", "Total Amount (₹)",
-        "Payment Method", "Payment Status", "Order Status", "Transaction ID", "Source"
+        "Customer ID",
+        "Name",
+        "Mobile",
+        "Email",
+        "City",
+        "State",
+        "Pincode",
+        "Order ID",
+        "Product",
+        "Qty",
+        "Total",
+        "Payment",
+        "Status"
       ]);
     }
     
-    // Append order row or custom form entry
+    // Append row matching exact user format
     sheet.appendRow([
-      data.timestamp || new Date().toISOString(),
-      data.orderId || data.id || "N/A",
-      data.invoiceNumber || "N/A",
-      data.orderDate || "N/A",
-      data.customerName || data.name || "N/A",
-      data.customerEmail || data.email || "N/A",
-      data.customerPhone || data.phone || "N/A",
-      data.shippingAddress || data.address || "N/A",
-      data.itemsSummary || data.message || "N/A",
-      data.totalAmount || data.amount || 0,
-      data.paymentMethod || "N/A",
-      data.paymentStatus || "N/A",
-      data.orderStatus || "N/A",
-      data.transactionId || "N/A",
-      data.source || data.formType || "MATRIN Store Data Collection"
+      data.customerId || data.customer_id || "CUST001",
+      data.name || data.customerName || "N/A",
+      data.mobile || data.phone || data.customerPhone || "N/A",
+      data.email || data.customerEmail || "N/A",
+      data.city || "N/A",
+      data.state || "N/A",
+      data.pincode || data.zip || "N/A",
+      data.orderId || data.invoiceNumber || "ORD1001",
+      data.product || data.itemsSummary || "N/A",
+      data.qty !== undefined ? data.qty : (data.quantity || 1),
+      data.total || (data.totalAmount ? ("₹" + data.totalAmount) : "₹0"),
+      data.payment || data.paymentMethod || "UPI",
+      data.status || data.orderStatus || "Processing"
     ]);
     
     return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
@@ -68,30 +79,29 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { action, webhookUrl: customWebhookUrl, data } = body;
 
-    // 1. Test Webhook Connection
+    // 1. Test Webhook Connection with exact sample format
     if (action === "test") {
       const testPayload = {
-        timestamp: new Date().toISOString(),
-        orderId: "TEST_ORD_001",
-        invoiceNumber: "INV-TEST-2026",
-        orderDate: new Date().toISOString().split("T")[0],
-        customerName: "MATRIN Connection Test",
-        customerEmail: "test@matrin-store.com",
-        customerPhone: "+91 99999 88888",
-        shippingAddress: "Mumbai, India",
-        itemsSummary: "MATRIN Test Cleaning Kit (x1)",
-        totalAmount: 499,
-        paymentMethod: "UPI Test",
-        paymentStatus: "Paid",
-        orderStatus: "Completed Test",
-        source: "Admin Connection Test",
+        customerId: "CUST001",
+        name: "Rahul Patel",
+        mobile: "9876543210",
+        email: "rahul@example.com",
+        city: "Ahmedabad",
+        state: "Gujarat",
+        pincode: "380015",
+        orderId: "ORD1001",
+        product: "Floor Cleaner",
+        qty: 2,
+        total: "₹537",
+        payment: "UPI",
+        status: "Processing",
       };
 
       const result = await sendToGoogleSheetsWebhook(testPayload, customWebhookUrl);
       if (result.success) {
         return jsonResponse({
           success: true,
-          message: "Google Sheets Webhook connection test successful! Sample row dispatched.",
+          message: "Google Sheets Webhook connection test successful! Sample row (CUST001 / Rahul Patel) dispatched.",
         });
       } else {
         return jsonResponse(
