@@ -62,11 +62,18 @@ function getCustomerId(customer: any, orderId: string): string {
   return `CUST${custNum}`;
 }
 
+import { inMemoryStore } from "./inMemoryStore";
+
 /**
  * Retrieves configured Google Sheets Webhook URL
  */
 export function getGoogleSheetsWebhookUrl(): string | null {
-  return process.env.GOOGLE_SHEETS_WEBHOOK_URL || runtimeWebhookUrl || null;
+  return (
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    runtimeWebhookUrl ||
+    (inMemoryStore.settings as any)?.googleSheetsWebhookUrl ||
+    null
+  );
 }
 
 /**
