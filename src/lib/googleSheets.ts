@@ -64,6 +64,9 @@ function getCustomerId(customer: any, orderId: string): string {
   return `CUST${custNum}`;
 }
 
+const DEFAULT_GOOGLE_SHEETS_WEBHOOK_URL =
+  "https://script.google.com/macros/s/AKfycbz6U5MNpC5kI8zISrL2eaZbK_Z-aIkiXT7z32XRR7dBYU8umCxCYumQ-r1h_nQvVMhqNA/exec";
+
 /**
  * Retrieves configured Google Sheets Webhook URL
  */
@@ -72,7 +75,7 @@ export function getGoogleSheetsWebhookUrl(): string | null {
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
     runtimeWebhookUrl ||
     (inMemoryStore.settings as any)?.googleSheetsWebhookUrl ||
-    null
+    DEFAULT_GOOGLE_SHEETS_WEBHOOK_URL
   );
 }
 
