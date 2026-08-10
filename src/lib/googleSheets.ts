@@ -224,6 +224,23 @@ export async function appendOrderToGoogleSheet(
     const baseState = (customer.state || "Gujarat").trim();
     const basePincode = (customer.pincode || "395007").trim();
 
+    const streetAddressStr = [houseFlatNo, streetArea].filter(Boolean).join(", ") || "N/A";
+
+    const orderDateStr = order.orderDate || new Date().toISOString().split("T")[0];
+
+    const unitPriceSummary = items
+      .map((item: any) => {
+        const price = Number(item.product?.price || item.price || 0);
+        return `₹${price.toLocaleString("en-IN")}`;
+      })
+      .join(", ") || "₹0";
+
+    const discountSummary = order.appliedCoupon
+      ? `${order.appliedCoupon} (₹${order.discountAmount || 0} OFF)`
+      : Number(order.discountAmount) > 0
+      ? `₹${order.discountAmount} OFF`
+      : "None";
+
     // Complete shipping address for courier delivery label
     const fullShippingAddress =
       [houseFlatNo, streetArea, baseCity, baseState, basePincode ? `PIN: ${basePincode}` : ""]
@@ -235,6 +252,8 @@ export async function appendOrderToGoogleSheet(
     const payload: Record<string, unknown> = {
       customerId: custId,
       customer_id: custId,
+      orderDate: orderDateStr,
+      date: orderDateStr,
       name: (customer.fullName || customer.name || "Customer").trim(),
       fullName: (customer.fullName || customer.name || "Customer").trim(),
       customerName: (customer.fullName || customer.name || "Customer").trim(),
@@ -243,6 +262,8 @@ export async function appendOrderToGoogleSheet(
       customerPhone: (customer.phone || "N/A").toString().trim(),
       email: (customer.email || "N/A").toString().trim().toLowerCase(),
       customerEmail: (customer.email || "N/A").toString().trim().toLowerCase(),
+      streetAddress: streetAddressStr,
+      street: streetAddressStr,
       addressLine: fullShippingAddress,
       address: fullShippingAddress,
       fullAddress: fullShippingAddress,
@@ -258,6 +279,12 @@ export async function appendOrderToGoogleSheet(
       itemsSummary: productsSummary,
       qty: totalQty,
       quantity: totalQty,
+      unitPrice: unitPriceSummary,
+      price: unitPriceSummary,
+      discountPromoCode: discountSummary,
+      discountCode: discountSummary,
+      couponCode: order.appliedCoupon || "None",
+      discount: discountSummary,
       total: formattedTotal,
       totalAmount: rawTotal,
       payment: paymentMethod,
@@ -287,6 +314,7 @@ export async function appendCustomDataToGoogleSheet(
   const state = (customData.state || "N/A").toString().trim();
   const pincode = (customData.pincode || "N/A").toString().trim();
 
+  const streetAddressStr = [houseFlatNo, streetArea].filter(Boolean).join(", ") || "N/A";
   const formattedAddr =
     (customData.address as string) ||
     (customData.fullAddress as string) ||
@@ -298,9 +326,13 @@ export async function appendCustomDataToGoogleSheet(
 
   const payload = {
     customerId: customData.customerId || "CUST001",
+    orderDate: customData.orderDate || customData.date || new Date().toISOString().split("T")[0],
+    date: customData.orderDate || customData.date || new Date().toISOString().split("T")[0],
     name: customData.name || "N/A",
     mobile: customData.mobile || customData.phone || "N/A",
     email: customData.email || "N/A",
+    streetAddress: streetAddressStr,
+    addressLine: formattedAddr,
     address: formattedAddr,
     fullAddress: formattedAddr,
     city,
@@ -309,6 +341,8 @@ export async function appendCustomDataToGoogleSheet(
     orderId: customData.orderId || "ORD1001",
     product: customData.product || customData.message || "Enquiry",
     qty: customData.qty || 1,
+    unitPrice: customData.unitPrice || customData.price || "₹0",
+    discountPromoCode: customData.discountPromoCode || customData.couponCode || customData.discount || "None",
     total: formattedTotal,
     payment: formatPaymentMethodLabel(customData.payment as string || "N/A"),
     status: formatOrderStatusLabel(customData.status as string || "Submitted"),
