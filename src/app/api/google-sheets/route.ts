@@ -43,16 +43,15 @@ export async function GET() {
     success: true,
     status,
     scriptTemplate: `/**
- * MATRIN Store - Google Sheets Data Collection Script
+ * MATRIN Store - Google Sheets Data Collection Script (14 Columns)
  * 
  * Target Format:
- * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
+ * | Customer ID | Name | Mobile | Email | Address | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  *
  * Paste this script into Extensions > Apps Script in your Google Sheet.
  * Deploy as Web App (Execute as: Me, Access: Anyone).
  */
 
-// Handles GET requests when URL is opened directly in a browser
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
@@ -60,19 +59,19 @@ function doGet(e) {
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
-// Handles POST requests sent automatically when orders are placed
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
     
-    // Auto-create exact headers on row 1 if sheet is empty
+    // Auto-create 14 headers on row 1 if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "Customer ID",
         "Name",
         "Mobile",
         "Email",
+        "Address",
         "City",
         "State",
         "Pincode",
@@ -85,15 +84,16 @@ function doPost(e) {
       ]);
     }
     
-    // Append row matching exact user format
+    // Append row matching exact 14 columns format
     sheet.appendRow([
       data.customerId || data.customer_id || "CUST001",
       data.name || data.customerName || "N/A",
       data.mobile || data.phone || data.customerPhone || "N/A",
       data.email || data.customerEmail || "N/A",
-      data.city || "N/A",
-      data.state || "N/A",
-      data.pincode || data.zip || "N/A",
+      data.address || data.fullAddress || "N/A",
+      data.city || "Surat",
+      data.state || "Gujarat",
+      data.pincode || data.zip || "395007",
       data.orderId || data.invoiceNumber || "ORD1001",
       data.product || data.itemsSummary || "N/A",
       data.qty !== undefined ? data.qty : (data.quantity || 1),
