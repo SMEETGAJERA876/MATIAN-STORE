@@ -24,6 +24,10 @@ export interface GoogleSheetsOrderPayload {
   name: string;
   mobile: string;
   email: string;
+  houseFlatNo: string;
+  streetArea: string;
+  fullAddress: string;
+  addressType: string;
   city: string;
   state: string;
   pincode: string;
@@ -169,11 +173,25 @@ export async function appendOrderToGoogleSheet(
 
     const orderStatus = order.orderStatus || order.paymentStatus || "Processing";
 
+    const houseFlatNo = customer.houseFlatNo || "";
+    const streetArea = customer.streetArea || "";
+    const fullAddress =
+      customer.addressLine ||
+      [houseFlatNo, streetArea, customer.city, customer.state, customer.pincode]
+        .filter(Boolean)
+        .join(", ") ||
+      "N/A";
+    const addressType = customer.addressType || "Home";
+
     const payload: GoogleSheetsOrderPayload = {
       customerId: custId,
       name: customer.fullName || customer.name || "Customer",
       mobile: customer.phone || "N/A",
       email: customer.email || "N/A",
+      houseFlatNo: houseFlatNo || "N/A",
+      streetArea: streetArea || "N/A",
+      fullAddress,
+      addressType,
       city: customer.city || "N/A",
       state: customer.state || "Gujarat",
       pincode: customer.pincode || "380015",

@@ -193,6 +193,15 @@ export default function CartPage() {
           name: shippingDetails.fullName || "Customer",
           mobile: shippingDetails.phone || "N/A",
           email: shippingDetails.email || "N/A",
+          houseFlatNo: shippingDetails.houseFlatNo || "N/A",
+          streetArea: shippingDetails.streetArea || "N/A",
+          fullAddress:
+            shippingDetails.addressLine ||
+            [shippingDetails.houseFlatNo, shippingDetails.streetArea, shippingDetails.city, shippingDetails.state, shippingDetails.pincode]
+              .filter(Boolean)
+              .join(", ") ||
+            "N/A",
+          addressType: shippingDetails.addressType || "Home",
           city: shippingDetails.city || "N/A",
           state: shippingDetails.state || "N/A",
           pincode: shippingDetails.pincode || "N/A",
