@@ -23,6 +23,16 @@ export async function GET() {
  * Paste this script into Extensions > Apps Script in your Google Sheet.
  * Deploy as Web App (Execute as: Me, Access: Anyone).
  */
+
+// Handles GET requests when URL is opened directly in a browser
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "online",
+    message: "MATRIN Store Google Sheets Data Collection Service is active!"
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Handles POST requests sent automatically when orders are placed
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
