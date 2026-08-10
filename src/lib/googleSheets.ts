@@ -1,3 +1,5 @@
+import { inMemoryStore } from "./inMemoryStore";
+
 /**
  * Google Sheets Integration Utility for MATRIN Store
  * 
@@ -62,8 +64,6 @@ function getCustomerId(customer: any, orderId: string): string {
   return `CUST${custNum}`;
 }
 
-import { inMemoryStore } from "./inMemoryStore";
-
 /**
  * Retrieves configured Google Sheets Webhook URL
  */
@@ -105,10 +105,11 @@ export async function sendToGoogleSheetsWebhook(
   }
 
   try {
+    // text/plain;charset=utf-8 avoids CORS preflight restrictions in Google Apps Script
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/plain;charset=utf-8",
       },
       body: JSON.stringify(payload),
       redirect: "follow",
@@ -121,7 +122,7 @@ export async function sendToGoogleSheetsWebhook(
     const text = await response.text().catch(() => "");
     return {
       success: false,
-      error: `Google Sheets Webhook returned HTTP status ${response.status}: ${text}`,
+      error: `Google Sheets Webhook returned HTTP status ${response.status}: ${text.substring(0, 200)}`,
     };
   } catch (err: unknown) {
     const error = err as Error;
