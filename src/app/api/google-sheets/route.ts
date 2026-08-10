@@ -1,13 +1,41 @@
+import fs from "fs";
+import path from "path";
 import { jsonResponse } from "@/lib/auth";
 import {
   getGoogleSheetsStatus,
   sendToGoogleSheetsWebhook,
   appendOrderToGoogleSheet,
   appendCustomDataToGoogleSheet,
+  setRuntimeWebhookUrl,
 } from "@/lib/googleSheets";
 import { connectToDatabase } from "@/lib/db";
 import { OrderModel } from "@/models/Order";
+import { SettingsModel } from "@/models/Settings";
 import { inMemoryStore } from "@/lib/inMemoryStore";
+
+function saveWebhookUrlToEnv(webhookUrl: string) {
+  try {
+    setRuntimeWebhookUrl(webhookUrl);
+    const envPath = path.join(process.cwd(), ".env.local");
+    let content = "";
+    if (fs.existsSync(envPath)) {
+      content = fs.readFileSync(envPath, "utf8");
+    }
+
+    if (content.includes("GOOGLE_SHEETS_WEBHOOK_URL=")) {
+      content = content.replace(
+        /GOOGLE_SHEETS_WEBHOOK_URL=.*/g,
+        `GOOGLE_SHEETS_WEBHOOK_URL=${webhookUrl}`
+      );
+    } else {
+      content += `\nGOOGLE_SHEETS_WEBHOOK_URL=${webhookUrl}\n`;
+    }
+
+    fs.writeFileSync(envPath, content, "utf8");
+  } catch (err) {
+    console.error("Failed to write GOOGLE_SHEETS_WEBHOOK_URL to .env.local:", err);
+  }
+}
 
 export async function GET() {
   const status = getGoogleSheetsStatus();
@@ -89,7 +117,35 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { action, webhookUrl: customWebhookUrl, data } = body;
 
-    // 1. Test Webhook Connection with exact sample format
+    if (customWebhookUrl) {
+      saveWebhookUrlToEnv(customWebhookUrl);
+    }
+
+    // 1. Save Webhook URL Action
+    if (action === "save_webhook") {
+      if (!customWebhookUrl) {
+        return jsonResponse({ error: "Webhook URL is required" }, 400);
+      }
+      saveWebhookUrlToEnv(customWebhookUrl);
+
+      const db = await connectToDatabase();
+      if (db) {
+        let settings = await SettingsModel.findOne();
+        if (!settings) {
+          settings = await SettingsModel.create({ googleSheetsWebhookUrl: customWebhookUrl });
+        } else {
+          settings.googleSheetsWebhookUrl = customWebhookUrl;
+          await settings.save();
+        }
+      }
+
+      return jsonResponse({
+        success: true,
+        message: "Google Sheets Webhook URL saved successfully and configured for live order sync!",
+      });
+    }
+
+    // 2. Test Webhook Connection with exact sample format
     if (action === "test") {
       const testPayload = {
         customerId: "CUST001",
@@ -124,7 +180,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. Bulk Sync Existing Orders to Google Sheets
+    // 3. Bulk Sync Existing Orders to Google Sheets
     if (action === "sync_orders") {
       const db = await connectToDatabase();
       let ordersToSync: any[] = [];
@@ -165,7 +221,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. Custom Lead/Data Collection Form Submission
+    // 4. Custom Lead/Data Collection Form Submission
     if (action === "submit_lead" || data) {
       const payload = data || body;
       const result = await appendCustomDataToGoogleSheet(payload, customWebhookUrl);
@@ -186,7 +242,7 @@ export async function POST(req: Request) {
     }
 
     return jsonResponse(
-      { error: "Invalid action. Supported actions: 'test', 'sync_orders', 'submit_lead'" },
+      { error: "Invalid action. Supported actions: 'test', 'save_webhook', 'sync_orders', 'submit_lead'" },
       400
     );
   } catch (err: unknown) {

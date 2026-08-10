@@ -37,10 +37,39 @@ export const SettingsView: React.FC = () => {
     addToast('success', 'Settings updated successfully');
   };
 
+  const handleSaveWebhook = async () => {
+    if (!webhookUrl.trim()) {
+      addToast('error', 'Please enter a valid Google Sheets Web App URL');
+      return;
+    }
+    try {
+      const res = await fetch('/api/google-sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_webhook',
+          webhookUrl: webhookUrl.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setConnectionStatus('success');
+        addToast('success', 'Google Sheets Webhook URL saved to .env.local!');
+      } else {
+        addToast('error', data.error || 'Failed to save Webhook URL');
+      }
+    } catch {
+      addToast('error', 'Error saving Webhook URL');
+    }
+  };
+
   const handleTestConnection = async () => {
     setIsTesting(true);
     setConnectionStatus('idle');
     try {
+      if (webhookUrl.trim()) {
+        await handleSaveWebhook();
+      }
       const res = await fetch('/api/google-sheets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

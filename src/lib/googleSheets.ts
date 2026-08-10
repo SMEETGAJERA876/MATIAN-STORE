@@ -5,6 +5,18 @@
  * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  */
 
+let runtimeWebhookUrl: string | null = null;
+
+/**
+ * Dynamically set Webhook URL at runtime
+ */
+export function setRuntimeWebhookUrl(url: string) {
+  runtimeWebhookUrl = url;
+  if (url) {
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL = url;
+  }
+}
+
 export interface GoogleSheetsOrderPayload {
   customerId: string;
   name: string;
@@ -40,7 +52,6 @@ function getCustomerId(customer: any, orderId: string): string {
   if (customer.customerId || customer.id) {
     return String(customer.customerId || customer.id);
   }
-  // Generate deterministic CUST number from email or orderId
   const seed = customer.email || orderId || "default";
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -55,7 +66,7 @@ function getCustomerId(customer: any, orderId: string): string {
  * Retrieves configured Google Sheets Webhook URL
  */
 export function getGoogleSheetsWebhookUrl(): string | null {
-  return process.env.GOOGLE_SHEETS_WEBHOOK_URL || null;
+  return process.env.GOOGLE_SHEETS_WEBHOOK_URL || runtimeWebhookUrl || null;
 }
 
 /**

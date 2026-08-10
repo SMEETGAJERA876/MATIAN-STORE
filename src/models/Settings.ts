@@ -8,6 +8,7 @@ export interface ISettings extends Document {
   freeShippingThreshold: number;
   flatShippingRate: number;
   taxRatePercentage: number;
+  googleSheetsWebhookUrl?: string;
   banners: Array<{
     id: string;
     title: string;
@@ -29,6 +30,7 @@ const SettingsSchema = new Schema<ISettings>(
     freeShippingThreshold: { type: Number, default: 499 },
     flatShippingRate: { type: Number, default: 49 },
     taxRatePercentage: { type: Number, default: 18 },
+    googleSheetsWebhookUrl: { type: String, default: "" },
     banners: [
       {
         id: String,
