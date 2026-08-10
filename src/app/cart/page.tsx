@@ -179,41 +179,8 @@ export default function CartPage() {
       transactionId: paymentId,
     };
 
-    // Save order & trigger server-side Google Sheets sync
+    // Save order & trigger server-side Google Sheets sync (Single entry)
     await addOrder(newInvoice);
-
-    // Direct Client-side Fallback Sync to Google Sheets
-    fetch("/api/google-sheets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "submit_lead",
-        data: {
-          customerId: `CUST${Math.floor(100 + Math.random() * 900)}`,
-          name: shippingDetails.fullName || "Customer",
-          mobile: shippingDetails.phone || "N/A",
-          email: shippingDetails.email || "N/A",
-          houseFlatNo: shippingDetails.houseFlatNo || "N/A",
-          streetArea: shippingDetails.streetArea || "N/A",
-          fullAddress:
-            shippingDetails.addressLine ||
-            [shippingDetails.houseFlatNo, shippingDetails.streetArea, shippingDetails.city, shippingDetails.state, shippingDetails.pincode]
-              .filter(Boolean)
-              .join(", ") ||
-            "N/A",
-          addressType: shippingDetails.addressType || "Home",
-          city: shippingDetails.city || "N/A",
-          state: shippingDetails.state || "N/A",
-          pincode: shippingDetails.pincode || "N/A",
-          orderId: invoiceNum,
-          product: cart.map((c) => c.product.name).join(", ") || "Order Items",
-          qty: cart.reduce((sum, c) => sum + c.quantity, 0) || 1,
-          total: `₹${total}`,
-          payment: paymentMethod.toUpperCase(),
-          status: status === "Cash on Delivery" ? "Pending COD" : "Paid",
-        },
-      }),
-    }).catch((err) => console.error("Client Google Sheets backup sync error:", err));
 
     setGeneratedInvoice(newInvoice);
     setCheckoutStep("success");

@@ -156,8 +156,12 @@ export async function appendOrderToGoogleSheet(
     const custId = getCustomerId(customer, order.id || "");
 
     const productsSummary = items
-      .map((item: any) => item.product?.name || item.name || "Product")
-      .join(", ") || "General Item";
+      .map((item: any) => {
+        const pName = item.product?.name || item.name || "Product";
+        const q = item.quantity || 1;
+        return `${pName} (x${q})`;
+      })
+      .join("; ") || "General Item";
 
     const totalQty = items.reduce(
       (sum: number, item: any) => sum + (item.quantity || 1),
