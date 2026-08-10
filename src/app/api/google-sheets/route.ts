@@ -43,9 +43,9 @@ export async function GET() {
     success: true,
     status,
     scriptTemplate: `/**
- * MATRIN Store - Google Sheets Data Collection Script (14 Columns)
+ * MATRIN Store - Plain Google Sheet Data Collector (14 Columns)
  * 
- * Target Format:
+ * Target Plain Format:
  * | Customer ID | Name | Mobile | Email | Address | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  *
  * Paste this script into Extensions > Apps Script in your Google Sheet.
@@ -55,7 +55,7 @@ export async function GET() {
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
-    message: "MATRIN Store Google Sheets Data Collection Service is active!"
+    message: "MATRIN Store Google Sheets Plain Data Collector is active!"
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -64,14 +64,14 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
     
-    // Auto-create 14 headers on row 1 if sheet is empty
+    // Auto-create 14 plain headers on row 1 if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "Customer ID",
         "Name",
         "Mobile",
         "Email",
-        "Address",
+        "Address Line",
         "City",
         "State",
         "Pincode",
@@ -82,15 +82,18 @@ function doPost(e) {
         "Payment",
         "Status"
       ]);
+      var headerRange = sheet.getRange(1, 1, 1, 14);
+      headerRange.clearFormat();
+      headerRange.setFontWeight("bold");
     }
     
-    // Append row matching exact 14 columns format
+    // Append plain row
     sheet.appendRow([
       data.customerId || data.customer_id || "CUST001",
-      data.name || data.customerName || "N/A",
+      data.name || data.customerName || data.fullName || "N/A",
       data.mobile || data.phone || data.customerPhone || "N/A",
       data.email || data.customerEmail || "N/A",
-      data.address || data.fullAddress || "N/A",
+      data.fullAddress || data.addressLine || data.address || "N/A",
       data.city || "Surat",
       data.state || "Gujarat",
       data.pincode || data.zip || "395007",
@@ -101,6 +104,15 @@ function doPost(e) {
       data.payment || data.paymentMethod || "UPI",
       data.status || data.orderStatus || "Processing"
     ]);
+    
+    // Clear all formatting boxes, colors, and borders on appended row for plain sheet output
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      var newRowRange = sheet.getRange(lastRow, 1, 1, 14);
+      newRowRange.clearFormat();
+      newRowRange.setFontFamily("Arial");
+      newRowRange.setFontSize(10);
+    }
     
     return ContentService.createTextOutput(JSON.stringify({ result: "success" }))
       .setMimeType(ContentService.MimeType.JSON);

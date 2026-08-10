@@ -44,20 +44,52 @@ export async function POST(req: Request) {
     const orderId = body.id || `ord_${Date.now()}`;
     const invoiceNumber = body.invoiceNumber || `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    const rawCustomer = body.customer || {};
+    const houseFlatNo = (rawCustomer.houseFlatNo || "").toString().trim();
+    const streetArea = (rawCustomer.streetArea || "").toString().trim();
+    const city = (rawCustomer.city || "").toString().trim();
+    const state = (rawCustomer.state || "").toString().trim();
+    const pincode = (rawCustomer.pincode || "").toString().trim();
+
+    const fullAddress =
+      [houseFlatNo, streetArea, city, state, pincode].filter(Boolean).join(", ") ||
+      (rawCustomer.addressLine || "").toString().trim() ||
+      "N/A";
+
+    const customer = {
+      fullName: (rawCustomer.fullName || rawCustomer.name || "Customer").toString().trim(),
+      email: (rawCustomer.email || "customer@example.com").toString().trim().toLowerCase(),
+      phone: (rawCustomer.phone || "N/A").toString().trim(),
+      houseFlatNo,
+      streetArea,
+      addressLine: fullAddress,
+      city: city || "Surat",
+      state: state || "Gujarat",
+      pincode: pincode || "395007",
+      addressType: rawCustomer.addressType || "Home",
+    };
+
+    const subtotal = Math.round(Number(body.subtotal || 0));
+    const discountAmount = Math.round(Number(body.discountAmount || 0));
+    const shippingFee = Math.round(Number(body.shippingFee || 0));
+    const totalAmount = Math.round(Number(body.totalAmount || 0));
+    const netSubtotal = Math.max(0, subtotal - discountAmount);
+    const taxAmount = Number(body.taxAmount) || Math.round((netSubtotal * 18) / 118);
+
     const orderData = {
       id: orderId,
       invoiceNumber,
       orderDate: body.orderDate || new Date().toISOString().split("T")[0],
       dueDate: body.dueDate || new Date().toISOString().split("T")[0],
-      customer: body.customer,
-      items: body.items,
-      subtotal: Number(body.subtotal),
-      discountAmount: Number(body.discountAmount || 0),
-      appliedCoupon: body.appliedCoupon,
-      shippingFee: Number(body.shippingFee || 0),
-      taxAmount: Number(body.taxAmount || 0),
-      totalAmount: Number(body.totalAmount),
-      paymentMethod: body.paymentMethod || "upi",
+      customer,
+      items: Array.isArray(body.items) ? body.items : [],
+      subtotal,
+      discountAmount,
+      appliedCoupon: body.appliedCoupon || undefined,
+      shippingFee,
+      taxAmount,
+      totalAmount,
+      paymentMethod: (body.paymentMethod || "upi").toString().toLowerCase(),
       paymentStatus: body.paymentStatus || "Paid",
       orderStatus: body.orderStatus || "Processing",
       transactionId: body.transactionId || `TXN-${Math.floor(10000000 + Math.random() * 90000000)}`,
@@ -90,10 +122,15 @@ export async function POST(req: Request) {
         link: "/admin/orders",
       });
 
-      // Trigger non-blocking Google Sheets data collection sync
-      appendOrderToGoogleSheet(createdOrder).catch((err) =>
-        console.error("Async Google Sheets order sync error:", err)
-      );
+      // Trigger Google Sheets data collection sync
+      try {
+        const sheetsResult = await appendOrderToGoogleSheet(createdOrder);
+        if (!sheetsResult.success) {
+          console.error("Google Sheets sync error:", sheetsResult.error);
+        }
+      } catch (sheetsErr) {
+        console.error("Google Sheets sync exception:", sheetsErr);
+      }
 
       return jsonResponse({ success: true, order: createdOrder }, 201);
     }
@@ -122,10 +159,15 @@ export async function POST(req: Request) {
       link: "/admin/orders",
     });
 
-    // Trigger non-blocking Google Sheets data collection sync
-    appendOrderToGoogleSheet(orderData).catch((err) =>
-      console.error("Async Google Sheets order sync error:", err)
-    );
+    // Trigger Google Sheets data collection sync
+    try {
+      const sheetsResult = await appendOrderToGoogleSheet(orderData);
+      if (!sheetsResult.success) {
+        console.error("Google Sheets sync error:", sheetsResult.error);
+      }
+    } catch (sheetsErr) {
+      console.error("Google Sheets sync exception:", sheetsErr);
+    }
 
     return jsonResponse({ success: true, order: orderData }, 201);
   } catch (err: unknown) {

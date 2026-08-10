@@ -24,59 +24,60 @@ export const OrdersView: React.FC = () => {
   const { orders, setSelectedOrderId, addToast } = useAdminStore();
   const [activeTab, setActiveTab] = useState('all');
 
-  const ordersData = [
+  const defaultMockOrders = [
     {
       id: 'ord-101',
-      orderNumber: '#MT-8842',
+      orderNumber: '#INV-2026-8842',
       date: 'Nov 28, 14:22',
-      customerName: 'Alex Sterling',
-      customerInitials: 'AS',
-      customerEmail: 'alex.sterling@example.com',
+      customerName: 'Rahul Patel',
+      customerInitials: 'RP',
+      customerEmail: 'rahul@example.com',
       paymentStatus: 'PAID',
-      fulfillment: 'UNFULFILLED',
+      fulfillment: 'PROCESSING',
       totalAmount: 1240.00,
     },
     {
       id: 'ord-102',
-      orderNumber: '#MT-8841',
+      orderNumber: '#INV-2026-8841',
       date: 'Nov 28, 11:05',
-      customerName: 'Rebecca Moore',
-      customerInitials: 'RM',
-      customerEmail: 'rmoore@enterprise.co',
+      customerName: 'Smeet Gajera',
+      customerInitials: 'SG',
+      customerEmail: 'smeet@example.com',
       paymentStatus: 'PAID',
       fulfillment: 'FULFILLED',
-      totalAmount: 84.50,
-    },
-    {
-      id: 'ord-103',
-      orderNumber: '#MT-8840',
-      date: 'Nov 27, 18:45',
-      customerName: 'Hiroki Kobayashi',
-      customerInitials: 'HK',
-      customerEmail: 'hiroki@techglobal.jp',
-      paymentStatus: 'PENDING',
-      fulfillment: 'UNFULFILLED',
-      totalAmount: 3100.22,
-    },
-    {
-      id: 'ord-104',
-      orderNumber: '#MT-8839',
-      date: 'Nov 27, 09:12',
-      customerName: 'Lucas Bennet',
-      customerInitials: 'LB',
-      customerEmail: 'lucas.b@design.io',
-      paymentStatus: 'PAID',
-      fulfillment: 'RESTOCKED',
-      totalAmount: 15.00,
+      totalAmount: 845.50,
     },
   ];
 
+  const mappedOrders = (orders && orders.length > 0)
+    ? orders.map((o) => {
+        const name = o.customerName || 'Customer';
+        const initials = name
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+        return {
+          id: o.id,
+          orderNumber: o.orderNumber || `#${o.id}`,
+          date: o.date || 'Today',
+          customerName: name,
+          customerInitials: initials || 'C',
+          customerEmail: o.customerEmail || 'N/A',
+          paymentStatus: (o.paymentStatus || 'PAID').toUpperCase(),
+          fulfillment: (o.shippingStatus || 'PROCESSING').toUpperCase(),
+          totalAmount: o.totalAmount || 0,
+        };
+      })
+    : defaultMockOrders;
+
+  const ordersData = mappedOrders;
+
   const filterTabs = [
-    { id: 'all', label: 'All', count: 1284 },
-    { id: 'unfulfilled', label: 'Unfulfilled', count: 42 },
-    { id: 'unpaid', label: 'Unpaid', count: 8 },
-    { id: 'open', label: 'Open', count: 50 },
-    { id: 'closed', label: 'Closed', count: 1184 },
+    { id: 'all', label: 'All', count: ordersData.length },
+    { id: 'unfulfilled', label: 'Unfulfilled', count: ordersData.filter(o => o.fulfillment !== 'FULFILLED').length },
+    { id: 'unpaid', label: 'Unpaid', count: ordersData.filter(o => o.paymentStatus !== 'PAID').length },
   ];
 
   const columns: Column<typeof ordersData[0]>[] = [

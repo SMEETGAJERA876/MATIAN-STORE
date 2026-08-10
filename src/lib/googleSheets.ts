@@ -74,8 +74,9 @@ const DEFAULT_GOOGLE_SHEETS_WEBHOOK_URL =
 /**
  * Retrieves configured Google Sheets Webhook URL
  */
-export function getGoogleSheetsWebhookUrl(): string | null {
+export function getGoogleSheetsWebhookUrl(): string {
   return (
+    process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEBHOOK_URL ||
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
     runtimeWebhookUrl ||
     (inMemoryStore.settings as any)?.googleSheetsWebhookUrl ||
@@ -112,21 +113,35 @@ export async function sendToGoogleSheetsWebhook(
   }
 
   try {
-    // text/plain;charset=utf-8 avoids CORS preflight restrictions in Google Apps Script
-    const response = await fetch(webhookUrl, {
+    const isBrowser = typeof window !== "undefined";
+    const fetchOptions: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "text/plain;charset=utf-8",
       },
       body: JSON.stringify(payload),
       redirect: "follow",
-    });
+    };
 
-    if (response.ok || response.status === 302 || response.status === 200) {
+    // Browsers require mode: 'no-cors' to post to Google Apps Script web apps on deployed sites
+    if (isBrowser) {
+      fetchOptions.mode = "no-cors";
+    }
+
+    const response = await fetch(webhookUrl, fetchOptions);
+
+    if (isBrowser || response.ok || response.status === 302 || response.status === 200 || response.type === "opaque") {
       return { success: true };
     }
 
     const text = await response.text().catch(() => "");
+    if (response.status === 404) {
+      return {
+        success: false,
+        error: "Google Sheets Webhook URL returned 404 Page Not Found. Please deploy the script in Google Sheets (Deploy > New deployment > Web App > Access: Anyone) and save the generated Web App URL in .env.local or Admin Settings.",
+      };
+    }
+
     return {
       success: false,
       error: `Google Sheets Webhook returned HTTP status ${response.status}: ${text.substring(0, 200)}`,
@@ -142,8 +157,37 @@ export async function sendToGoogleSheetsWebhook(
 }
 
 /**
- * Format and append an Order to Google Sheets in exact user-requested format:
- * | Customer ID | Name | Mobile | Email | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
+ * Format payment method for display & reporting (Plain Text)
+ */
+export function formatPaymentMethodLabel(method: string = ""): string {
+  const m = method.toString().trim().toLowerCase();
+  if (m === "upi") return "UPI";
+  if (m === "card") return "Card";
+  if (m === "cod") return "COD";
+  if (m === "test") return "Test";
+  if (m === "netbanking") return "Net Banking";
+  return method || "UPI";
+}
+
+/**
+ * Format order status for reporting (Plain Text)
+ */
+export function formatOrderStatusLabel(status: string = ""): string {
+  if (!status) return "Processing";
+  const s = status.toString().trim();
+  if (s.toLowerCase() === "paid") return "Paid";
+  if (s.toLowerCase() === "pending") return "Pending";
+  if (s.toLowerCase() === "cash on delivery") return "Cash on Delivery";
+  if (s.toLowerCase() === "shipped") return "Shipped";
+  if (s.toLowerCase() === "delivered") return "Delivered";
+  if (s.toLowerCase() === "cancelled") return "Cancelled";
+  if (s.toLowerCase() === "refunded") return "Refunded";
+  return s;
+}
+
+/**
+ * Format and append an Order to Google Sheets in plain text format:
+ * | Customer ID | Name | Mobile | Email | Address | City | State | Pincode | Order ID | Product | Qty | Total | Payment | Status |
  */
 export async function appendOrderToGoogleSheet(
   order: any,
@@ -159,9 +203,9 @@ export async function appendOrderToGoogleSheet(
       .map((item: any) => {
         const pName = item.product?.name || item.name || "Product";
         const q = item.quantity || 1;
-        return `${pName} (x${q})`;
+        return q > 1 ? `${pName} x${q}` : pName;
       })
-      .join("; ") || "General Item";
+      .join(", ") || "Product";
 
     const totalQty = items.reduce(
       (sum: number, item: any) => sum + (item.quantity || 1),
@@ -169,48 +213,60 @@ export async function appendOrderToGoogleSheet(
     ) || 1;
 
     const rawTotal = Number(order.totalAmount || 0);
-    const formattedTotal = `₹${rawTotal}`;
+    const formattedTotal = `₹${rawTotal.toLocaleString("en-IN")}`;
 
-    let paymentMethod = (order.paymentMethod || "UPI").toString().toUpperCase();
-    if (paymentMethod === "COD") paymentMethod = "COD";
-    if (paymentMethod === "CARD") paymentMethod = "Card";
+    const paymentMethod = formatPaymentMethodLabel(order.paymentMethod);
+    const orderStatus = formatOrderStatusLabel(order.orderStatus || order.paymentStatus);
 
-    const orderStatus = order.orderStatus || order.paymentStatus || "Processing";
+    const houseFlatNo = (customer.houseFlatNo || "").trim();
+    const streetArea = (customer.streetArea || "").trim();
+    const baseCity = (customer.city || "Surat").trim();
+    const baseState = (customer.state || "Gujarat").trim();
+    const basePincode = (customer.pincode || "395007").trim();
 
-    const houseFlatNo = customer.houseFlatNo || "";
-    const streetArea = customer.streetArea || "";
-    const addressType = customer.addressType || "Home";
-    const baseCity = customer.city || "Surat";
-
-    const formattedAddressStr =
-      [houseFlatNo, streetArea].filter(Boolean).join(", ") ||
+    // Complete shipping address for courier delivery label
+    const fullShippingAddress =
+      [houseFlatNo, streetArea, baseCity, baseState, basePincode ? `PIN: ${basePincode}` : ""]
+        .filter(Boolean)
+        .join(", ") ||
       customer.addressLine ||
       "N/A";
 
-    const addressWithDetails = `${formattedAddressStr} [${addressType}]`;
-
-    const payload: GoogleSheetsOrderPayload = {
+    const payload: Record<string, unknown> = {
       customerId: custId,
-      name: customer.fullName || customer.name || "Customer",
-      mobile: customer.phone || "N/A",
-      email: customer.email || "N/A",
-      address: addressWithDetails,
+      customer_id: custId,
+      name: (customer.fullName || customer.name || "Customer").trim(),
+      fullName: (customer.fullName || customer.name || "Customer").trim(),
+      customerName: (customer.fullName || customer.name || "Customer").trim(),
+      mobile: (customer.phone || "N/A").toString().trim(),
+      phone: (customer.phone || "N/A").toString().trim(),
+      customerPhone: (customer.phone || "N/A").toString().trim(),
+      email: (customer.email || "N/A").toString().trim().toLowerCase(),
+      customerEmail: (customer.email || "N/A").toString().trim().toLowerCase(),
+      addressLine: fullShippingAddress,
+      address: fullShippingAddress,
+      fullAddress: fullShippingAddress,
       houseFlatNo: houseFlatNo || "N/A",
       streetArea: streetArea || "N/A",
-      fullAddress: `${formattedAddressStr}, ${baseCity}, ${customer.state || "Gujarat"} - ${customer.pincode || "395007"} [${addressType}]`,
-      addressType,
       city: baseCity,
-      state: customer.state || "Gujarat",
-      pincode: customer.pincode || "395007",
+      state: baseState,
+      pincode: basePincode,
+      zip: basePincode,
       orderId: order.invoiceNumber || order.id || "ORD1001",
+      invoiceNumber: order.invoiceNumber || order.id || "ORD1001",
       product: productsSummary,
+      itemsSummary: productsSummary,
       qty: totalQty,
+      quantity: totalQty,
       total: formattedTotal,
+      totalAmount: rawTotal,
       payment: paymentMethod,
+      paymentMethod: paymentMethod,
       status: orderStatus,
+      orderStatus: orderStatus,
     };
 
-    return await sendToGoogleSheetsWebhook(payload as Record<string, unknown>, webhookUrl);
+    return await sendToGoogleSheetsWebhook(payload, webhookUrl);
   } catch (err: unknown) {
     const error = err as Error;
     console.error("[GoogleSheets] Failed formatting order payload:", error);
@@ -225,20 +281,37 @@ export async function appendCustomDataToGoogleSheet(
   customData: GoogleSheetsCustomPayload,
   webhookUrl?: string
 ): Promise<{ success: boolean; error?: string }> {
+  const houseFlatNo = (customData.houseFlatNo || "").toString().trim();
+  const streetArea = (customData.streetArea || "").toString().trim();
+  const city = (customData.city || "N/A").toString().trim();
+  const state = (customData.state || "N/A").toString().trim();
+  const pincode = (customData.pincode || "N/A").toString().trim();
+
+  const formattedAddr =
+    (customData.address as string) ||
+    (customData.fullAddress as string) ||
+    [houseFlatNo, streetArea, city, state, pincode].filter((s) => s && s !== "N/A").join(", ") ||
+    "N/A";
+
+  const rawTotal = customData.total || (customData.totalAmount ? `₹${customData.totalAmount}` : "₹0");
+  const formattedTotal = typeof rawTotal === "number" ? `₹${rawTotal.toLocaleString("en-IN")}` : String(rawTotal);
+
   const payload = {
     customerId: customData.customerId || "CUST001",
     name: customData.name || "N/A",
     mobile: customData.mobile || customData.phone || "N/A",
     email: customData.email || "N/A",
-    city: customData.city || "N/A",
-    state: customData.state || "N/A",
-    pincode: customData.pincode || "N/A",
+    address: formattedAddr,
+    fullAddress: formattedAddr,
+    city,
+    state,
+    pincode,
     orderId: customData.orderId || "ORD1001",
     product: customData.product || customData.message || "Enquiry",
     qty: customData.qty || 1,
-    total: customData.total || "₹0",
-    payment: customData.payment || "N/A",
-    status: customData.status || "Submitted",
+    total: formattedTotal,
+    payment: formatPaymentMethodLabel(customData.payment as string || "N/A"),
+    status: formatOrderStatusLabel(customData.status as string || "Submitted"),
     ...customData,
   };
 

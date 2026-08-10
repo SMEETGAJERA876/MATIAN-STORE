@@ -150,8 +150,33 @@ export default function CartPage() {
       applyCouponRedemption(appliedCoupon);
     }
 
-    const tax = Math.round(subtotal * 0.18);
+    const netSubtotal = Math.max(0, subtotal - discountAmount);
+    const tax = Math.round((netSubtotal * 18) / 118);
     const invoiceNum = `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const cleanHouseFlatNo = (shippingDetails.houseFlatNo || "").trim();
+    const cleanStreetArea = (shippingDetails.streetArea || "").trim();
+    const cleanCity = (shippingDetails.city || "").trim();
+    const cleanState = (shippingDetails.state || "").trim();
+    const cleanPincode = (shippingDetails.pincode || "").trim();
+
+    const formattedAddressLine =
+      [cleanHouseFlatNo, cleanStreetArea, cleanCity, cleanState, cleanPincode]
+        .filter(Boolean)
+        .join(", ");
+
+    const sanitizedCustomer: ShippingAddress = {
+      fullName: (shippingDetails.fullName || "").trim(),
+      phone: (shippingDetails.phone || "").trim(),
+      email: (shippingDetails.email || "").trim().toLowerCase(),
+      houseFlatNo: cleanHouseFlatNo,
+      streetArea: cleanStreetArea,
+      addressLine: formattedAddressLine || shippingDetails.addressLine || "N/A",
+      city: cleanCity,
+      state: cleanState,
+      pincode: cleanPincode,
+      addressType: shippingDetails.addressType || "Home",
+    };
 
     const newInvoice: OrderInvoice = {
       id: `ord_${Date.now()}`,
@@ -166,7 +191,7 @@ export default function CartPage() {
         month: "short",
         year: "numeric",
       }),
-      customer: { ...shippingDetails },
+      customer: sanitizedCustomer,
       items: [...cart],
       subtotal,
       discountAmount,
@@ -179,8 +204,19 @@ export default function CartPage() {
       transactionId: paymentId,
     };
 
-    // Save order & trigger server-side Google Sheets sync (Single entry)
+    // Save order & trigger server-side Google Sheets sync
     await addOrder(newInvoice);
+
+    // Client-side backup sync to Google Sheets API
+    try {
+      fetch("/api/google-sheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "submit_lead", data: newInvoice }),
+      }).catch(() => {});
+    } catch {
+      // ignore backup error
+    }
 
     setGeneratedInvoice(newInvoice);
     setCheckoutStep("success");
@@ -197,8 +233,16 @@ export default function CartPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!shippingDetails.fullName || !shippingDetails.phone || !shippingDetails.addressLine) {
-      toast.error("Please fill all shipping address fields!");
+    if (
+      !shippingDetails.fullName?.trim() ||
+      !shippingDetails.phone?.trim() ||
+      !shippingDetails.email?.trim() ||
+      !shippingDetails.houseFlatNo?.trim() ||
+      !shippingDetails.streetArea?.trim() ||
+      !shippingDetails.city?.trim() ||
+      !shippingDetails.pincode?.trim()
+    ) {
+      toast.error("Please complete all required shipping address fields!");
       return;
     }
 
