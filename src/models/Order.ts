@@ -9,10 +9,13 @@ export interface IOrder extends Document {
     fullName: string;
     email: string;
     phone: string;
+    houseFlatNo?: string;
+    streetArea?: string;
     addressLine: string;
     city: string;
     state: string;
     pincode: string;
+    addressType?: "Home" | "Office" | "Other";
   };
   items: Array<{
     product: {
@@ -46,10 +49,13 @@ const OrderSchema = new Schema<IOrder>(
       fullName: { type: String, required: true },
       email: { type: String, required: true },
       phone: { type: String, required: true },
+      houseFlatNo: { type: String, default: "" },
+      streetArea: { type: String, default: "" },
       addressLine: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, default: "Maharashtra" },
       pincode: { type: String, required: true },
+      addressType: { type: String, enum: ["Home", "Office", "Other"], default: "Home" },
     },
     items: [
       {

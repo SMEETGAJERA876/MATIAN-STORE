@@ -4,6 +4,7 @@ import { ProductModel } from "@/models/Product";
 import { NotificationModel } from "@/models/Notification";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore, initialOrders } from "@/lib/inMemoryStore";
+import { appendOrderToGoogleSheet } from "@/lib/googleSheets";
 
 export async function GET(req: Request) {
   const auth = getAuthFromReq(req);
@@ -89,6 +90,11 @@ export async function POST(req: Request) {
         link: "/admin/orders",
       });
 
+      // Trigger non-blocking Google Sheets data collection sync
+      appendOrderToGoogleSheet(createdOrder).catch((err) =>
+        console.error("Async Google Sheets order sync error:", err)
+      );
+
       return jsonResponse({ success: true, order: createdOrder }, 201);
     }
 
@@ -115,6 +121,11 @@ export async function POST(req: Request) {
       isRead: false,
       link: "/admin/orders",
     });
+
+    // Trigger non-blocking Google Sheets data collection sync
+    appendOrderToGoogleSheet(orderData).catch((err) =>
+      console.error("Async Google Sheets order sync error:", err)
+    );
 
     return jsonResponse({ success: true, order: orderData }, 201);
   } catch (err: unknown) {

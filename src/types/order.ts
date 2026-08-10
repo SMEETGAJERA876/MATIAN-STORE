@@ -6,10 +6,13 @@ export interface ShippingAddress {
   fullName: string;
   phone: string;
   email: string;
+  houseFlatNo: string;
+  streetArea: string;
   addressLine: string;
   city: string;
   state: string;
   pincode: string;
+  addressType: "Home" | "Office" | "Other";
 }
 
 export interface OrderInvoice {

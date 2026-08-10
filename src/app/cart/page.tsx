@@ -26,6 +26,9 @@ import {
   MapPin,
   User as UserIcon,
   Phone,
+  Mail,
+  Home,
+  Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -58,10 +61,13 @@ export default function CartPage() {
     fullName: user?.name || "Rohan Sharma",
     phone: "9876543210",
     email: user?.email || "customer@matrin.com",
+    houseFlatNo: "Flat 402",
+    streetArea: "Green Acres Apt, Bandra West",
     addressLine: "Flat 402, Green Acres Apt, Bandra West",
     city: "Mumbai",
     state: "Maharashtra",
     pincode: "400050",
+    addressType: "Home",
   });
 
   // Payment method state
@@ -548,45 +554,105 @@ export default function CartPage() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
+                    {/* Full Name */}
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         Full Name *
                       </label>
-                      <input
-                        type="text"
-                        required
-                        value={shippingDetails.fullName}
-                        onChange={(e) => setShippingDetails({ ...shippingDetails, fullName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
-                      />
+                      <div className="relative">
+                        <UserIcon className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Rohan Sharma"
+                          value={shippingDetails.fullName}
+                          onChange={(e) => setShippingDetails({ ...shippingDetails, fullName: e.target.value })}
+                          className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
+                        />
+                      </div>
                     </div>
 
+                    {/* Email Address */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Email Address *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                        <input
+                          type="email"
+                          required
+                          placeholder="e.g. customer@domain.com"
+                          value={shippingDetails.email}
+                          onChange={(e) => setShippingDetails({ ...shippingDetails, email: e.target.value })}
+                          className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Phone Number */}
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         Phone Number *
                       </label>
-                      <input
-                        type="text"
-                        required
-                        value={shippingDetails.phone}
-                        onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
-                      />
+                      <div className="relative">
+                        <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                        <input
+                          type="tel"
+                          required
+                          placeholder="e.g. 9876543210"
+                          value={shippingDetails.phone}
+                          onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
+                          className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
+                        />
+                      </div>
                     </div>
 
-                    <div className="sm:col-span-2">
+                    {/* House / Flat Number */}
+                    <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                        Delivery Address *
+                        House / Flat Number *
                       </label>
                       <input
                         type="text"
                         required
-                        value={shippingDetails.addressLine}
-                        onChange={(e) => setShippingDetails({ ...shippingDetails, addressLine: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
+                        placeholder="e.g. Flat 402, Building 4"
+                        value={shippingDetails.houseFlatNo || ''}
+                        onChange={(e) => {
+                          const h = e.target.value;
+                          setShippingDetails({
+                            ...shippingDetails,
+                            houseFlatNo: h,
+                            addressLine: [h, shippingDetails.streetArea].filter(Boolean).join(", "),
+                          });
+                        }}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
                       />
                     </div>
 
+                    {/* Street / Area / Landmark */}
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Street / Area / Landmark *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Green Acres Apt, Near City Mall, Bandra West"
+                        value={shippingDetails.streetArea || ''}
+                        onChange={(e) => {
+                          const s = e.target.value;
+                          setShippingDetails({
+                            ...shippingDetails,
+                            streetArea: s,
+                            addressLine: [shippingDetails.houseFlatNo, s].filter(Boolean).join(", "),
+                          });
+                        }}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
+                      />
+                    </div>
+
+                    {/* City */}
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         City *
@@ -594,12 +660,29 @@ export default function CartPage() {
                       <input
                         type="text"
                         required
+                        placeholder="e.g. Mumbai"
                         value={shippingDetails.city}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
                       />
                     </div>
 
+                    {/* State */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Maharashtra"
+                        value={shippingDetails.state}
+                        onChange={(e) => setShippingDetails({ ...shippingDetails, state: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium"
+                      />
+                    </div>
+
+                    {/* PIN Code */}
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         PIN Code *
@@ -607,10 +690,38 @@ export default function CartPage() {
                       <input
                         type="text"
                         required
+                        placeholder="e.g. 400050"
                         value={shippingDetails.pincode}
                         onChange={(e) => setShippingDetails({ ...shippingDetails, pincode: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#0645B5] focus:outline-hidden font-medium font-mono"
                       />
+                    </div>
+
+                    {/* Address Type Selector */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Address Type *
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {[
+                          { id: "Home", label: "Home 🏠", icon: Home },
+                          { id: "Office", label: "Office 🏢", icon: Briefcase },
+                          { id: "Other", label: "Other 📍", icon: MapPin },
+                        ].map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            onClick={() => setShippingDetails({ ...shippingDetails, addressType: type.id as any })}
+                            className={`flex-1 py-2.5 px-2 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 ${
+                              shippingDetails.addressType === type.id
+                                ? "bg-[#0645B5] text-white border-[#0645B5] shadow-xs"
+                                : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            {type.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

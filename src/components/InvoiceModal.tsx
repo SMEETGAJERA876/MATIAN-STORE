@@ -103,9 +103,18 @@ export default function InvoiceModal({
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#0A2E4E] block mb-1">
                   BILLED TO & SHIPPING ADDRESS
                 </span>
-                <h4 className="font-bold text-slate-800 text-sm">{invoice.customer.fullName}</h4>
-                <p className="text-xs text-slate-600 mt-1">{invoice.customer.addressLine}</p>
-                <p className="text-xs text-slate-600">{invoice.customer.city}, {invoice.customer.state} - {invoice.customer.pincode}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-bold text-slate-800 text-sm">{invoice.customer.fullName}</h4>
+                  {invoice.customer.addressType && (
+                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-[#0A2E4E]/10 text-[#0A2E4E]">
+                      {invoice.customer.addressType === "Home" ? "🏠 Home" : invoice.customer.addressType === "Office" ? "🏢 Office" : "📍 Other"}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 mt-1 font-medium">
+                  {invoice.customer.houseFlatNo ? `${invoice.customer.houseFlatNo}, ${invoice.customer.streetArea}` : invoice.customer.addressLine}
+                </p>
+                <p className="text-xs text-slate-600 font-medium">{invoice.customer.city}, {invoice.customer.state} - {invoice.customer.pincode}</p>
                 <p className="text-xs text-slate-600 font-mono mt-1">Phone: {invoice.customer.phone} | Email: {invoice.customer.email}</p>
               </div>
 
