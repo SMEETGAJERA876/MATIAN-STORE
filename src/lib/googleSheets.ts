@@ -228,6 +228,12 @@ export async function appendOrderToGoogleSheet(
 
     const orderDateStr = order.orderDate || new Date().toISOString().split("T")[0];
 
+    const expectedDeliveryDateStr =
+      order.dueDate ||
+      order.expectedDeliveryDate ||
+      order.deliveryDate ||
+      new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
     const unitPriceSummary = items
       .map((item: any) => {
         const price = Number(item.product?.price || item.price || 0);
@@ -254,6 +260,9 @@ export async function appendOrderToGoogleSheet(
       customer_id: custId,
       orderDate: orderDateStr,
       date: orderDateStr,
+      expectedDeliveryDate: expectedDeliveryDateStr,
+      dueDate: expectedDeliveryDateStr,
+      deliveryDate: expectedDeliveryDateStr,
       name: (customer.fullName || customer.name || "Customer").trim(),
       fullName: (customer.fullName || customer.name || "Customer").trim(),
       customerName: (customer.fullName || customer.name || "Customer").trim(),
@@ -283,6 +292,7 @@ export async function appendOrderToGoogleSheet(
       price: unitPriceSummary,
       discountPromoCode: discountSummary,
       discountCode: discountSummary,
+      appliedCoupon: order.appliedCoupon || "None",
       couponCode: order.appliedCoupon || "None",
       discount: discountSummary,
       total: formattedTotal,

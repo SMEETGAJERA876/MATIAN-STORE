@@ -43,10 +43,10 @@ export async function GET() {
     success: true,
     status,
     scriptTemplate: `/**
- * MATRIN Store - Plain Google Sheet Data Collector (18 Columns)
+ * MATRIN Store - Plain Google Sheet Data Collector (19 Columns)
  * 
  * Target Plain Format:
- * | Customer ID | Order Date | Name | Mobile | Email | Street Address | Address Line | City | State | Pincode | Order ID | Product | Qty | Unit Price | Discount / Promo Code | Total | Payment | Status |
+ * | Customer ID | Order Date | Expected Delivery Date | Name | Mobile | Email | Street Address | Address Line | City | State | Pincode | Order ID | Product | Qty | Unit Price | Discount / Promo Code | Total | Payment | Status |
  *
  * Paste this script into Extensions > Apps Script in your Google Sheet.
  * Deploy as Web App (Execute as: Me, Access: Anyone).
@@ -64,11 +64,12 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
     
-    // Auto-create 18 plain headers on row 1 if sheet is empty
+    // Auto-create 19 plain headers on row 1 if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "Customer ID",
         "Order Date",
+        "Expected Delivery Date",
         "Name",
         "Mobile",
         "Email",
@@ -86,15 +87,16 @@ function doPost(e) {
         "Payment",
         "Status"
       ]);
-      var headerRange = sheet.getRange(1, 1, 1, 18);
+      var headerRange = sheet.getRange(1, 1, 1, 19);
       headerRange.clearFormat();
       headerRange.setFontWeight("bold");
     }
     
-    // Append plain row matching 18 columns format
+    // Append plain row matching 19 columns format
     sheet.appendRow([
       data.customerId || data.customer_id || "CUST001",
       data.orderDate || data.date || "2026-08-11",
+      data.expectedDeliveryDate || data.dueDate || data.deliveryDate || "2026-08-15",
       data.name || data.customerName || data.fullName || "N/A",
       data.mobile || data.phone || data.customerPhone || "N/A",
       data.email || data.customerEmail || "N/A",
@@ -116,7 +118,7 @@ function doPost(e) {
     // Clear all formatting boxes, colors, and borders on appended row for plain sheet output
     var lastRow = sheet.getLastRow();
     if (lastRow > 1) {
-      var newRowRange = sheet.getRange(lastRow, 1, 1, 18);
+      var newRowRange = sheet.getRange(lastRow, 1, 1, 19);
       newRowRange.clearFormat();
       newRowRange.setFontFamily("Arial");
       newRowRange.setFontSize(10);
