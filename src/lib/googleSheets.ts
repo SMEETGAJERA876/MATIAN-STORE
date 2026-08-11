@@ -236,10 +236,15 @@ export async function appendOrderToGoogleSheet(
 
     const unitPriceSummary = items
       .map((item: any) => {
-        const price = Number(item.product?.price || item.price || 0);
+        const price = Number(
+          item.product?.price ||
+          item.price ||
+          item.unitPrice ||
+          (rawTotal > 0 && totalQty > 0 ? Math.round(rawTotal / totalQty) : 0)
+        );
         return `₹${price.toLocaleString("en-IN")}`;
       })
-      .join(", ") || "₹0";
+      .join(", ") || (rawTotal > 0 ? `₹${rawTotal.toLocaleString("en-IN")}` : "₹0");
 
     const discountSummary = order.appliedCoupon
       ? `${order.appliedCoupon} (₹${order.discountAmount || 0} OFF)`

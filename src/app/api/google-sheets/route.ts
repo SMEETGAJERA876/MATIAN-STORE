@@ -108,7 +108,7 @@ function doPost(e) {
       data.orderId || data.invoiceNumber || "ORD1001",
       data.product || data.itemsSummary || "N/A",
       data.qty !== undefined ? data.qty : (data.quantity || 1),
-      data.unitPrice || data.price || "₹0",
+      data.unitPrice || data.price || data.unit_price || (data.totalAmount && data.qty ? ("₹" + Math.round(data.totalAmount / data.qty)) : "₹0"),
       data.discountPromoCode || data.discountCode || data.couponCode || data.discount || "None",
       data.total || (data.totalAmount ? ("₹" + data.totalAmount) : "₹0"),
       data.payment || data.paymentMethod || "UPI",
