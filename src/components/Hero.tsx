@@ -7,16 +7,16 @@ import { motion } from "framer-motion";
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#EAF5FF] via-[#F5FAFF] to-white pt-8 pb-12 lg:pt-12 lg:pb-16 border-b border-[#DCE8F5]">
-      
+
       {/* Background Water Splash FX Accents */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200/40 via-transparent to-transparent pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
-          
+
           {/* Left Column: Text Content & CTAs */}
           <div className="lg:col-span-5 space-y-6">
-            
+
             {/* Eyebrow Tag matching reference image */}
             <div className="inline-block">
               <span className="inline-block bg-[#EAF5FF] text-[#0645B5] px-3.5 py-1 rounded-md text-xs font-black uppercase tracking-wider border border-[#DCE8F5] shadow-2xs">
@@ -84,14 +84,14 @@ export default function Hero() {
 
           {/* Right Column: Full Hero Product Showcase Photo */}
           <div className="lg:col-span-7 flex justify-center lg:justify-end">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               className="relative w-full max-w-2xl overflow-hidden rounded-3xl shadow-xl shadow-blue-900/10 border border-white/80 bg-white/40 backdrop-blur-xs group"
             >
               <img
-                src="/images/matrin-full-hero-banner.png"
+                src="/images/MATRIN_1024x1024.webp"
                 alt="MATRIN Clean Home Better Living Product Lineup"
                 className="w-full h-auto object-cover rounded-3xl transition-transform duration-700 group-hover:scale-102"
               />
