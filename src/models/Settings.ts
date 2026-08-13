@@ -24,8 +24,8 @@ export interface ISettings extends Document {
 const SettingsSchema = new Schema<ISettings>(
   {
     siteTitle: { type: String, default: "MATRIN - Pure Cleaning, Better Living" },
-    contactEmail: { type: String, default: "support@matrin.com" },
-    contactPhone: { type: String, default: "+91 1800-200-8899" },
+    contactEmail: { type: String, default: "carematrin@gmail.com" },
+    contactPhone: { type: String, default: "+91 83477 81818" },
     currency: { type: String, default: "₹" },
     freeShippingThreshold: { type: Number, default: 499 },
     flatShippingRate: { type: Number, default: 49 },

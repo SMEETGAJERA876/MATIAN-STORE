@@ -203,8 +203,8 @@ export const initialNotifications: Array<{
 
 export const initialSettings = {
   siteTitle: "MATRIN - Pure Cleaning, Better Living",
-  contactEmail: "support@matrin.com",
-  contactPhone: "+91 1800-200-8899",
+  contactEmail: "carematrin@gmail.com",
+  contactPhone: "+91 83477 81818",
   currency: "₹",
   freeShippingThreshold: 499,
   flatShippingRate: 49,

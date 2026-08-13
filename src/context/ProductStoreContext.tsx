@@ -203,8 +203,8 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [settings, setSettings] = useState<StoreSettings>({
     siteTitle: "MATRIN Store",
-    contactEmail: "support@matrin.com",
-    contactPhone: "+91 98765 43210",
+    contactEmail: "carematrin@gmail.com",
+    contactPhone: "+91 83477 81818",
     currency: "₹",
     freeShippingThreshold: 499,
     flatShippingRate: 49,

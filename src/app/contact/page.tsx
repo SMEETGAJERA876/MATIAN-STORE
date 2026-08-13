@@ -242,7 +242,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <div className="text-xs font-extrabold text-[#102A5C]">Call Us</div>
-                    <div className="text-xs font-bold text-[#0645B5] mt-0.5">+91 98765 43210</div>
+                    <div className="text-xs font-bold text-[#0645B5] mt-0.5">+91 83477 81818</div>
                     <div className="text-[10px] text-slate-400 font-medium">Mon - Sat: 9:00 AM - 6:00 PM</div>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <div className="text-xs font-extrabold text-[#102A5C]">WhatsApp</div>
-                    <div className="text-xs font-bold text-emerald-700 mt-0.5">+91 98765 43210</div>
+                    <div className="text-xs font-bold text-emerald-700 mt-0.5">+91 83477 81818</div>
                     <div className="text-[10px] text-slate-400 font-medium">Chat with us on WhatsApp</div>
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <div className="text-xs font-extrabold text-[#102A5C]">Email Us</div>
-                    <div className="text-xs font-bold text-purple-700 mt-0.5">support@matrin.com</div>
+                    <div className="text-xs font-bold text-purple-700 mt-0.5">carematrin@gmail.com</div>
                     <div className="text-[10px] text-slate-400 font-medium">We reply within 24 hours</div>
                   </div>
                 </div>
@@ -278,8 +278,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <div className="text-xs font-extrabold text-[#102A5C]">Visit Us</div>
-                    <div className="text-[11px] font-bold text-slate-700 mt-0.5">Matrin House, Clean City, Mumbai, Maharashtra - 400001</div>
-                    <a href="#" className="text-[10px] font-extrabold text-[#0645B5] hover:underline block mt-1">View on Google Maps</a>
+                    <div className="text-[11px] font-bold text-slate-700 mt-0.5">MATRIN INDUSTRIAL TECHNOLOGY, Madhav Industrial Estate, Ankleshwar, Jitali, Gujarat 393002</div>
+                    <a href="https://maps.google.com/?q=Madhav+Industrial+Estate+Ankleshwar+Jitali+Gujarat+393002" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold text-[#0645B5] hover:underline block mt-1">View on Google Maps</a>
                   </div>
                 </div>
               </div>
