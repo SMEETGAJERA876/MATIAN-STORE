@@ -32,7 +32,7 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="bg-white py-16 lg:py-20 border-y border-[#DCE8F5]" id="why-matrin">
+    <section className="bg-white py-16 lg:py-20 border-y border-[#FFFFFF]" id="why-matrin">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-12 items-center">
 

@@ -21,7 +21,6 @@ import {
   Zap,
   Trash2,
   RefreshCw,
-  Clock,
   Headphones,
   Leaf,
   Droplet,
@@ -441,10 +440,6 @@ export default function ProductDetailsPage() {
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={16} className="text-[#0645B5]" />
                   <span>100% Secure Payments</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-[#0645B5]" />
-                  <span>7 Days Replacement</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Headphones size={16} className="text-[#0645B5]" />
