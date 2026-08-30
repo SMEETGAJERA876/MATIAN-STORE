@@ -6,7 +6,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductImage from "@/components/ProductImage";
 import {
   Star,
@@ -46,6 +46,89 @@ export default function ProductDetailsPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"details" | "usage" | "ingredients" | "reviews" | "faqs">("details");
+
+  const [localReviews, setLocalReviews] = useState<Array<{
+    id: string;
+    customerName: string;
+    rating: number;
+    comment: string;
+    date: string;
+  }>>([
+    {
+      id: "rev_default_1",
+      customerName: "Priya S.",
+      rating: 5,
+      comment: "Great liquid detergent! Clothes smell amazing and feel super soft.",
+      date: "2025-05-24",
+    },
+  ]);
+
+  const [newReviewName, setNewReviewName] = useState("");
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewComment, setNewReviewComment] = useState("");
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`/api/reviews?productId=${product.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const formatted = data.map((r: any) => ({
+              id: r.id || r._id,
+              customerName: r.customerName || "Verified Customer",
+              rating: r.rating || 5,
+              comment: r.comment || "",
+              date: r.date || new Date().toISOString().split("T")[0],
+            }));
+            setLocalReviews(formatted);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load reviews:", err);
+      }
+    };
+    if (product?.id) {
+      fetchReviews();
+    }
+  }, [product?.id]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReviewName.trim() || !newReviewComment.trim()) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    const newRev = {
+      id: `rev_${Date.now()}`,
+      productId: product.id,
+      productName: product.name,
+      customerName: newReviewName,
+      customerEmail: "user@example.com",
+      rating: newReviewRating,
+      comment: newReviewComment,
+      date: new Date().toISOString().split("T")[0],
+      status: "Approved" as const,
+    };
+
+    setLocalReviews((prev) => [newRev, ...prev]);
+    toast.success("Review submitted successfully!");
+
+    setNewReviewName("");
+    setNewReviewRating(5);
+    setNewReviewComment("");
+
+    try {
+      await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newRev),
+      });
+    } catch (err) {
+      console.error("Failed to save review to backend:", err);
+    }
+  };
 
   const SIZE_DETAILS: Record<string, { price: number; oldPrice: number; discount: string }> = {
     "500 ml": { price: 169, oldPrice: 219, discount: "23% OFF" },
@@ -256,7 +339,7 @@ export default function ProductDetailsPage() {
                 <div className="flex items-center gap-1 text-amber-500 font-extrabold">
                   <Star size={14} className="fill-amber-400 text-amber-400" />
                   <span className="text-[#102A5C]">4.8</span>
-                  <span className="text-slate-400 font-normal">(1,256 Reviews)</span>
+                  <span className="text-slate-400 font-normal">({localReviews.length} {localReviews.length === 1 ? "Review" : "Reviews"})</span>
                 </div>
                 <span className="text-slate-300">|</span>
                 <span className="font-extrabold text-[#0645B5]">10K+ Sold</span>
@@ -464,7 +547,7 @@ export default function ProductDetailsPage() {
                 { id: "details", label: "Product Details" },
                 { id: "usage", label: "How to Use" },
                 { id: "ingredients", label: "Ingredients" },
-                { id: "reviews", label: "Reviews (1,256)" },
+                { id: "reviews", label: `Reviews (${localReviews.length})` },
                 { id: "faqs", label: "FAQs" },
               ].map((tab) => (
                 <button
@@ -550,14 +633,78 @@ export default function ProductDetailsPage() {
               )}
 
               {activeTab === "reviews" && (
-                <div className="space-y-3">
-                  <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60">
-                    <div className="flex items-center justify-between font-bold text-xs">
-                      <span>Priya S.</span>
-                      <span className="text-amber-500">★★★★★</span>
-                    </div>
-                    <p className="mt-1 text-xs text-slate-600">Great liquid detergent! Clothes smell amazing and feel super soft.</p>
+                <div className="space-y-4">
+                  {/* Reviews List */}
+                  <div className="space-y-3">
+                    {localReviews.length === 0 ? (
+                      <p className="text-xs text-slate-500 italic">No reviews yet. Be the first to review this product!</p>
+                    ) : (
+                      localReviews.map((rev, index) => (
+                        <div key={rev.id || index} className="rounded-2xl bg-slate-50 p-4 border border-slate-200/60">
+                          <div className="flex items-center justify-between font-bold text-xs">
+                            <span className="text-[#102A5C]">{rev.customerName}</span>
+                            <span className="text-amber-500 font-bold">{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</span>
+                          </div>
+                          <p className="mt-1 text-xs text-slate-600 font-normal">{rev.comment}</p>
+                          <span className="text-[10px] text-slate-400 block mt-1.5">{rev.date}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
+
+                  {/* Add Review Form */}
+                  <form onSubmit={handleReviewSubmit} className="mt-6 rounded-2xl bg-white p-5 border border-slate-200/80 shadow-xs space-y-4">
+                    <h4 className="font-extrabold text-[#102A5C] text-sm border-b border-slate-100 pb-2">
+                      Write a Review
+                    </h4>
+                    
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-1">Your Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={newReviewName}
+                          onChange={(e) => setNewReviewName(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0645B5] transition"
+                          placeholder="e.g. John Doe"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-1">Rating</label>
+                        <select
+                          value={newReviewRating}
+                          onChange={(e) => setNewReviewRating(Number(e.target.value))}
+                          className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0645B5] transition font-bold"
+                        >
+                          <option value={5}>5 Stars ★★★★★</option>
+                          <option value={4}>4 Stars ★★★★☆</option>
+                          <option value={3}>3 Stars ★★★☆☆</option>
+                          <option value={2}>2 Stars ★★☆☆☆</option>
+                          <option value={1}>1 Star ★☆☆☆☆</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-500 mb-1">Review</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={newReviewComment}
+                        onChange={(e) => setNewReviewComment(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0645B5] transition"
+                        placeholder="Share your thoughts about this product..."
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-[#0645B5] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/10 hover:bg-[#1a3899] transition active:scale-98"
+                    >
+                      Submit Review
+                    </button>
+                  </form>
                 </div>
               )}
 
