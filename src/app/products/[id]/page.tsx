@@ -176,8 +176,6 @@ export default function ProductDetailsPage() {
 
   const handleSizeChange = (sz: string) => {
     setSelectedSize(sz);
-    const info = SIZE_DETAILS[sz] || { price: product.price };
-    toast.success(`Switched to ${sz} packing variant (₹${info.price})`, { icon: "🧴" });
   };
 
   const handleBuyNow = () => {
