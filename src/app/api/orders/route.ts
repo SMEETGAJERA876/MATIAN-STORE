@@ -7,7 +7,7 @@ import { inMemoryStore, initialOrders } from "@/lib/inMemoryStore";
 import { appendOrderToGoogleSheet } from "@/lib/googleSheets";
 
 export async function GET(req: Request) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   const db = await connectToDatabase();
 
   if (db) {

@@ -19,7 +19,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }

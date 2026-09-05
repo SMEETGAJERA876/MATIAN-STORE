@@ -1,29 +1,24 @@
-import { connectToDatabase } from "@/lib/db";
-import { UserModel } from "@/models/User";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore, initialUsers } from "@/lib/inMemoryStore";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(req: Request) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
-  const db = await connectToDatabase();
-  if (db) {
-    const count = await UserModel.countDocuments();
-    if (count === 0) {
-      await UserModel.insertMany(initialUsers);
-    }
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data, error } = await supabaseAdmin
+    .from("profiles")
+    .select("id, name, email, role, status, createdAt:created_at, totalOrders:total_orders, totalSpent:total_spent")
+    .eq("role", "CUSTOMER")
+    .order("created_at", { ascending: false });
 
-    const customers = await UserModel.find({ role: "CUSTOMER" }).select("-password").sort({ createdAt: -1 });
-    return jsonResponse(customers);
+  if (error) {
+    return jsonResponse({ error: error.message }, 500);
   }
 
-  const memCustomers = inMemoryStore.users
-    .filter((u) => u.role === "CUSTOMER")
-    .map(({ password, ...u }) => u);
-  return jsonResponse(memCustomers);
+  return jsonResponse(data);
 }
 
 export async function OPTIONS() {

@@ -10,11 +10,10 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.8,
     reviewCount: 142,
-    image: "/images/products/detergent.webp",
+    image: "/images/products/matrin-detergent-real.webp",
     galleryImages: [
+      "/images/products/matrin-detergent-real.webp",
       "/images/products/detergent.webp",
-      "/images/hero.webp",
-      "/images/products/dish-cleaner.webp",
     ],
     description:
       "Ultra Liquid Detergent delivers powerful stain removal with advanced fabric care technology. Formulated to keep whites bright and colors vibrant while leaving a fresh ocean breeze scent.",
@@ -60,10 +59,12 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.9,
     reviewCount: 98,
-    image: "/images/products/dishwash.webp",
+    image: "/images/products/matrin-dishwash-front-real.webp",
     galleryImages: [
+      "/images/products/matrin-dishwash-front-real.webp",
+      "/images/products/matrin-dishwash-lifestyle-real.webp",
+      "/images/products/matrin-dishwash-howto-real.webp",
       "/images/products/dishwash.webp",
-      "/images/products/dish-cleaner.webp",
     ],
     description:
       "Dishwash Lemon effortlessly cuts through tough grease and burnt-on food. Enriched with real lemon extracts, it leaves utensils squeaky clean without drying your hands.",
@@ -107,8 +108,9 @@ export const products: Product[] = [
     discountPercentage: 20,
     rating: 4.7,
     reviewCount: 84,
-    image: "/images/products/floor-cleaner.webp",
+    image: "/images/products/matrin-floor-cleaner-real.webp",
     galleryImages: [
+      "/images/products/matrin-floor-cleaner-real.webp",
       "/images/products/floor-cleaner.webp",
     ],
     description:
@@ -153,8 +155,10 @@ export const products: Product[] = [
     discountPercentage: 18,
     rating: 4.8,
     reviewCount: 110,
-    image: "/images/products/toilet-cleaner.webp",
+    image: "/images/products/matrin-toilet-cleaner-front-real.webp",
     galleryImages: [
+      "/images/products/matrin-toilet-cleaner-front-real.webp",
+      "/images/products/matrin-toilet-cleaner-back-real.webp",
       "/images/products/toilet-cleaner.webp",
     ],
     description:
@@ -199,8 +203,10 @@ export const products: Product[] = [
     discountPercentage: 17,
     rating: 4.9,
     reviewCount: 74,
-    image: "/images/products/bathroom-cleaner.webp",
+    image: "/images/products/matrin-bathroom-cleaner-real.webp",
     galleryImages: [
+      "/images/products/matrin-bathroom-cleaner-real.webp",
+      "/images/products/matrin-bathroom-cleaner-banner-real.webp",
       "/images/products/bathroom-cleaner.webp",
     ],
     description:
@@ -291,8 +297,9 @@ export const products: Product[] = [
     discountPercentage: 19,
     rating: 4.8,
     reviewCount: 76,
-    image: "/images/products/detergent.webp",
+    image: "/images/products/matrin-detergent-real.webp",
     galleryImages: [
+      "/images/products/matrin-detergent-real.webp",
       "/images/products/detergent.webp",
     ],
     description:
@@ -337,8 +344,9 @@ export const products: Product[] = [
     discountPercentage: 17,
     rating: 5.0,
     reviewCount: 61,
-    image: "/images/products/detergent.webp",
+    image: "/images/products/matrin-detergent-real.webp",
     galleryImages: [
+      "/images/products/matrin-detergent-real.webp",
       "/images/products/detergent.webp",
     ],
     description:

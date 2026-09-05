@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import { extractCredentials, verifyCredentials, createAdminClient } from "@supabase/server/core";
+import { resolveSupabaseEnv, getSupabaseJwks } from "./supabase/env";
+import type { Database } from "./supabase/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "matrin_enterprise_secret_jwt_key_2026_x9823";
 const TOKEN_NAME = "matrin_token";
@@ -33,31 +36,63 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-export function getAuthFromReq(req: Request): TokenPayload | null {
-  // 1. Check Authorization header
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-    if (decoded) return decoded;
-  }
+// Authentication is backed by Supabase Auth. Since supabase-js keeps its
+// session client-side (not as an httpOnly cookie), AuthContext mirrors the
+// current access token into a plain "sb-access-token" cookie so same-origin
+// fetch() calls from the admin dashboard keep working without every call
+// site having to attach an Authorization header.
+export async function getAuthFromReq(req: Request): Promise<TokenPayload | null> {
+  const baseEnv = resolveSupabaseEnv();
+  if (!baseEnv.url) return null;
 
-  // 2. Check Cookies
-  const cookieHeader = req.headers.get("cookie");
-  if (cookieHeader) {
-    const cookies = Object.fromEntries(
-      cookieHeader.split("; ").map((c) => {
-        const [k, ...v] = c.split("=");
-        return [k, decodeURIComponent(v.join("="))];
-      })
-    );
-    if (cookies[TOKEN_NAME]) {
-      const decoded = verifyToken(cookies[TOKEN_NAME]);
-      if (decoded) return decoded;
+  let creds = extractCredentials(req);
+
+  if (!creds.token) {
+    const cookieHeader = req.headers.get("cookie");
+    if (cookieHeader) {
+      const cookies = Object.fromEntries(
+        cookieHeader.split("; ").map((c) => {
+          const [k, ...v] = c.split("=");
+          return [k, decodeURIComponent(v.join("="))];
+        })
+      );
+      if (cookies["sb-access-token"]) {
+        creds = { token: cookies["sb-access-token"], apikey: null };
+      }
     }
   }
 
-  return null;
+  const jwks = await getSupabaseJwks(baseEnv.url);
+  const env = { ...baseEnv, jwks };
+
+  const { data: auth, error } = await verifyCredentials(creds, { auth: "user", env });
+  if (error || !auth?.userClaims) return null;
+
+  // Role lookup is best-effort: a misconfigured/missing secret key must never
+  // crash the request, and must never fail open to ADMIN — default CUSTOMER.
+  try {
+    const supabaseAdmin = createAdminClient<Database>({ env });
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("name, email, role")
+      .eq("id", auth.userClaims.id)
+      .single();
+
+    return {
+      userId: auth.userClaims.id,
+      email: profile?.email || auth.userClaims.email || "",
+      name: profile?.name || "",
+      role: (profile?.role as "ADMIN" | "CUSTOMER") || "CUSTOMER",
+    };
+  } catch (err) {
+    console.error("Failed to resolve Supabase profile/role:", err);
+    return {
+      userId: auth.userClaims.id,
+      email: auth.userClaims.email || "",
+      name: "",
+      role: "CUSTOMER",
+    };
+  }
 }
 
 export function corsHeaders() {

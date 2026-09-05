@@ -5,7 +5,7 @@ import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore } from "@/lib/inMemoryStore";
 
 export async function POST(req: Request) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }

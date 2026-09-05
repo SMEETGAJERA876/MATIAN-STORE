@@ -4,7 +4,7 @@ import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore, initialNotifications } from "@/lib/inMemoryStore";
 
 export async function GET(req: Request) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  const auth = getAuthFromReq(req);
+  const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }

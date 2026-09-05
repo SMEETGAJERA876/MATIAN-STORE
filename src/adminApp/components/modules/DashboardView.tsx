@@ -10,6 +10,11 @@ import {
   BarChart2,
   ChevronRight,
   Inbox,
+  Wallet,
+  Boxes,
+  Warehouse,
+  Truck,
+  CheckCircle2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -45,6 +50,39 @@ export const DashboardView: React.FC = () => {
   const totalRevenue = useMemo(() => orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0), [orders]);
   const pendingOrdersCount = useMemo(() => orders.filter((o) => o.paymentStatus === 'Pending').length, [orders]);
   const lowStockCount = useMemo(() => products.filter((p) => (p.stock || 0) <= 10).length, [products]);
+
+  // Net Revenue: gross sales with failed payments and cancelled/returned orders backed out
+  const netRevenue = useMemo(
+    () =>
+      orders
+        .filter((o) => o.paymentStatus !== 'Failed' && o.paymentStatus !== 'Refunded')
+        .filter((o) => o.shippingStatus !== 'Cancelled' && o.shippingStatus !== 'Returned')
+        .reduce((sum, o) => sum + (o.totalAmount || 0), 0),
+    [orders]
+  );
+
+  const unitsSold = useMemo(
+    () => orders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.quantity || 0), 0), 0),
+    [orders]
+  );
+
+  const inventoryValue = useMemo(
+    () => products.reduce((sum, p) => sum + (p.discountPrice || p.price || 0) * (p.stock || 0), 0),
+    [products]
+  );
+
+  const pendingShipmentsCount = useMemo(
+    () => orders.filter((o) => o.shippingStatus === 'Processing' || o.shippingStatus === 'In Transit').length,
+    [orders]
+  );
+
+  const deliverySuccessRate = useMemo(() => {
+    const delivered = orders.filter((o) => o.shippingStatus === 'Delivered').length;
+    const terminal = orders.filter((o) =>
+      ['Delivered', 'Cancelled', 'Returned'].includes(o.shippingStatus)
+    ).length;
+    return terminal === 0 ? 0 : Math.round((delivered / terminal) * 1000) / 10;
+  }, [orders]);
 
   // Chart data from actual orders/products or fallback chart
   const revenueData = useMemo(() => {
@@ -125,7 +163,7 @@ export const DashboardView: React.FC = () => {
 
       {/* Metric Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        {/* Total Revenue */}
+        {/* Total Sales */}
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
           <div className="flex items-center justify-between">
             <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-matrin-primary dark:text-blue-400">
@@ -134,10 +172,27 @@ export const DashboardView: React.FC = () => {
           </div>
           <div className="mt-3">
             <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
-              Total Revenue
+              Total Sales
             </div>
             <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
               {formatCurrency(totalRevenue)}
+            </div>
+          </div>
+        </div>
+
+        {/* Net Revenue */}
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
+          <div className="flex items-center justify-between">
+            <div className="p-2 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
+              <Wallet className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
+              Net Revenue
+            </div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
+              {formatCurrency(netRevenue)}
             </div>
           </div>
         </div>
@@ -159,6 +214,23 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
 
+        {/* Units Sold */}
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
+          <div className="flex items-center justify-between">
+            <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400">
+              <Boxes className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
+              Units Sold
+            </div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
+              {unitsSold}
+            </div>
+          </div>
+        </div>
+
         {/* Total Customers */}
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
           <div className="flex items-center justify-between">
@@ -172,6 +244,23 @@ export const DashboardView: React.FC = () => {
             </div>
             <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
               {customers.length}
+            </div>
+          </div>
+        </div>
+
+        {/* Inventory Value */}
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
+          <div className="flex items-center justify-between">
+            <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400">
+              <Warehouse className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
+              Inventory Value
+            </div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
+              {formatCurrency(inventoryValue)}
             </div>
           </div>
         </div>
@@ -223,6 +312,40 @@ export const DashboardView: React.FC = () => {
             </div>
             <div className="text-xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight mt-0.5">
               {lowStockCount}
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Shipments */}
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
+          <div className="flex items-center justify-between">
+            <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+              <Truck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
+              Pending Shipments
+            </div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
+              {pendingShipmentsCount}
+            </div>
+          </div>
+        </div>
+
+        {/* Delivery Success Rate */}
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-4 shadow-card hover:shadow-soft transition-all">
+          <div className="flex items-center justify-between">
+            <div className="p-2 rounded-xl bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold text-matrin-gray dark:text-slate-400">
+              Delivery Success Rate
+            </div>
+            <div className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight mt-0.5">
+              {deliverySuccessRate}%
             </div>
           </div>
         </div>

@@ -381,9 +381,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     async function syncBackendData() {
       try {
         const apiBase = '/api';
-        const [resProd, resOrd] = await Promise.all([
+        const [resProd, resOrd, resCust] = await Promise.all([
           fetch(`${apiBase}/products`),
           fetch(`${apiBase}/orders`),
+          fetch(`${apiBase}/customers`),
         ]);
 
         if (resProd.ok) {
@@ -443,6 +444,28 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   unitPrice: it.product?.price || 299,
                   totalPrice: (it.product?.price || 299) * (it.quantity || 1),
                 })),
+              }))
+            );
+          }
+        }
+        if (resCust.ok) {
+          const apiCustomers = await resCust.json();
+          if (Array.isArray(apiCustomers) && apiCustomers.length > 0) {
+            setCustomers(
+              apiCustomers.map((c: any) => ({
+                id: String(c.id),
+                name: c.name || 'Customer',
+                email: c.email || '',
+                phone: c.phone || 'N/A',
+                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+                location: 'N/A',
+                totalOrders: Number(c.totalOrders) || 0,
+                totalSpent: Number(c.totalSpent) || 0,
+                segment: (Number(c.totalOrders) || 0) > 5 ? 'VIP' : (Number(c.totalOrders) || 0) > 0 ? 'Returning' : 'New',
+                status: c.status === 'Blocked' ? 'Blocked' : 'Active',
+                joinDate: c.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+                lifetimeValue: Number(c.totalSpent) || 0,
+                recentPurchases: [],
               }))
             );
           }
