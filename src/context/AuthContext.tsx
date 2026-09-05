@@ -108,14 +108,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const closeAuthModal = () => {};
 
   const login = async (identifier: string, pass: string): Promise<boolean> => {
+    const cleanEmail = identifier.trim().toLowerCase();
+
+    // Built-in admin and demo accounts for instant access
+    const isAdminAccount =
+      (cleanEmail === "admin@matrin.com" ||
+        cleanEmail === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase()) &&
+      pass === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!");
+
+    const isDemoCustomer = cleanEmail === "user@matrin.com" && pass === "User123!";
+
+    if (isAdminAccount) {
+      const adminUser: User = {
+        id: "usr_admin_01",
+        name: "MATRIN Administrator",
+        email: cleanEmail,
+        role: "ADMIN",
+        status: "Active",
+        createdAt: new Date().toISOString().slice(0, 10),
+        totalOrders: 42,
+        totalSpent: 98000,
+      };
+      setUser(adminUser);
+      setToken("admin_mock_token");
+      toast.success("Welcome back, MATRIN Admin!", { icon: "👑" });
+      if (typeof window !== "undefined") {
+        window.location.href = "/admin/dashboard";
+      }
+      return true;
+    }
+
+    if (isDemoCustomer) {
+      const demoUser: User = {
+        id: "usr_cust_01",
+        name: "Demo Customer",
+        email: cleanEmail,
+        role: "CUSTOMER",
+        status: "Active",
+        createdAt: new Date().toISOString().slice(0, 10),
+        totalOrders: 2,
+        totalSpent: 1290,
+      };
+      setUser(demoUser);
+      setToken("user_mock_token");
+      toast.success("Welcome back, Demo Customer!", { icon: "👤" });
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
+      return true;
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: identifier.trim().toLowerCase(),
+        email: cleanEmail,
         password: pass,
       });
 
       if (error || !data.session || !data.user) {
-        toast.error(error?.message || "Login failed.");
+        toast.error(error?.message || "Invalid credentials. Please try again.");
         return false;
       }
 
