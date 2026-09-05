@@ -19,6 +19,12 @@ if (!cached) {
 }
 
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
+  // On production serverless (e.g. Vercel), do not attempt to connect to localhost/127.0.0.1
+  const isLocalhost = !process.env.MONGODB_URI || MONGODB_URI.includes("127.0.0.1") || MONGODB_URI.includes("localhost");
+  if (isLocalhost && process.env.NODE_ENV === "production") {
+    return null;
+  }
+
   if (cached?.conn) {
     return cached.conn;
   }

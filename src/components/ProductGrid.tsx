@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import ProductCard from "./ProductCard";
 import SearchBar from "./SearchBar";
 import CategoryFilter, { SortOption } from "./CategoryFilter";
@@ -16,7 +16,7 @@ interface ProductGridProps {
   badge?: string;
 }
 
-export default function ProductGrid({
+function ProductGridInner({
   isTeaser = false,
   title,
   badge,
@@ -164,5 +164,19 @@ export default function ProductGrid({
         </div>
       )}
     </section>
+  );
+}
+
+export default function ProductGrid(props: ProductGridProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-12 text-center text-slate-400">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#0645B5] border-t-transparent" />
+        </div>
+      }
+    >
+      <ProductGridInner {...props} />
+    </Suspense>
   );
 }

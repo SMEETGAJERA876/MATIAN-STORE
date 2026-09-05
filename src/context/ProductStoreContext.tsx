@@ -248,22 +248,20 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
     },
   };
 
-  // Fetch initial data from APIs on load
+  // Fetch storefront data from APIs on load
   const refreshStoreData = async () => {
     try {
-      const [resProd, resCat, resOrd, resCpn, resRev, resSet, resNotif, resInv] = await Promise.all([
+      const results = await Promise.allSettled([
         fetch("/api/products"),
         fetch("/api/categories"),
-        fetch("/api/orders"),
         fetch("/api/coupons"),
         fetch("/api/reviews"),
-        fetch("/api/settings"),
-        fetch("/api/notifications"),
-        fetch("/api/inventory"),
       ]);
 
-      if (resProd.ok) {
-        const prodData = await resProd.json();
+      const [resProd, resCat, resCpn, resRev] = results;
+
+      if (resProd.status === "fulfilled" && resProd.value.ok) {
+        const prodData = await resProd.value.json();
         if (Array.isArray(prodData) && prodData.length > 0) {
           setProducts(
             prodData.map((p) => ({
@@ -291,37 +289,22 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
         }
       }
 
-      if (resCat.ok) {
-        const catData = await resCat.json();
+      if (resCat.status === "fulfilled" && resCat.value.ok) {
+        const catData = await resCat.value.json();
         if (Array.isArray(catData) && catData.length > 0) setCategories(catData);
       }
 
-      if (resOrd.ok) {
-        const ordData = await resOrd.json();
-        if (Array.isArray(ordData)) setOrders(ordData);
-      }
-
-      if (resCpn.ok) {
-        const cpnData = await resCpn.json();
+      if (resCpn.status === "fulfilled" && resCpn.value.ok) {
+        const cpnData = await resCpn.value.json();
         if (Array.isArray(cpnData)) setCoupons(cpnData);
       }
 
-      if (resRev.ok) {
-        const revData = await resRev.json();
+      if (resRev.status === "fulfilled" && resRev.value.ok) {
+        const revData = await resRev.value.json();
         if (Array.isArray(revData)) setReviews(revData);
       }
-
-      if (resNotif.ok) {
-        const notifData = await resNotif.json();
-        if (Array.isArray(notifData)) setNotifications(notifData);
-      }
-
-      if (resInv.ok) {
-        const invData = await resInv.json();
-        if (invData.logs) setInventoryLogs(invData.logs);
-      }
     } catch (err) {
-      console.error("Failed to sync store data with API:", err);
+      console.warn("Using offline catalog fallback:", err);
     }
   };
 

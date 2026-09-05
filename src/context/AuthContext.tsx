@@ -58,21 +58,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let active = true;
 
     async function loadInitialSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (!active) return;
+        if (!active) return;
 
-      setAccessTokenCookie(session);
-      setToken(session?.access_token || null);
+        setAccessTokenCookie(session);
+        setToken(session?.access_token || null);
 
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id, session.user.email || "");
-        if (active) setUser(profile);
+        if (session?.user) {
+          const profile = await fetchProfile(session.user.id, session.user.email || "");
+          if (active) setUser(profile);
+        }
+      } catch (err) {
+        console.warn("Could not load initial auth session:", err);
+      } finally {
+        if (active) setIsLoaded(true);
       }
-
-      if (active) setIsLoaded(true);
     }
 
     loadInitialSession();
