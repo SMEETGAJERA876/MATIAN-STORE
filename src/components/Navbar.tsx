@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProductStore } from "@/context/ProductStoreContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, X, Shield, Sparkles, ArrowRight, Truck, ChevronDown } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu, X, Shield, Sparkles, ArrowRight, Truck, ChevronDown, LayoutDashboard, LogOut, UserCircle2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductImage from "./ProductImage";
@@ -14,13 +14,16 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const accountRef = useRef<HTMLDivElement>(null);
 
   const { cartCount, openCartDrawer } = useCart();
   const { wishlistCount } = useWishlist();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const isAdmin = user?.role?.toUpperCase() === "ADMIN";
   const { products } = useProductStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -31,6 +34,16 @@ export default function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setIsAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const navLinks = [
@@ -275,7 +288,71 @@ export default function Navbar() {
               )}
             </form>
 
-
+            {/* Account / Login Button */}
+            <div className="relative" ref={accountRef}>
+              {user ? (
+                <>
+                  <button
+                    onClick={() => setIsAccountOpen((v) => !v)}
+                    className="min-h-[44px] flex items-center gap-2 text-slate-700 hover:text-[#0645B5] transition-colors p-2 rounded-xl hover:bg-slate-50"
+                    title="Account"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-[#0645B5] text-white flex items-center justify-center text-xs font-extrabold uppercase shrink-0">
+                      {user.name?.charAt(0) || "U"}
+                    </div>
+                    <span className="hidden lg:inline text-xs font-bold max-w-[100px] truncate">
+                      {user.name}
+                    </span>
+                    <ChevronDown size={14} className={`text-slate-400 transition-transform ${isAccountOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {isAccountOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full right-0 mt-1 w-56 rounded-2xl bg-white p-2 shadow-2xl border border-slate-100 z-50"
+                      >
+                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                          <p className="text-xs font-extrabold text-slate-800 truncate">{user.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                        </div>
+                        {isAdmin && (
+                          <Link
+                            href="/admin/dashboard"
+                            onClick={() => setIsAccountOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#0645B5] transition"
+                          >
+                            <LayoutDashboard size={16} />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition"
+                        >
+                          <LogOut size={16} />
+                          <span>Sign Out</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="min-h-[44px] flex items-center gap-1.5 text-slate-700 hover:text-[#0645B5] transition-colors px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-bold"
+                  title="Login"
+                >
+                  <UserCircle2 size={20} />
+                  <span className="hidden lg:inline">Login</span>
+                </Link>
+              )}
+            </div>
 
             {/* Wishlist Button */}
             <button
@@ -305,6 +382,21 @@ export default function Navbar() {
 
           {/* Mobile Action Bar (<640px) */}
           <div className="flex items-center gap-1 md:hidden">
+            {/* Mobile Account/Login Button */}
+            <Link
+              href={user ? (isAdmin ? "/admin/dashboard" : "/") : "/login"}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-[#0645B5] p-2 rounded-xl transition active:scale-95"
+              aria-label={user ? "Account" : "Login"}
+            >
+              {user ? (
+                <div className="h-6 w-6 rounded-full bg-[#0645B5] text-white flex items-center justify-center text-[10px] font-extrabold uppercase">
+                  {user.name?.charAt(0) || "U"}
+                </div>
+              ) : (
+                <UserCircle2 size={20} />
+              )}
+            </Link>
+
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
@@ -398,7 +490,41 @@ export default function Navbar() {
                   );
                 })}
 
-
+                <div className="mt-2 pt-2 border-t border-slate-100">
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setIsOpen(false)}
+                          className="min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center gap-2.5 text-slate-800 hover:bg-slate-50 transition"
+                        >
+                          <LayoutDashboard size={18} className="text-slate-400" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          setIsOpen(false);
+                          logout();
+                        }}
+                        className="w-full min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center gap-2.5 text-rose-600 hover:bg-rose-50 transition"
+                      >
+                        <LogOut size={18} />
+                        <span>Sign Out</span>
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="min-h-[44px] py-3 px-4 rounded-xl text-base font-bold flex items-center gap-2.5 text-slate-800 hover:bg-slate-50 transition"
+                    >
+                      <UserCircle2 size={18} className="text-slate-400" />
+                      <span>Login / Sign Up</span>
+                    </Link>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}

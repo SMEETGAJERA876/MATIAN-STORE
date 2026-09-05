@@ -41,7 +41,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const auth = getAuthFromReq(req);
-  if (auth && auth.role !== "ADMIN") {
+  if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 

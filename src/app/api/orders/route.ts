@@ -16,7 +16,11 @@ export async function GET(req: Request) {
       await OrderModel.insertMany(initialOrders);
     }
 
-    if (auth && auth.role !== "ADMIN") {
+    if (!auth) {
+      return jsonResponse({ error: "Unauthorized" }, 401);
+    }
+
+    if (auth.role !== "ADMIN") {
       // Return customer's own orders
       const userOrders = await OrderModel.find({ "customer.email": auth.email }).sort({ createdAt: -1 });
       return jsonResponse(userOrders);
@@ -28,7 +32,11 @@ export async function GET(req: Request) {
   }
 
   // Memory Fallback
-  if (auth && auth.role !== "ADMIN") {
+  if (!auth) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
+  if (auth.role !== "ADMIN") {
     const userOrders = inMemoryStore.orders.filter((o) => o.customer.email === auth.email);
     return jsonResponse(userOrders);
   }

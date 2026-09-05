@@ -6,7 +6,7 @@ import { inMemoryStore } from "@/lib/inMemoryStore";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = body;
+    const { name, email, password } = body;
 
     if (!name || !email || !password) {
       return jsonResponse({ error: "Name, email, and password are required" }, 400);
@@ -14,7 +14,9 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim();
-    const userRole: "ADMIN" | "CUSTOMER" = role === "ADMIN" ? "ADMIN" : "CUSTOMER";
+    // Public registration can only ever create CUSTOMER accounts — admin accounts
+    // must be provisioned separately, never via a client-supplied role.
+    const userRole: "ADMIN" | "CUSTOMER" = "CUSTOMER";
 
     const db = await connectToDatabase();
 

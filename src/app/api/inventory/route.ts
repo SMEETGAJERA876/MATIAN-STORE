@@ -6,7 +6,7 @@ import { inMemoryStore } from "@/lib/inMemoryStore";
 
 export async function GET(req: Request) {
   const auth = getAuthFromReq(req);
-  if (auth && auth.role !== "ADMIN") {
+  if (!auth || auth.role !== "ADMIN") {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
