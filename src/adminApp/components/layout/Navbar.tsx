@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
+import { Tooltip } from '../ui/Tooltip';
 
 export const Navbar: React.FC = () => {
   const {
@@ -157,13 +158,14 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Theme Switcher */}
-        <button
-          onClick={toggleDarkMode}
-          className="p-2.5 rounded-2xl text-matrin-gray hover:text-matrin-text dark:text-slate-300 dark:hover:text-white hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors"
-          title="Toggle Light / Dark Mode"
-        >
-          {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-        </button>
+        <Tooltip label="Toggle Light / Dark Mode" position="bottom">
+          <button
+            onClick={toggleDarkMode}
+            className="p-2.5 rounded-2xl text-matrin-gray hover:text-matrin-text dark:text-slate-300 dark:hover:text-white hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors"
+          >
+            {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+          </button>
+        </Tooltip>
 
         {/* Help Center */}
         <button

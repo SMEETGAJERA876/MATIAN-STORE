@@ -1,34 +1,74 @@
-import React, { useState } from 'react';
-import { Plus, Edit3, ArrowUpRight, AlertTriangle, Layers, Award, PackageCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit3, Trash2, ArrowUpRight, AlertTriangle, Layers, Award, PackageCheck } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
+import { Tooltip } from '../ui/Tooltip';
 import { useAdminStore } from '../../store/adminStore';
 import { formatCurrency } from '../../utils/formatters';
 
 export const CategoriesView: React.FC = () => {
-  const { categories, addCategory, toggleCategoryStatus, setAddCategoryModalOpen, isAddCategoryModalOpen, addToast } = useAdminStore();
+  const {
+    categories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    toggleCategoryStatus,
+    setAddCategoryModalOpen,
+    isAddCategoryModalOpen,
+    editingCategory,
+    setEditingCategory,
+    addToast,
+  } = useAdminStore();
+  const isEditMode = !!editingCategory;
 
   const [newCatName, setNewCatName] = useState('');
   const [newCatParent, setNewCatParent] = useState('Kitchen Essentials');
   const [newCatImg, setNewCatImg] = useState('https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80');
 
+  // Pre-fill the form when opening in edit mode; reset when switching to add mode
+  useEffect(() => {
+    if (!isAddCategoryModalOpen) return;
+    if (editingCategory) {
+      setNewCatName(editingCategory.name);
+      setNewCatParent(editingCategory.parentCategory);
+      setNewCatImg(editingCategory.image);
+    } else {
+      setNewCatName('');
+      setNewCatParent('Kitchen Essentials');
+      setNewCatImg('https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80');
+    }
+  }, [isAddCategoryModalOpen, editingCategory]);
+
+  const closeModal = () => {
+    setEditingCategory(null);
+    setAddCategoryModalOpen(false);
+  };
+
   const handleCreateCategory = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCatName.trim()) return;
-    addCategory({
-      name: newCatName,
-      image: newCatImg,
-      parentCategory: newCatParent,
-      productCount: 12,
-      revenue: 8500,
-      status: 'Active',
-      topLevel: false,
-      subcategories: ['General Accessories'],
-    });
-    setNewCatName('');
-    setAddCategoryModalOpen(false);
+
+    if (isEditMode && editingCategory) {
+      updateCategory(editingCategory.id, {
+        name: newCatName,
+        image: newCatImg,
+        parentCategory: newCatParent,
+      });
+    } else {
+      addCategory({
+        name: newCatName,
+        image: newCatImg,
+        parentCategory: newCatParent,
+        productCount: 12,
+        revenue: 8500,
+        status: 'Active',
+        topLevel: false,
+        subcategories: ['General Accessories'],
+      });
+    }
+    closeModal();
   };
 
   return (
@@ -47,7 +87,10 @@ export const CategoriesView: React.FC = () => {
         <Button
           variant="primary"
           icon={<Plus className="w-4 h-4" />}
-          onClick={() => setAddCategoryModalOpen(true)}
+          onClick={() => {
+            setEditingCategory(null);
+            setAddCategoryModalOpen(true);
+          }}
         >
           Add New Category
         </Button>
@@ -182,12 +225,30 @@ export const CategoriesView: React.FC = () => {
                 </span>
               </label>
 
-              <button
-                onClick={() => addToast('info', `Editing category "${cat.name}"`)}
-                className="p-2 text-matrin-gray hover:text-matrin-primary dark:hover:text-blue-400 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors"
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <Tooltip label="Edit Category">
+                  <button
+                    onClick={() => {
+                      setEditingCategory(cat);
+                      setAddCategoryModalOpen(true);
+                    }}
+                    className="p-2 text-matrin-gray hover:text-matrin-primary dark:hover:text-blue-400 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                </Tooltip>
+                <Tooltip label="Delete Category">
+                  <button
+                    onClick={() => {
+                      deleteCategory(cat.id);
+                      addToast('warning', `Deleted category "${cat.name}"`);
+                    }}
+                    className="p-2 text-matrin-gray hover:text-rose-600 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </Tooltip>
+              </div>
             </div>
           </div>
         ))}
@@ -196,8 +257,8 @@ export const CategoriesView: React.FC = () => {
       {/* Modal to Add New Category */}
       <Modal
         isOpen={isAddCategoryModalOpen}
-        onClose={() => setAddCategoryModalOpen(false)}
-        title="Add New Category"
+        onClose={closeModal}
+        title={isEditMode ? 'Edit Category' : 'Add New Category'}
         maxWidth="md"
       >
         <form onSubmit={handleCreateCategory} className="space-y-4">
@@ -245,11 +306,11 @@ export const CategoriesView: React.FC = () => {
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-matrin-border">
-            <Button variant="outline" type="button" onClick={() => setAddCategoryModalOpen(false)}>
+            <Button variant="outline" type="button" onClick={closeModal}>
               Cancel
             </Button>
             <Button variant="primary" type="submit">
-              Save Category
+              {isEditMode ? 'Save Changes' : 'Save Category'}
             </Button>
           </div>
         </form>

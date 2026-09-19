@@ -10,9 +10,8 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.8,
     reviewCount: 142,
-    image: "/images/products/matrin-detergent-real.webp",
+    image: "/images/products/detergent.webp",
     galleryImages: [
-      "/images/products/matrin-detergent-real.webp",
       "/images/products/detergent.webp",
     ],
     description:

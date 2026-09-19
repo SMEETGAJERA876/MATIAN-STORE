@@ -19,6 +19,7 @@ import {
   Shield,
   Truck,
   Headphones,
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -87,11 +88,12 @@ export default function LoginScreen() {
   };
 
   const handleDemoAdminLogin = async () => {
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!";
     setEmail("admin@matrin.com");
-    setPassword("Admin123!");
+    setPassword(adminPassword);
     setIsSubmitting(true);
     try {
-      await login("admin@matrin.com", "Admin123!");
+      await login("admin@matrin.com", adminPassword);
     } finally {
       setIsSubmitting(false);
     }
@@ -257,8 +259,11 @@ export default function LoginScreen() {
                     disabled={isSubmitting}
                     className="p-2 rounded-xl bg-white border border-blue-200/80 hover:bg-blue-50 text-left transition flex items-center justify-between text-[11px] font-bold text-slate-800 shadow-2xs group disabled:opacity-50"
                   >
-                    <span>👤 Customer</span>
-                    <span className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform text-[10px]">&rarr;</span>
+                    <span className="flex items-center gap-1.5">
+                      <User size={13} className="text-[#0645B5]" />
+                      Customer
+                    </span>
+                    <ArrowRight size={12} className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform" />
                   </button>
                   <button
                     type="button"
@@ -266,8 +271,11 @@ export default function LoginScreen() {
                     disabled={isSubmitting}
                     className="p-2 rounded-xl bg-white border border-blue-200/80 hover:bg-blue-50 text-left transition flex items-center justify-between text-[11px] font-bold text-slate-800 shadow-2xs group disabled:opacity-50"
                   >
-                    <span>👑 Admin</span>
-                    <span className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform text-[10px]">&rarr;</span>
+                    <span className="flex items-center gap-1.5">
+                      <Crown size={13} className="text-[#0645B5]" />
+                      Admin
+                    </span>
+                    <ArrowRight size={12} className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 </div>
               </div>
@@ -483,18 +491,24 @@ export default function LoginScreen() {
           </div>
 
           {/* Bottom Security Footer */}
-          <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-500 font-medium">
-            <div className="flex items-center justify-center gap-1">
-              <Shield size={13} className="text-[#0645B5]" />
-              <span>100% Secure</span>
+          <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
+            <div className="flex items-center gap-2 rounded-xl p-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
+                <Shield size={14} className="text-[#0645B5]" />
+              </div>
+              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">100% Secure</span>
             </div>
-            <div className="flex items-center justify-center gap-1">
-              <Truck size={13} className="text-[#0645B5]" />
-              <span>Free Delivery ₹499+</span>
+            <div className="flex items-center gap-2 rounded-xl p-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
+                <Truck size={14} className="text-[#0645B5]" />
+              </div>
+              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">Free Delivery ₹499+</span>
             </div>
-            <div className="flex items-center justify-center gap-1">
-              <Headphones size={13} className="text-[#0645B5]" />
-              <span>24/7 Support</span>
+            <div className="flex items-center gap-2 rounded-xl p-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
+                <Headphones size={14} className="text-[#0645B5]" />
+              </div>
+              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">24/7 Support</span>
             </div>
           </div>
 

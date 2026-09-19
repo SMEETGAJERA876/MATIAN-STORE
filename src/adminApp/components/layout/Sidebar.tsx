@@ -31,6 +31,7 @@ import {
 import { useAdminStore } from '../../store/adminStore';
 import { ModuleType } from '../../types';
 import { MatrinLogo } from '../ui/MatrinLogo';
+import { Tooltip } from '../ui/Tooltip';
 
 interface NavItem {
   id: ModuleType;
@@ -100,11 +101,10 @@ export const Sidebar: React.FC = () => {
       )}
       {items.map((item) => {
         const isActive = activeModule === item.id;
-        return (
+        const navButton = (
           <button
             key={item.id}
             onClick={() => setActiveModule(item.id)}
-            title={isSidebarCollapsed ? item.label : undefined}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150 group ${
               isActive
                 ? 'bg-matrin-primary/10 dark:bg-blue-600/20 text-matrin-primary dark:text-blue-400 font-semibold shadow-card'
@@ -133,6 +133,14 @@ export const Sidebar: React.FC = () => {
             )}
           </button>
         );
+
+        return isSidebarCollapsed ? (
+          <Tooltip key={item.id} label={item.label} position="right" className="w-full">
+            {navButton}
+          </Tooltip>
+        ) : (
+          navButton
+        );
       })}
     </div>
   );
@@ -145,27 +153,35 @@ export const Sidebar: React.FC = () => {
     >
       {/* Brand Header */}
       <div>
-        <div className="h-20 px-5 flex items-center justify-between border-b border-matrin-border dark:border-matrin-darkborder">
-          <div className="flex items-center gap-3 overflow-hidden">
-            {isSidebarCollapsed ? (
-              <MatrinLogo variant="icon" />
-            ) : (
+        {isSidebarCollapsed ? (
+          <div className="h-20 flex flex-col items-center justify-center gap-2 border-b border-matrin-border dark:border-matrin-darkborder">
+            <MatrinLogo variant="icon" className="shrink-0" />
+            <button
+              onClick={toggleSidebar}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="h-20 px-5 flex items-center justify-between border-b border-matrin-border dark:border-matrin-darkborder">
+            <div className="flex items-center gap-3 overflow-hidden">
               <div className="flex flex-col">
-                <MatrinLogo className="h-9" />
+                <MatrinLogo className="h-12" />
                 <span className="text-[9px] font-extrabold tracking-widest uppercase text-matrin-gray dark:text-slate-400 pl-0.5">
                   Enterprise Admin
                 </span>
               </div>
-            )}
-          </div>
+            </div>
 
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
-          >
-            {isSidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
-        </div>
+            <button
+              onClick={toggleSidebar}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Scrollable Navigation */}
         <div className="p-3 overflow-y-auto max-h-[calc(100vh-180px)] space-y-1">
@@ -186,13 +202,14 @@ export const Sidebar: React.FC = () => {
             <span>Support Center</span>
           </button>
         ) : (
-          <button
-            onClick={() => setActiveModule('support-tickets')}
-            title="Support Center"
-            className="w-full flex justify-center p-2.5 rounded-xl bg-matrin-primary text-white shadow-soft"
-          >
-            <Headphones className="w-4 h-4" />
-          </button>
+          <Tooltip label="Support Center" position="right" className="w-full">
+            <button
+              onClick={() => setActiveModule('support-tickets')}
+              className="w-full flex justify-center p-2.5 rounded-xl bg-matrin-primary text-white shadow-soft"
+            >
+              <Headphones className="w-4 h-4" />
+            </button>
+          </Tooltip>
         )}
 
         <button

@@ -11,6 +11,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
 
   const isAdminRoute = pathname?.startsWith("/admin");
+  const isAuthRoute = pathname === "/login";
 
   if (isAdminRoute && !isLoaded) {
     return (
@@ -25,7 +26,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     );
   }
 
-  if (isAdminRoute) {
+  if (isAdminRoute || isAuthRoute) {
     return <div className="flex-1 min-h-screen">{children}</div>;
   }
 

@@ -20,7 +20,20 @@ import { CustomersView } from './components/modules/CustomersView';
 import { ReviewsView } from './components/modules/ReviewsView';
 import { PromotionsView } from './components/modules/PromotionsView';
 import { AnalyticsView } from './components/modules/AnalyticsView';
+import { SalesReportsView } from './components/modules/SalesReportsView';
+import { RevenueView } from './components/modules/RevenueView';
+import { MarketingView } from './components/modules/MarketingView';
+import { AIInsightsView } from './components/modules/AIInsightsView';
 import { SettingsView } from './components/modules/SettingsView';
+import { ShippingView } from './components/modules/ShippingView';
+import { ReturnsView } from './components/modules/ReturnsView';
+import { SuppliersView } from './components/modules/SuppliersView';
+import { WarehouseView } from './components/modules/WarehouseView';
+import { FinanceView } from './components/modules/FinanceView';
+import { EmployeesView } from './components/modules/EmployeesView';
+import { SupportTicketsView } from './components/modules/SupportTicketsView';
+import { NotificationsView } from './components/modules/NotificationsView';
+import { SecurityView } from './components/modules/SecurityView';
 import { OtherModulesView } from './components/modules/OtherModulesView';
 import { ModuleType } from './types';
 
@@ -68,8 +81,34 @@ export const MainLayout: React.FC<{ initialModule?: string }> = ({ initialModule
         return <PromotionsView />;
       case 'analytics':
         return <AnalyticsView />;
+      case 'sales-reports':
+        return <SalesReportsView />;
+      case 'revenue':
+        return <RevenueView />;
+      case 'marketing':
+        return <MarketingView />;
+      case 'ai-insights':
+        return <AIInsightsView />;
       case 'settings':
         return <SettingsView />;
+      case 'shipping':
+        return <ShippingView />;
+      case 'returns':
+        return <ReturnsView />;
+      case 'suppliers':
+        return <SuppliersView />;
+      case 'warehouse':
+        return <WarehouseView />;
+      case 'finance':
+        return <FinanceView />;
+      case 'employees':
+        return <EmployeesView />;
+      case 'support-tickets':
+        return <SupportTicketsView />;
+      case 'notifications':
+        return <NotificationsView />;
+      case 'security':
+        return <SecurityView />;
       default:
         return <OtherModulesView module={activeModule} />;
     }

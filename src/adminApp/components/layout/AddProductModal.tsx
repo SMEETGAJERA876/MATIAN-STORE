@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useAdminStore } from '../../store/adminStore';
@@ -57,7 +57,16 @@ const processImageFile = (file: File): Promise<string> => {
 };
 
 export const AddProductModal: React.FC = () => {
-  const { isAddProductModalOpen, setAddProductModalOpen, addProduct, addToast } = useAdminStore();
+  const {
+    isAddProductModalOpen,
+    setAddProductModalOpen,
+    addProduct,
+    updateProduct,
+    editingProduct,
+    setEditingProduct,
+    addToast,
+  } = useAdminStore();
+  const isEditMode = !!editingProduct;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +105,59 @@ export const AddProductModal: React.FC = () => {
   // Badges
   const [isBestSeller, setIsBestSeller] = useState(true);
   const [isNewArrival, setIsNewArrival] = useState(false);
+
+  const resetForm = () => {
+    setName('');
+    setSku('');
+    setCategory('Laundry Care');
+    setBrand('MATRIN Enterprise');
+    setPrice('');
+    setOldPrice('');
+    setStock('50');
+    setWarehouse('Central Logistics Hub');
+    setVendor('MATRIN Systems');
+    setPrimaryImage('https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80');
+    setGalleryImages([]);
+    setVolume('5 Liter');
+    setScent('Fresh Lavender');
+    setFormulation('Ultra Concentrated Liquid');
+    setDescription('');
+    setFeatureInputs([
+      'Eliminates 99.9% of tough stains & bacteria',
+      'Biodegradable eco-friendly formulation',
+      'Gentle on skin & safe for all machine types',
+    ]);
+    setIsBestSeller(true);
+    setIsNewArrival(false);
+  };
+
+  // Pre-fill the form when opening in edit mode; reset when switching to add mode
+  useEffect(() => {
+    if (!isAddProductModalOpen) return;
+
+    if (editingProduct) {
+      const p = editingProduct as typeof editingProduct & { specifications?: Record<string, string>; galleryImages?: string[] };
+      setName(p.name || '');
+      setSku(p.sku || '');
+      setCategory(p.category || 'Laundry Care');
+      setBrand(p.brand || 'MATRIN Enterprise');
+      setPrice(p.price != null ? String(p.price) : '');
+      setOldPrice(p.discountPrice != null ? String(p.discountPrice) : '');
+      setStock(p.stock != null ? String(p.stock) : '50');
+      setWarehouse(p.warehouse || 'Central Logistics Hub');
+      setVendor(p.vendor || 'MATRIN Systems');
+      setPrimaryImage(p.image || '');
+      setGalleryImages((p.galleryImages || []).filter((img) => img !== p.image));
+      setVolume(p.specifications?.volume || '5 Liter');
+      setScent(p.specifications?.scent || 'Fresh Lavender');
+      setFormulation(p.specifications?.formulation || 'Ultra Concentrated Liquid');
+      setDescription(p.description || '');
+      setFeatureInputs(p.features && p.features.length > 0 ? p.features : []);
+    } else {
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAddProductModalOpen, editingProduct]);
 
   // Handle direct file uploads from PC (.jpeg, .jpg, .png, .webp)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,57 +274,75 @@ export const AddProductModal: React.FC = () => {
       },
     };
 
-    // 1. Add to Admin Store State
-    addProduct(newProdPayload);
+    const apiSyncBody = {
+      name: newProdPayload.name,
+      sku: newProdPayload.sku,
+      category: newProdPayload.category,
+      price: newProdPayload.price,
+      originalPrice: oldPriceNum,
+      stock: newProdPayload.stock,
+      image: newProdPayload.image,
+      images: newProdPayload.galleryImages,
+      description: newProdPayload.description,
+      features: newProdPayload.features,
+      specifications: newProdPayload.specifications,
+      inStock: stockNum > 0,
+      badge: isBestSeller ? 'Bestseller' : isNewArrival ? 'New' : undefined,
+    };
 
-    // 2. Post to Next.js API for backend sync
-    try {
-      await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newProdPayload.name,
-          sku: newProdPayload.sku,
-          category: newProdPayload.category,
-          price: newProdPayload.price,
-          originalPrice: oldPriceNum,
-          stock: newProdPayload.stock,
-          image: newProdPayload.image,
-          images: newProdPayload.galleryImages,
-          description: newProdPayload.description,
-          features: newProdPayload.features,
-          specifications: newProdPayload.specifications,
-          inStock: stockNum > 0,
-          badge: isBestSeller ? 'Bestseller' : isNewArrival ? 'New' : undefined,
-        }),
-      });
-    } catch (err) {
-      console.log('Synced locally in Admin Store');
+    if (isEditMode && editingProduct) {
+      // 1. Update Admin Store State
+      updateProduct(editingProduct.id, newProdPayload);
+
+      // 2. Best-effort sync to Next.js API for backend persistence
+      try {
+        await fetch(`/api/products/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiSyncBody),
+        });
+      } catch (err) {
+        console.log('Synced locally in Admin Store');
+      }
+
+      addToast('success', `Product "${name.trim()}" updated successfully!`);
+    } else {
+      // 1. Add to Admin Store State
+      addProduct(newProdPayload);
+
+      // 2. Post to Next.js API for backend sync
+      try {
+        await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiSyncBody),
+        });
+      } catch (err) {
+        console.log('Synced locally in Admin Store');
+      }
+
+      addToast('success', `Product "${name.trim()}" published with ${allPhotos.length} photos!`);
     }
 
-    addToast('success', `Product "${name.trim()}" published with ${allPhotos.length} photos!`);
-
     // Reset & Close
-    setName('');
-    setSku('');
-    setPrice('');
-    setOldPrice('');
-    setStock('50');
-    setDescription('');
-    setGalleryImages([]);
+    setEditingProduct(null);
+    resetForm();
     setAddProductModalOpen(false);
   };
 
   return (
     <Modal
       isOpen={isAddProductModalOpen}
-      onClose={() => setAddProductModalOpen(false)}
+      onClose={() => {
+        setEditingProduct(null);
+        setAddProductModalOpen(false);
+      }}
       title={
         <div className="flex items-center gap-2 text-matrin-text dark:text-white font-extrabold text-base">
           <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-matrin-primary">
             <Package className="w-5 h-5" />
           </div>
-          <span>Add New MATRIN Product</span>
+          <span>{isEditMode ? 'Edit Product Details' : 'Add New MATRIN Product'}</span>
         </div>
       }
       maxWidth="xl"
@@ -646,12 +726,15 @@ export const AddProductModal: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => setAddProductModalOpen(false)}
+            onClick={() => {
+              setEditingProduct(null);
+              setAddProductModalOpen(false);
+            }}
           >
             Cancel
           </Button>
           <Button type="submit" variant="primary" icon={<Sparkles className="w-4 h-4" />}>
-            Publish Product to Store
+            {isEditMode ? 'Save Changes' : 'Publish Product to Store'}
           </Button>
         </div>
       </form>

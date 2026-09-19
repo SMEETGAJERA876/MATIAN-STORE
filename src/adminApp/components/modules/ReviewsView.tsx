@@ -4,6 +4,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { DataTable, Column } from '../ui/DataTable';
+import { Tooltip } from '../ui/Tooltip';
 import { useAdminStore } from '../../store/adminStore';
 import { Review } from '../../types';
 
@@ -126,13 +127,14 @@ export const ReviewsView: React.FC = () => {
               </Button>
             </>
           ) : (
-            <button
-              onClick={() => updateReviewStatus(row.id, 'Flagged')}
-              className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 transition-colors"
-              title="Flag Review"
-            >
-              <Flag className="w-4 h-4" />
-            </button>
+            <Tooltip label="Flag Review">
+              <button
+                onClick={() => updateReviewStatus(row.id, 'Flagged')}
+                className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <Flag className="w-4 h-4" />
+              </button>
+            </Tooltip>
           )}
         </div>
       ),

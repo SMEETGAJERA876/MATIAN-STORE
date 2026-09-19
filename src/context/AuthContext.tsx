@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { User, AuthContextType } from "@/types/auth";
 import { supabase } from "@/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
@@ -48,6 +49,7 @@ async function fetchProfile(userId: string, fallbackEmail: string): Promise<User
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -132,9 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(adminUser);
       setToken("admin_mock_token");
       toast.success("Welcome back, MATRIN Admin!", { icon: "👑" });
-      if (typeof window !== "undefined") {
-        window.location.href = "/admin/dashboard";
-      }
+      router.push("/admin/dashboard");
       return true;
     }
 
@@ -152,9 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(demoUser);
       setToken("user_mock_token");
       toast.success("Welcome back, Demo Customer!", { icon: "👤" });
-      if (typeof window !== "undefined") {
-        window.location.href = "/";
-      }
+      router.push("/");
       return true;
     }
 
@@ -174,12 +172,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       toast.success(`Welcome back, ${profile?.name || "there"}!`, { icon: "👤" });
 
-      if (typeof window !== "undefined") {
-        if (profile?.role?.toString().toUpperCase() === "ADMIN") {
-          window.location.href = "/admin/dashboard";
-        } else {
-          window.location.href = "/";
-        }
+      if (profile?.role?.toString().toUpperCase() === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
       }
 
       return true;
@@ -246,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const quickAdminLogin = () => {
-    login("admin@matrin.com", "Admin123!");
+    login("admin@matrin.com", process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!");
   };
 
   return (

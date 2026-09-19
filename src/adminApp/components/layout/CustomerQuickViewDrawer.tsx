@@ -3,6 +3,7 @@ import { Mail, Phone, Edit, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Tooltip } from '../ui/Tooltip';
 import { useAdminStore } from '../../store/adminStore';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -50,27 +51,30 @@ export const CustomerQuickViewDrawer: React.FC = () => {
 
           {/* Action Quick Buttons */}
           <div className="flex items-center gap-2 mt-4">
-            <button
-              onClick={() => addToast('info', `Opening mail client for ${customer.email}`)}
-              className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-matrin-secondary hover:bg-blue-100 transition-colors"
-              title="Send Email"
-            >
-              <Mail className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => addToast('info', `Calling ${customer.phone}`)}
-              className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 hover:bg-emerald-100 transition-colors"
-              title="Call Phone"
-            >
-              <Phone className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => addToast('info', 'Edit Customer Profile')}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition-colors"
-              title="Edit Customer"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
+            <Tooltip label="Send Email">
+              <button
+                onClick={() => addToast('info', `Opening mail client for ${customer.email}`)}
+                className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-matrin-secondary hover:bg-blue-100 transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip label="Call Phone">
+              <button
+                onClick={() => addToast('info', `Calling ${customer.phone}`)}
+                className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 hover:bg-emerald-100 transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            <Tooltip label="Edit Customer">
+              <button
+                onClick={() => addToast('info', 'Edit Customer Profile')}
+                className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+            </Tooltip>
           </div>
         </div>
 

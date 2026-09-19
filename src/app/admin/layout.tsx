@@ -10,19 +10,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
-  // If login route, render standalone view without AdminProvider or RBAC blocking
-  if (pathname?.startsWith("/admin/login")) {
-    return <>{children}</>;
-  }
+  const isLoginRoute = pathname?.startsWith("/admin/login");
 
   // Verify Role-Based Access Control (RBAC) Protection for Admin Console
   useEffect(() => {
+    if (isLoginRoute) return;
     if (isLoaded) {
       if (!user || user.role?.toUpperCase() !== "ADMIN") {
         router.push("/admin/login");
       }
     }
-  }, [user, isLoaded, router]);
+  }, [user, isLoaded, router, isLoginRoute]);
+
+  // If login route, render standalone view without AdminProvider or RBAC blocking
+  if (isLoginRoute) {
+    return <>{children}</>;
+  }
 
   if (!isLoaded || !user || user.role?.toUpperCase() !== "ADMIN") {
     return (

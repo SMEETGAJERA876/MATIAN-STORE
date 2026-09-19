@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* Tailwind v4 defaults dark: to prefers-color-scheme. The admin panel's dark
+   mode toggle (adminStore isDarkMode) drives a "dark" class on <html>, so we
+   need class-based dark variants instead of the media-query default. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #F5FAFF;
   --foreground: #12213F;

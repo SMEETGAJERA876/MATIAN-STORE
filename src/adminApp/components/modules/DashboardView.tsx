@@ -130,7 +130,7 @@ export const DashboardView: React.FC = () => {
           <div className="pt-2 flex items-center gap-3">
             <Button
               variant="primary"
-              className="bg-white text-[#1D68E8] hover:bg-blue-50 font-extrabold border-none shadow-md"
+              className="bg-white hover:bg-blue-50 !text-[#1D68E8] font-extrabold border-none shadow-md"
               icon={<Plus className="w-4 h-4 text-[#1D68E8]" />}
               onClick={() => setAddProductModalOpen(true)}
             >
@@ -140,7 +140,7 @@ export const DashboardView: React.FC = () => {
               variant="outline"
               className="bg-white/10 text-white border-white/30 hover:bg-white/20 font-bold"
               icon={<BarChart2 className="w-4 h-4 text-white" />}
-              onClick={() => setActiveModule('sales-reports')}
+              onClick={() => setActiveModule('analytics')}
             >
               View Analytics
             </Button>

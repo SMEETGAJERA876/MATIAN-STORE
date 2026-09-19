@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    workerThreads: true,
+  },
 };
 
 export default nextConfig;

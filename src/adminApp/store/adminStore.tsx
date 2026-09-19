@@ -13,12 +13,18 @@ import {
   SupportTicket,
   NotificationItem,
   UserProfile,
+  SecuritySession,
 } from '../types';
 
 interface ToastMessage {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
+}
+
+export interface SecuritySettings {
+  twoFactorEnabled: boolean;
+  ipWhitelist: string[];
 }
 
 export interface StockMovementLog {
@@ -57,6 +63,14 @@ interface AdminContextType {
   selectedProductId: string | null;
   setSelectedProductId: (id: string | null) => void;
 
+  // Editing targets (null = "add new" mode, set = "edit existing" mode)
+  editingProduct: Product | null;
+  setEditingProduct: (product: Product | null) => void;
+  editingCategory: Category | null;
+  setEditingCategory: (category: Category | null) => void;
+  editingPromotion: Promotion | null;
+  setEditingPromotion: (promotion: Promotion | null) => void;
+
   // Modals state
   isAddProductModalOpen: boolean;
   setAddProductModalOpen: (open: boolean) => void;
@@ -84,6 +98,8 @@ interface AdminContextType {
   supportTickets: SupportTicket[];
   notifications: NotificationItem[];
   stockLogs: StockMovementLog[];
+  securitySettings: SecuritySettings;
+  activeSessions: SecuritySession[];
 
   // Mutators / Actions
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -101,15 +117,48 @@ interface AdminContextType {
   ) => void;
 
   addCategory: (category: Omit<Category, 'id'>) => void;
+  updateCategory: (id: string, category: Partial<Category>) => void;
+  deleteCategory: (id: string) => void;
   toggleCategoryStatus: (id: string) => void;
 
   updateOrderStatus: (id: string, paymentStatus: Order['paymentStatus'], shippingStatus: Order['shippingStatus']) => void;
 
   updateReviewStatus: (id: string, status: Review['status']) => void;
   addPromotion: (promo: Omit<Promotion, 'id'>) => void;
+  updatePromotion: (id: string, promo: Partial<Promotion>) => void;
+  deletePromotion: (id: string) => void;
 
   markNotificationRead: (id: string) => void;
   clearNotifications: () => void;
+
+  // Suppliers
+  addSupplier: (supplier: Omit<Supplier, 'id'>) => void;
+  updateSupplier: (id: string, supplier: Partial<Supplier>) => void;
+  deleteSupplier: (id: string) => void;
+
+  // Employees
+  addEmployee: (employee: Omit<Employee, 'id'>) => void;
+  updateEmployee: (id: string, employee: Partial<Employee>) => void;
+  deleteEmployee: (id: string) => void;
+  toggleEmployeeStatus: (id: string) => void;
+
+  // Support Tickets
+  addSupportTicket: (ticket: Omit<SupportTicket, 'id' | 'ticketNumber' | 'createdAt'>) => void;
+  updateTicketStatus: (id: string, status: SupportTicket['status']) => void;
+  deleteSupportTicket: (id: string) => void;
+
+  // Shipping & Returns (derived from Orders)
+  updateShippingInfo: (
+    orderId: string,
+    updates: Partial<Pick<Order, 'courier' | 'trackingNumber' | 'shippingStatus'>>
+  ) => void;
+  processRefund: (orderId: string) => void;
+
+  // Security
+  toggleTwoFactor: () => void;
+  addIpToWhitelist: (ip: string) => void;
+  removeIpFromWhitelist: (ip: string) => void;
+  revokeSession: (sessionId: string) => void;
 
   // Toasts
   toasts: ToastMessage[];
@@ -315,6 +364,17 @@ const initialNotifications: NotificationItem[] = [
   { id: 'n-1', title: 'Low Stock Alert', description: 'MATRIN Eco-Clean Refill Bundle has dropped to 3 units.', timestamp: '10 minutes ago', type: 'inventory', read: false, priority: 'high' },
 ];
 
+const initialSecuritySettings: SecuritySettings = {
+  twoFactorEnabled: true,
+  ipWhitelist: ['203.0.113.42', '198.51.100.17'],
+};
+
+const initialActiveSessions: SecuritySession[] = [
+  { id: 'sess-1', device: 'Chrome on Windows 11', location: 'San Jose, CA', ipAddress: '203.0.113.42', lastActive: 'Active now', current: true },
+  { id: 'sess-2', device: 'Safari on iPhone 15', location: 'Austin, TX', ipAddress: '198.51.100.17', lastActive: '2 hours ago' },
+  { id: 'sess-3', device: 'Firefox on macOS', location: 'Chicago, IL', ipAddress: '192.0.2.88', lastActive: '1 day ago' },
+];
+
 const initialStockLogs: StockMovementLog[] = [
   { id: 'log-1', productName: 'MATRIN X1 Robotic Vacuum', sku: 'MTR-X1-ROBOT', quantityChange: 50, warehouse: 'San Jose Logistics Hub', reason: 'Restock Purchase Order PO-901', timestamp: '2 hours ago', performedBy: 'Alex Thompson (Super Admin)' },
   { id: 'log-2', productName: 'MATRIN Eco-Clean Refill Bundle', sku: 'MTR-ECO-99', quantityChange: 100, warehouse: 'Austin Distribution Facility', reason: 'Supplier Shipment Received', timestamp: '5 hours ago', performedBy: 'Jessica Taylor (Manager)' },
@@ -343,6 +403,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
 
   const [isAddProductModalOpen, setAddProductModalOpen] = useState<boolean>(false);
   const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState<boolean>(false);
@@ -363,6 +426,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(initialSupportTickets);
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
   const [stockLogs, setStockLogs] = useState<StockMovementLog[]>(initialStockLogs);
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(initialSecuritySettings);
+  const [activeSessions, setActiveSessions] = useState<SecuritySession[]>(initialActiveSessions);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -407,7 +472,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 weight: '1.2 kg',
                 dimensions: '20x15x30 cm',
                 visibility: p.inStock ? 'Published' : 'Draft',
-                status: p.stock > 0 ? 'In Stock' : 'Low Stock',
+                status:
+                  Number(p.stock) > 10
+                    ? 'In Stock'
+                    : Number(p.stock) > 0
+                    ? 'Low Stock'
+                    : 'Out of Stock',
                 rating: p.rating || 4.8,
                 reviewsCount: p.reviewsCount || 10,
                 createdAt: p.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
@@ -586,7 +656,20 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (exists) {
         return prev.map((i) =>
           i.sku === targetProd.sku
-            ? { ...i, currentStock: updatedStock, lastRestocked: new Date().toISOString().slice(0, 10) }
+            ? {
+                ...i,
+                currentStock: updatedStock,
+                warehouse: warehouse || i.warehouse,
+                status:
+                  updatedStock <= 0
+                    ? 'Critical'
+                    : updatedStock <= i.criticalLevel
+                    ? 'Critical'
+                    : updatedStock <= i.criticalLevel * 2
+                    ? 'Low Stock'
+                    : 'Healthy',
+                lastRestocked: new Date().toISOString().slice(0, 10),
+              }
             : i
         );
       } else {
@@ -638,6 +721,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     addToast('success', `Category "${newCat.name}" added successfully`);
   };
 
+  const updateCategory = (id: string, updatedData: Partial<Category>) => {
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updatedData } : c)));
+    addToast('info', 'Category details updated');
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+    addToast('warning', 'Category deleted');
+  };
+
   const toggleCategoryStatus = (id: string) => {
     setCategories((prev) =>
       prev.map((c) =>
@@ -672,6 +765,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     addToast('success', `Coupon code "${newPromo.code}" generated!`);
   };
 
+  const updatePromotion = (id: string, updatedData: Partial<Promotion>) => {
+    setPromotions((prev) => prev.map((p) => (p.id === id ? { ...p, ...updatedData } : p)));
+    addToast('info', 'Coupon details updated');
+  };
+
+  const deletePromotion = (id: string) => {
+    setPromotions((prev) => prev.filter((p) => p.id !== id));
+    addToast('warning', 'Coupon deleted');
+  };
+
   const markNotificationRead = (id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
@@ -679,6 +782,111 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const clearNotifications = () => {
     setNotifications([]);
     addToast('info', 'All notifications cleared');
+  };
+
+  // Suppliers
+  const addSupplier = (supplierData: Omit<Supplier, 'id'>) => {
+    const newSupplier: Supplier = { ...supplierData, id: 'sup-' + Date.now() };
+    setSuppliers((prev) => [newSupplier, ...prev]);
+    addToast('success', `Supplier "${newSupplier.name}" added`);
+  };
+
+  const updateSupplier = (id: string, updatedData: Partial<Supplier>) => {
+    setSuppliers((prev) => prev.map((s) => (s.id === id ? { ...s, ...updatedData } : s)));
+    addToast('info', 'Supplier details updated');
+  };
+
+  const deleteSupplier = (id: string) => {
+    setSuppliers((prev) => prev.filter((s) => s.id !== id));
+    addToast('warning', 'Supplier removed');
+  };
+
+  // Employees
+  const addEmployee = (employeeData: Omit<Employee, 'id'>) => {
+    const newEmployee: Employee = { ...employeeData, id: 'emp-' + Date.now() };
+    setEmployees((prev) => [newEmployee, ...prev]);
+    addToast('success', `Employee "${newEmployee.name}" added`);
+  };
+
+  const updateEmployee = (id: string, updatedData: Partial<Employee>) => {
+    setEmployees((prev) => prev.map((e) => (e.id === id ? { ...e, ...updatedData } : e)));
+    addToast('info', 'Employee details updated');
+  };
+
+  const deleteEmployee = (id: string) => {
+    setEmployees((prev) => prev.filter((e) => e.id !== id));
+    addToast('warning', 'Employee removed');
+  };
+
+  const toggleEmployeeStatus = (id: string) => {
+    setEmployees((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status: e.status === 'Active' ? 'Inactive' : 'Active' } : e))
+    );
+    addToast('info', 'Employee status updated');
+  };
+
+  // Support Tickets
+  const addSupportTicket = (ticketData: Omit<SupportTicket, 'id' | 'ticketNumber' | 'createdAt'>) => {
+    const newTicket: SupportTicket = {
+      ...ticketData,
+      id: 't-' + Date.now(),
+      ticketNumber: '#TICK-' + Math.floor(1000 + Math.random() * 9000),
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+    };
+    setSupportTickets((prev) => [newTicket, ...prev]);
+    addToast('success', `Ticket ${newTicket.ticketNumber} created`);
+  };
+
+  const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
+    setSupportTickets((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
+    addToast('info', `Ticket updated to ${status}`);
+  };
+
+  const deleteSupportTicket = (id: string) => {
+    setSupportTickets((prev) => prev.filter((t) => t.id !== id));
+    addToast('warning', 'Ticket deleted');
+  };
+
+  // Shipping & Returns
+  const updateShippingInfo = (
+    orderId: string,
+    updates: Partial<Pick<Order, 'courier' | 'trackingNumber' | 'shippingStatus'>>
+  ) => {
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...updates } : o)));
+    addToast('success', `Shipment for order ${orderId} updated`);
+  };
+
+  const processRefund = (orderId: string) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderId ? { ...o, paymentStatus: 'Refunded', shippingStatus: 'Returned' } : o
+      )
+    );
+    addToast('success', `Refund processed for order ${orderId}`);
+  };
+
+  // Security
+  const toggleTwoFactor = () => {
+    setSecuritySettings((prev) => ({ ...prev, twoFactorEnabled: !prev.twoFactorEnabled }));
+    addToast('info', 'Two-factor authentication setting updated');
+  };
+
+  const addIpToWhitelist = (ip: string) => {
+    if (!ip.trim()) return;
+    setSecuritySettings((prev) =>
+      prev.ipWhitelist.includes(ip) ? prev : { ...prev, ipWhitelist: [...prev.ipWhitelist, ip] }
+    );
+    addToast('success', `IP ${ip} added to whitelist`);
+  };
+
+  const removeIpFromWhitelist = (ip: string) => {
+    setSecuritySettings((prev) => ({ ...prev, ipWhitelist: prev.ipWhitelist.filter((i) => i !== ip) }));
+    addToast('warning', `IP ${ip} removed from whitelist`);
+  };
+
+  const revokeSession = (sessionId: string) => {
+    setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
+    addToast('warning', 'Session revoked');
   };
 
   return (
@@ -702,6 +910,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSelectedOrderId,
         selectedProductId,
         setSelectedProductId,
+        editingProduct,
+        setEditingProduct,
+        editingCategory,
+        setEditingCategory,
+        editingPromotion,
+        setEditingPromotion,
         isAddProductModalOpen,
         setAddProductModalOpen,
         isAddCategoryModalOpen,
@@ -726,6 +940,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         supportTickets,
         notifications,
         stockLogs,
+        securitySettings,
+        activeSessions,
         addProduct,
         updateProduct,
         deleteProduct,
@@ -733,12 +949,32 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         importProducts,
         adjustProductStockByName,
         addCategory,
+        updateCategory,
+        deleteCategory,
         toggleCategoryStatus,
         updateOrderStatus,
         updateReviewStatus,
         addPromotion,
+        updatePromotion,
+        deletePromotion,
         markNotificationRead,
         clearNotifications,
+        addSupplier,
+        updateSupplier,
+        deleteSupplier,
+        addEmployee,
+        updateEmployee,
+        deleteEmployee,
+        toggleEmployeeStatus,
+        addSupportTicket,
+        updateTicketStatus,
+        deleteSupportTicket,
+        updateShippingInfo,
+        processRefund,
+        toggleTwoFactor,
+        addIpToWhitelist,
+        removeIpFromWhitelist,
+        revokeSession,
         toasts,
         addToast,
         removeToast,

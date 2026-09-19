@@ -8,11 +8,13 @@ import {
   TrendingUp,
   AlertTriangle,
   Sparkles,
+  Pencil,
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { DataTable, Column } from '../ui/DataTable';
+import { Tooltip } from '../ui/Tooltip';
 import { useAdminStore } from '../../store/adminStore';
 import { Product } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
@@ -22,6 +24,7 @@ export const ProductsView: React.FC = () => {
     products,
     deleteProduct,
     setAddProductModalOpen,
+    setEditingProduct,
     addToast,
   } = useAdminStore();
 
@@ -153,23 +156,39 @@ export const ProductsView: React.FC = () => {
       header: 'ACTIONS',
       cell: (row) => (
         <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => addToast('info', `SKU: ${row.sku}`)}
-            className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            title="View Details"
-          >
-            <Barcode className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              deleteProduct(row.id);
-              addToast('warning', `Deleted ${row.name}`);
-            }}
-            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            title="Delete Product"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          <Tooltip label="View Details">
+            <button
+              onClick={() => addToast('info', `SKU: ${row.sku}`)}
+              className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Barcode className="w-4 h-4" />
+            </button>
+          </Tooltip>
+          <Tooltip label="Edit Product">
+            <button
+              onClick={() => {
+                const fullProduct = products.find((p) => p.id === row.id);
+                if (fullProduct) {
+                  setEditingProduct(fullProduct);
+                  setAddProductModalOpen(true);
+                }
+              }}
+              className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </Tooltip>
+          <Tooltip label="Delete Product">
+            <button
+              onClick={() => {
+                deleteProduct(row.id);
+                addToast('warning', `Deleted ${row.name}`);
+              }}
+              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </Tooltip>
         </div>
       ),
     },
@@ -202,7 +221,10 @@ export const ProductsView: React.FC = () => {
           <Button
             variant="primary"
             icon={<Plus className="w-4 h-4" />}
-            onClick={() => setAddProductModalOpen(true)}
+            onClick={() => {
+              setEditingProduct(null);
+              setAddProductModalOpen(true);
+            }}
           >
             Add Product
           </Button>

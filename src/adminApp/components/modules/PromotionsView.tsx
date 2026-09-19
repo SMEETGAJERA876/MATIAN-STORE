@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Plus, Tag, TrendingUp, Sparkles, Clock, Rocket, Filter, Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Tag, TrendingUp, Sparkles, Clock, Rocket, Filter, Download, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
 import { DataTable, Column } from '../ui/DataTable';
+import { Tooltip } from '../ui/Tooltip';
 import { useAdminStore } from '../../store/adminStore';
 import { Promotion } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
@@ -13,31 +14,66 @@ export const PromotionsView: React.FC = () => {
   const {
     promotions,
     addPromotion,
+    updatePromotion,
+    deletePromotion,
+    editingPromotion,
+    setEditingPromotion,
     isCreateCouponModalOpen,
     setCreateCouponModalOpen,
     addToast,
   } = useAdminStore();
+  const isEditMode = !!editingPromotion;
 
   const [code, setCode] = useState('');
   const [type, setType] = useState<'Percentage' | 'Fixed Amount' | 'Free Shipping'>('Percentage');
   const [val, setVal] = useState('15%');
   const [limit, setLimit] = useState(500);
 
+  // Pre-fill the form when opening in edit mode; reset when switching to add mode
+  useEffect(() => {
+    if (!isCreateCouponModalOpen) return;
+    if (editingPromotion) {
+      setCode(editingPromotion.code);
+      setType(editingPromotion.incentiveType);
+      setVal(editingPromotion.value);
+      setLimit(editingPromotion.usageLimit);
+    } else {
+      setCode('');
+      setType('Percentage');
+      setVal('15%');
+      setLimit(500);
+    }
+  }, [isCreateCouponModalOpen, editingPromotion]);
+
+  const closeCouponModal = () => {
+    setEditingPromotion(null);
+    setCreateCouponModalOpen(false);
+  };
+
   const handleCreateCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim()) return;
-    addPromotion({
-      code: code.toUpperCase(),
-      incentiveType: type,
-      value: val,
-      usageProgress: 0,
-      usageLimit: limit,
-      expiryDate: 'Nov 30, 2024',
-      status: 'Active',
-      revenueAttributed: 0,
-    });
-    setCode('');
-    setCreateCouponModalOpen(false);
+
+    if (isEditMode && editingPromotion) {
+      updatePromotion(editingPromotion.id, {
+        code: code.toUpperCase(),
+        incentiveType: type,
+        value: val,
+        usageLimit: limit,
+      });
+    } else {
+      addPromotion({
+        code: code.toUpperCase(),
+        incentiveType: type,
+        value: val,
+        usageProgress: 0,
+        usageLimit: limit,
+        expiryDate: 'Nov 30, 2024',
+        status: 'Active',
+        revenueAttributed: 0,
+      });
+    }
+    closeCouponModal();
   };
 
   const columns: Column<Promotion>[] = [
@@ -123,6 +159,35 @@ export const PromotionsView: React.FC = () => {
         </Badge>
       ),
     },
+    {
+      header: 'ACTIONS',
+      cell: (row) => (
+        <div className="flex items-center gap-1.5">
+          <Tooltip label="Edit Coupon">
+            <button
+              onClick={() => {
+                setEditingPromotion(row);
+                setCreateCouponModalOpen(true);
+              }}
+              className="p-1.5 text-slate-400 hover:text-matrin-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </Tooltip>
+          <Tooltip label="Delete Coupon">
+            <button
+              onClick={() => {
+                deletePromotion(row.id);
+                addToast('warning', `Deleted coupon "${row.code}"`);
+              }}
+              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </Tooltip>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -141,7 +206,10 @@ export const PromotionsView: React.FC = () => {
         <Button
           variant="primary"
           icon={<Plus className="w-4 h-4" />}
-          onClick={() => setCreateCouponModalOpen(true)}
+          onClick={() => {
+            setEditingPromotion(null);
+            setCreateCouponModalOpen(true);
+          }}
         >
           Create Coupon
         </Button>
@@ -265,11 +333,11 @@ export const PromotionsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal for Create Coupon */}
+      {/* Modal for Create/Edit Coupon */}
       <Modal
         isOpen={isCreateCouponModalOpen}
-        onClose={() => setCreateCouponModalOpen(false)}
-        title="Generate New Coupon Code"
+        onClose={closeCouponModal}
+        title={isEditMode ? 'Edit Coupon Code' : 'Generate New Coupon Code'}
         maxWidth="md"
       >
         <form onSubmit={handleCreateCoupon} className="space-y-4">
@@ -330,11 +398,11 @@ export const PromotionsView: React.FC = () => {
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-matrin-border">
-            <Button variant="outline" type="button" onClick={() => setCreateCouponModalOpen(false)}>
+            <Button variant="outline" type="button" onClick={closeCouponModal}>
               Cancel
             </Button>
             <Button variant="primary" type="submit">
-              Save & Launch Coupon
+              {isEditMode ? 'Save Changes' : 'Save & Launch Coupon'}
             </Button>
           </div>
         </form>

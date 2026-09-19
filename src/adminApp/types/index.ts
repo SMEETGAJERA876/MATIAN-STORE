@@ -200,3 +200,12 @@ export interface UserProfile {
   avatar: string;
   companyName: string;
 }
+
+export interface SecuritySession {
+  id: string;
+  device: string;
+  location: string;
+  ipAddress: string;
+  lastActive: string;
+  current?: boolean;
+}

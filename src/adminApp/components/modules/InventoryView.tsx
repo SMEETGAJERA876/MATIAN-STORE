@@ -37,7 +37,7 @@ const inventoryChartData = [
 ];
 
 export const InventoryView: React.FC = () => {
-  const { products, setStockAdjustmentModalOpen, stockLogs, addToast } = useAdminStore();
+  const { products, setStockAdjustmentModalOpen, setSelectedProductId, stockLogs, addToast } = useAdminStore();
   const [chartMode, setChartMode] = useState<'Monthly' | 'Weekly'>('Monthly');
 
   const columns: Column<typeof products[0]>[] = [
@@ -100,7 +100,10 @@ export const InventoryView: React.FC = () => {
           variant="secondary"
           size="sm"
           icon={<Plus className="w-3.5 h-3.5" />}
-          onClick={() => setStockAdjustmentModalOpen(true)}
+          onClick={() => {
+            setSelectedProductId(row.id);
+            setStockAdjustmentModalOpen(true);
+          }}
         >
           Add Stock
         </Button>
@@ -125,7 +128,10 @@ export const InventoryView: React.FC = () => {
           <Button
             variant="primary"
             icon={<Plus className="w-4 h-4" />}
-            onClick={() => setStockAdjustmentModalOpen(true)}
+            onClick={() => {
+              setSelectedProductId(null);
+              setStockAdjustmentModalOpen(true);
+            }}
             className="shadow-glow"
           >
             Add Stock by Product Name
@@ -203,7 +209,7 @@ export const InventoryView: React.FC = () => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2">
           <Card>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-matrin-text dark:text-white">Inventory Dynamics</h3>
@@ -238,15 +244,6 @@ export const InventoryView: React.FC = () => {
               </ResponsiveContainer>
             </div>
           </Card>
-
-          <DataTable
-            title="Live Stock Inventory by Product Name"
-            data={products}
-            columns={columns}
-            searchKey="name"
-            searchPlaceholder="Search products by name, SKU, or category..."
-            exportFilename="matrin_inventory_by_product_name"
-          />
         </div>
 
         {/* Right Column */}
@@ -262,7 +259,10 @@ export const InventoryView: React.FC = () => {
               variant="secondary"
               className="w-full py-3 text-xs font-bold shadow-glow"
               icon={<Plus className="w-4 h-4" />}
-              onClick={() => setStockAdjustmentModalOpen(true)}
+              onClick={() => {
+                setSelectedProductId(null);
+                setStockAdjustmentModalOpen(true);
+              }}
             >
               Add Product Stock by Name
             </Button>
@@ -306,6 +306,16 @@ export const InventoryView: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* Full-Width Inventory Table */}
+      <DataTable
+        title="Live Stock Inventory by Product Name"
+        data={products}
+        columns={columns}
+        searchKey="name"
+        searchPlaceholder="Search products by name, SKU, or category..."
+        exportFilename="matrin_inventory_by_product_name"
+      />
     </div>
   );
 };

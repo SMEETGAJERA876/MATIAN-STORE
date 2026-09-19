@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("admin@matrin.com");
-  const [password, setPassword] = useState("Admin123!");
+  const [password, setPassword] = useState(process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!");
   const [isLoading, setIsLoading] = useState(false);
 
   // If already logged in as admin, redirect automatically
@@ -45,11 +45,12 @@ export default function AdminLoginPage() {
   };
 
   const handleQuickAdminLogin = async () => {
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!";
     setEmail("admin@matrin.com");
-    setPassword("Admin123!");
+    setPassword(adminPassword);
     setIsLoading(true);
     try {
-      const success = await login("admin@matrin.com", "Admin123!");
+      const success = await login("admin@matrin.com", adminPassword);
       if (success) {
         toast.success("Logged in with Quick Admin account!");
         router.push("/admin/dashboard");

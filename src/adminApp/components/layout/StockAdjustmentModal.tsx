@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Plus, Minus, Warehouse, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -11,6 +11,8 @@ export const StockAdjustmentModal: React.FC = () => {
     products,
     adjustProductStockByName,
     addToast,
+    selectedProductId,
+    setSelectedProductId,
   } = useAdminStore();
 
   const [selectedProdId, setSelectedProdId] = useState(products[0]?.id || '');
@@ -18,7 +20,19 @@ export const StockAdjustmentModal: React.FC = () => {
   const [warehouse, setWarehouse] = useState<string>('San Jose Logistics Hub');
   const [reason, setReason] = useState<string>('Purchase Order Restock');
 
+  // Pre-select whichever product the user clicked "Add Stock" on; default to the first product otherwise
+  useEffect(() => {
+    if (!isStockAdjustmentModalOpen) return;
+    setSelectedProdId(selectedProductId || products[0]?.id || '');
+    setQuantity(50);
+  }, [isStockAdjustmentModalOpen, selectedProductId, products]);
+
   const selectedProduct = products.find((p) => p.id === selectedProdId) || products[0];
+
+  const closeModal = () => {
+    setSelectedProductId(null);
+    setStockAdjustmentModalOpen(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +47,13 @@ export const StockAdjustmentModal: React.FC = () => {
     }
 
     adjustProductStockByName(selectedProduct.id, Number(quantity), warehouse, reason);
-    setStockAdjustmentModalOpen(false);
+    closeModal();
   };
 
   return (
     <Modal
       isOpen={isStockAdjustmentModalOpen}
-      onClose={() => setStockAdjustmentModalOpen(false)}
+      onClose={closeModal}
       title="Add / Adjust Product Stock by Name"
       maxWidth="md"
     >
@@ -167,7 +181,7 @@ export const StockAdjustmentModal: React.FC = () => {
           <Button
             variant="outline"
             type="button"
-            onClick={() => setStockAdjustmentModalOpen(false)}
+            onClick={closeModal}
           >
             Cancel
           </Button>
