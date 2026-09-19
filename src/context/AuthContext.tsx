@@ -225,7 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = async () => {
+  const logout = async (redirectTo?: string) => {
     try {
       await supabase.auth.signOut();
     } catch (e) {
@@ -236,7 +236,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAccessTokenCookie(null);
       toast.success("Signed out successfully");
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        const dest =
+          redirectTo ||
+          (window.location.pathname.startsWith("/admin") ? "/admin/login" : "/login");
+        window.location.href = dest;
       }
     }
   };

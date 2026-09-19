@@ -32,6 +32,7 @@ import { useAdminStore } from '../../store/adminStore';
 import { ModuleType } from '../../types';
 import { MatrinLogo } from '../ui/MatrinLogo';
 import { Tooltip } from '../ui/Tooltip';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
   id: ModuleType;
@@ -41,6 +42,7 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC = () => {
+  const { logout } = useAuth();
   const {
     activeModule,
     setActiveModule,
@@ -88,8 +90,9 @@ export const Sidebar: React.FC = () => {
     { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
-  const handleLogout = () => {
-    addToast('info', 'Logged out of MATRIN Enterprise session');
+  const handleLogout = async () => {
+    addToast('info', 'Logging out of MATRIN Enterprise session...');
+    await logout('/admin/login');
   };
 
   const renderNavGroup = (title: string, items: NavItem[]) => (
@@ -212,15 +215,24 @@ export const Sidebar: React.FC = () => {
           </Tooltip>
         )}
 
-        <button
-          onClick={handleLogout}
-          className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors ${
-            isSidebarCollapsed ? 'justify-center' : ''
-          }`}
-        >
-          <LogOut className="w-4 h-4 shrink-0" />
-          {!isSidebarCollapsed && <span>Logout</span>}
-        </button>
+        {isSidebarCollapsed ? (
+          <Tooltip label="Logout" position="right" className="w-full">
+            <button
+              onClick={handleLogout}
+              className="w-full flex justify-center p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+            >
+              <LogOut className="w-4 h-4 shrink-0" />
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span>Logout</span>
+          </button>
+        )}
       </div>
     </aside>
   );

@@ -34,5 +34,5 @@ export interface AuthContextType {
   quickUserLogin: () => void;
   quickAdminLogin?: () => void;
   register: (name: string, email: string, password: string) => Promise<boolean> | boolean;
-  logout: () => void;
+  logout: (redirectTo?: string) => Promise<void> | void;
 }
