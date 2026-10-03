@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Boxes,
   AlertTriangle,
@@ -39,6 +39,19 @@ const inventoryChartData = [
 export const InventoryView: React.FC = () => {
   const { products, setStockAdjustmentModalOpen, setSelectedProductId, stockLogs, addToast } = useAdminStore();
   const [chartMode, setChartMode] = useState<'Monthly' | 'Weekly'>('Monthly');
+  const [activeTab, setActiveTab] = useState('all');
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: products.length },
+    { id: 'In Stock', label: 'In Stock', count: products.filter((p) => p.status === 'In Stock').length },
+    { id: 'Low Stock', label: 'Low Stock', count: products.filter((p) => p.status === 'Low Stock').length },
+    { id: 'Out of Stock', label: 'Out of Stock', count: products.filter((p) => p.status === 'Out of Stock').length },
+  ];
+
+  const filteredProducts = useMemo(() => {
+    if (activeTab === 'all') return products;
+    return products.filter((p) => p.status === activeTab);
+  }, [products, activeTab]);
 
   const columns: Column<typeof products[0]>[] = [
     {
@@ -310,11 +323,14 @@ export const InventoryView: React.FC = () => {
       {/* Full-Width Inventory Table */}
       <DataTable
         title="Live Stock Inventory by Product Name"
-        data={products}
+        data={filteredProducts}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search products by name, SKU, or category..."
         exportFilename="matrin_inventory_by_product_name"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );

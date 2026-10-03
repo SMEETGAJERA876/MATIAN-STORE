@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Megaphone, Tag, Users, TrendingUp, Mail, Bell, MessageSquare, Share2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -9,6 +9,7 @@ import { Promotion } from '../../types';
 
 export const MarketingView: React.FC = () => {
   const { promotions, setActiveModule } = useAdminStore();
+  const [activeTab, setActiveTab] = useState('all');
 
   const activeCampaigns = promotions.filter((p) => p.status === 'Active').length;
   const totalRedemptions = promotions.reduce((sum, p) => sum + p.usageProgress, 0);
@@ -17,6 +18,19 @@ export const MarketingView: React.FC = () => {
     const rates = promotions.filter((p) => p.usageLimit > 0).map((p) => p.usageProgress / p.usageLimit);
     return rates.length > 0 ? Math.round((rates.reduce((a, b) => a + b, 0) / rates.length) * 100) : 0;
   }, [promotions]);
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: promotions.length },
+    { id: 'Active', label: 'Active', count: activeCampaigns },
+    { id: 'Scheduled', label: 'Scheduled', count: promotions.filter((p) => p.status === 'Scheduled').length },
+    { id: 'Archived', label: 'Archived', count: promotions.filter((p) => p.status === 'Archived').length },
+    { id: 'Expired', label: 'Expired', count: promotions.filter((p) => p.status === 'Expired').length },
+  ];
+
+  const filteredPromotions = useMemo(() => {
+    if (activeTab === 'all') return promotions;
+    return promotions.filter((p) => p.status === activeTab);
+  }, [promotions, activeTab]);
 
   const columns: Column<Promotion>[] = [
     {
@@ -127,11 +141,14 @@ export const MarketingView: React.FC = () => {
 
       <DataTable
         title="Campaign Performance"
-        data={promotions}
+        data={filteredPromotions}
         columns={columns}
         searchKey="code"
         searchPlaceholder="Search coupon codes..."
         exportFilename="matrin_marketing_campaigns"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       <Card>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Edit3, Trash2, Building2, Mail, Phone, Clock } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -23,6 +23,7 @@ export const SuppliersView: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -61,6 +62,18 @@ export const SuppliersView: React.FC = () => {
   const avgLeadTime = suppliers.length
     ? Math.round(suppliers.reduce((sum, s) => sum + s.leadTimeDays, 0) / suppliers.length)
     : 0;
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: suppliers.length },
+    { id: 'Active', label: 'Active', count: activeCount },
+    { id: 'On Hold', label: 'On Hold', count: suppliers.filter((s) => s.status === 'On Hold').length },
+    { id: 'Under Review', label: 'Under Review', count: suppliers.filter((s) => s.status === 'Under Review').length },
+  ];
+
+  const filteredSuppliers = useMemo(() => {
+    if (activeTab === 'all') return suppliers;
+    return suppliers.filter((s) => s.status === activeTab);
+  }, [suppliers, activeTab]);
 
   const columns: Column<Supplier>[] = [
     {
@@ -182,12 +195,15 @@ export const SuppliersView: React.FC = () => {
 
       <DataTable
         title="Supplier Directory"
-        data={suppliers}
+        data={filteredSuppliers}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search suppliers by name, category, or contact..."
         exportFilename="matrin_suppliers"
         onBulkDelete={(ids) => ids.forEach((id) => deleteSupplier(id))}
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editing ? 'Edit Supplier' : 'Add New Supplier'} maxWidth="md">

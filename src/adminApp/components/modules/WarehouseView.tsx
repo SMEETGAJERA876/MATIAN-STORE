@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Warehouse as WarehouseIcon, Boxes, AlertTriangle, Plus } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -10,6 +10,7 @@ const REORDER_THRESHOLD = 10;
 
 export const WarehouseView: React.FC = () => {
   const { products, setSelectedProductId, setStockAdjustmentModalOpen } = useAdminStore();
+  const [activeTab, setActiveTab] = useState('all');
 
   const openRestock = (product: Product) => {
     setSelectedProductId(product.id);
@@ -34,6 +35,18 @@ export const WarehouseView: React.FC = () => {
 
   const totalCritical = products.filter((p) => p.status !== 'In Stock').length;
   const totalUnits = products.reduce((sum, p) => sum + p.stock, 0);
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: products.length },
+    { id: 'In Stock', label: 'In Stock', count: products.filter((p) => p.status === 'In Stock').length },
+    { id: 'Low Stock', label: 'Low Stock', count: products.filter((p) => p.status === 'Low Stock').length },
+    { id: 'Out of Stock', label: 'Out of Stock', count: products.filter((p) => p.status === 'Out of Stock').length },
+  ];
+
+  const filteredProducts = useMemo(() => {
+    if (activeTab === 'all') return products;
+    return products.filter((p) => p.status === activeTab);
+  }, [products, activeTab]);
 
   const columns: Column<Product>[] = [
     {
@@ -158,11 +171,14 @@ export const WarehouseView: React.FC = () => {
 
       <DataTable
         title="Warehouse Stock Ledger"
-        data={products}
+        data={filteredProducts}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search by item name, SKU, or warehouse..."
         exportFilename="matrin_warehouse_stock"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );

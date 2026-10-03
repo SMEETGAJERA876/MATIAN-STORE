@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Edit3, Trash2, ShieldCheck, UserCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -24,6 +24,7 @@ export const EmployeesView: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Employee | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -58,7 +59,21 @@ export const EmployeesView: React.FC = () => {
   };
 
   const activeCount = employees.filter((e) => e.status === 'Active').length;
+  const inactiveCount = employees.length - activeCount;
   const adminCount = employees.filter((e) => e.role === 'Super Admin' || e.role === 'Admin').length;
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: employees.length },
+    { id: 'Active', label: 'Active', count: activeCount },
+    { id: 'Inactive', label: 'Inactive', count: inactiveCount },
+    { id: 'admin', label: 'Admin-Level', count: adminCount },
+  ];
+
+  const filteredEmployees = useMemo(() => {
+    if (activeTab === 'all') return employees;
+    if (activeTab === 'admin') return employees.filter((e) => e.role === 'Super Admin' || e.role === 'Admin');
+    return employees.filter((e) => e.status === activeTab);
+  }, [employees, activeTab]);
 
   const columns: Column<Employee>[] = [
     {
@@ -184,12 +199,15 @@ export const EmployeesView: React.FC = () => {
 
       <DataTable
         title="Team Members"
-        data={employees}
+        data={filteredEmployees}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search employees by name, role, or department..."
         exportFilename="matrin_employees"
         onBulkDelete={(ids) => ids.forEach((id) => deleteEmployee(id))}
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editing ? 'Edit Employee' : 'Add New Employee'} maxWidth="md">

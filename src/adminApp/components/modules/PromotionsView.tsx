@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Tag, TrendingUp, Sparkles, Clock, Rocket, Filter, Download, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -24,6 +24,7 @@ export const PromotionsView: React.FC = () => {
   } = useAdminStore();
   const isEditMode = !!editingPromotion;
 
+  const [activeTab, setActiveTab] = useState('all');
   const [code, setCode] = useState('');
   const [type, setType] = useState<'Percentage' | 'Fixed Amount' | 'Free Shipping'>('Percentage');
   const [val, setVal] = useState('15%');
@@ -75,6 +76,19 @@ export const PromotionsView: React.FC = () => {
     }
     closeCouponModal();
   };
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: promotions.length },
+    { id: 'Active', label: 'Active', count: promotions.filter((p) => p.status === 'Active').length },
+    { id: 'Scheduled', label: 'Scheduled', count: promotions.filter((p) => p.status === 'Scheduled').length },
+    { id: 'Archived', label: 'Archived', count: promotions.filter((p) => p.status === 'Archived').length },
+    { id: 'Expired', label: 'Expired', count: promotions.filter((p) => p.status === 'Expired').length },
+  ];
+
+  const filteredPromotions = useMemo(() => {
+    if (activeTab === 'all') return promotions;
+    return promotions.filter((p) => p.status === activeTab);
+  }, [promotions, activeTab]);
 
   const columns: Column<Promotion>[] = [
     {
@@ -257,11 +271,14 @@ export const PromotionsView: React.FC = () => {
       {/* Main Campaign Performance DataTable */}
       <DataTable
         title="Campaign Performance"
-        data={promotions}
+        data={filteredPromotions}
         columns={columns}
         searchKey="code"
         searchPlaceholder="Search coupon codes..."
         exportFilename="matrin_promotions"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       {/* Bottom Banners Grid (Matching Reference Image 2) */}
