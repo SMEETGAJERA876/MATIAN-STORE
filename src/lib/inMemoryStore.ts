@@ -152,6 +152,20 @@ export const initialReviews: Array<{
   status: "Approved" | "Pending" | "Flagged";
 }> = [];
 
+export const initialSupportTickets: Array<{
+  id: string;
+  ticketNumber: string;
+  subject: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  message: string;
+  priority: "Urgent" | "High" | "Medium" | "Low";
+  status: "Open" | "In Progress" | "Resolved" | "Closed";
+  category: "Billing" | "Shipping" | "Product Issue" | "General";
+  createdAt: string;
+}> = [];
+
 export const initialOrders: Array<{
   id: string;
   invoiceNumber: string;
@@ -230,6 +244,7 @@ class MemoryStore {
   coupons = [...initialCoupons];
   reviews = [...initialReviews];
   orders = [...initialOrders];
+  supportTickets = [...initialSupportTickets];
   notifications = [...initialNotifications];
   settings = { ...initialSettings };
   inventoryLogs: Array<{

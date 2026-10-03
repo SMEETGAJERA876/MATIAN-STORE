@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LifeBuoy, Clock, AlertCircle, Plus } from 'lucide-react';
+import { LifeBuoy, Clock, AlertCircle, Plus, Mail, Phone, User, Tag } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
@@ -11,6 +11,8 @@ const emptyForm = {
   subject: '',
   customerName: '',
   customerEmail: '',
+  customerPhone: '',
+  message: '',
   priority: 'Medium' as SupportTicket['priority'],
   status: 'Open' as SupportTicket['status'],
   category: 'General' as SupportTicket['category'],
@@ -21,6 +23,7 @@ export const SupportTicketsView: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [isModalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [viewingTicket, setViewingTicket] = useState<SupportTicket | null>(null);
 
   const filterTabs = [
     { id: 'all', label: 'All Tickets', count: supportTickets.length },
@@ -33,8 +36,8 @@ export const SupportTicketsView: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.subject.trim() || !form.customerEmail.trim()) return;
-    addSupportTicket(form);
+    if (!form.subject.trim() || !form.customerEmail.trim() || !form.message.trim()) return;
+    addSupportTicket({ ...form, customerPhone: form.customerPhone || undefined });
     setForm(emptyForm);
     setModalOpen(false);
   };
@@ -155,6 +158,7 @@ export const SupportTicketsView: React.FC = () => {
         filterTabs={filterTabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onRowClick={(row) => setViewingTicket(row)}
         exportFilename="matrin_support_tickets"
       />
 
@@ -192,6 +196,25 @@ export const SupportTicketsView: React.FC = () => {
               />
             </div>
           </div>
+          <div>
+            <label className="block text-xs font-bold text-matrin-text dark:text-white mb-1">Customer Phone</label>
+            <input
+              type="tel"
+              value={form.customerPhone}
+              onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+              className="w-full px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-matrin-text dark:text-white mb-1">Message</label>
+            <textarea
+              rows={3}
+              required
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              className="w-full px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-matrin-text dark:text-white mb-1">Priority</label>
@@ -225,6 +248,90 @@ export const SupportTicketsView: React.FC = () => {
             <Button variant="primary" type="submit">Create Ticket</Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Full Ticket Detail — shows everything the customer submitted */}
+      <Modal
+        isOpen={!!viewingTicket}
+        onClose={() => setViewingTicket(null)}
+        title={viewingTicket ? `Ticket ${viewingTicket.ticketNumber}` : 'Ticket'}
+        maxWidth="lg"
+      >
+        {viewingTicket && (
+          <div className="space-y-5">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray mb-1">Subject</div>
+              <div className="text-sm font-extrabold text-matrin-text dark:text-white">{viewingTicket.subject}</div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-matrin-bg/60 dark:bg-slate-900/60 border border-matrin-border dark:border-matrin-darkborder">
+              <div className="flex items-start gap-2.5">
+                <User className="w-4 h-4 text-matrin-primary dark:text-blue-400 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Customer</div>
+                  <div className="text-xs font-bold text-matrin-text dark:text-white">{viewingTicket.customerName}</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Mail className="w-4 h-4 text-matrin-primary dark:text-blue-400 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Email</div>
+                  <a href={`mailto:${viewingTicket.customerEmail}`} className="text-xs font-bold text-matrin-primary dark:text-blue-400 hover:underline break-all">
+                    {viewingTicket.customerEmail}
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Phone className="w-4 h-4 text-matrin-primary dark:text-blue-400 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Phone</div>
+                  <div className="text-xs font-bold text-matrin-text dark:text-white">
+                    {viewingTicket.customerPhone || 'Not provided'}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Tag className="w-4 h-4 text-matrin-primary dark:text-blue-400 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Category</div>
+                  <div className="text-xs font-bold text-matrin-text dark:text-white">{viewingTicket.category}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray mb-1.5">Message</div>
+              <div className="text-xs leading-relaxed text-matrin-text dark:text-slate-200 whitespace-pre-wrap p-4 rounded-2xl bg-white dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder">
+                {viewingTicket.message || 'No message provided.'}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-3">
+                <Badge variant={viewingTicket.priority === 'Urgent' ? 'danger' : viewingTicket.priority === 'High' ? 'warning' : 'neutral'} dot>
+                  {viewingTicket.priority} Priority
+                </Badge>
+                <span className="flex items-center gap-1 text-[11px] text-matrin-gray">
+                  <Clock className="w-3.5 h-3.5" /> {viewingTicket.createdAt}
+                </span>
+              </div>
+              <select
+                value={viewingTicket.status}
+                onChange={(e) => {
+                  const status = e.target.value as SupportTicket['status'];
+                  updateTicketStatus(viewingTicket.id, status);
+                  setViewingTicket({ ...viewingTicket, status });
+                }}
+                className="text-xs font-bold bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-matrin-primary"
+              >
+                <option>Open</option>
+                <option>In Progress</option>
+                <option>Resolved</option>
+                <option>Closed</option>
+              </select>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

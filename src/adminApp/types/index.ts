@@ -177,6 +177,8 @@ export interface SupportTicket {
   subject: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
+  message: string;
   priority: 'Urgent' | 'High' | 'Medium' | 'Low';
   status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
   category: 'Billing' | 'Shipping' | 'Product Issue' | 'General';

@@ -363,9 +363,9 @@ const initialEmployees: Employee[] = [
   { id: 'emp-1', name: 'Alex Thompson', email: 'alex.t@matrin.com', role: 'Super Admin', department: 'Executive', status: 'Active', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', lastActive: 'Online now' },
 ];
 
-const initialSupportTickets: SupportTicket[] = [
-  { id: 't-1', ticketNumber: '#TICK-9012', subject: 'Inquiry regarding MATRIN X1 firmware update 2.4', customerName: 'Sarah Jenkins', customerEmail: 'sarah.j@enterprise.com', priority: 'High', status: 'In Progress', category: 'Product Issue', createdAt: '2023-10-25 09:30' },
-];
+// Starts empty; real tickets load from the backend (including ones customers
+// submit through the storefront Contact Us form) via the sync effect below.
+const initialSupportTickets: SupportTicket[] = [];
 
 const initialNotifications: NotificationItem[] = [
   { id: 'n-1', title: 'Low Stock Alert', description: 'MATRIN Eco-Clean Refill Bundle has dropped to 3 units.', timestamp: '10 minutes ago', type: 'inventory', read: false, priority: 'high' },
@@ -468,10 +468,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     async function syncBackendData() {
       try {
         const apiBase = '/api';
-        const [resProd, resOrd, resCust] = await Promise.all([
+        const [resProd, resOrd, resCust, resTickets] = await Promise.all([
           fetch(`${apiBase}/products`),
           fetch(`${apiBase}/orders`),
           fetch(`${apiBase}/customers`),
+          fetch(`${apiBase}/support-tickets`),
         ]);
 
         if (resProd.ok) {
@@ -558,6 +559,26 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 joinDate: c.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
                 lifetimeValue: Number(c.totalSpent) || 0,
                 recentPurchases: [],
+              }))
+            );
+          }
+        }
+        if (resTickets.ok) {
+          const apiTickets = await resTickets.json();
+          if (Array.isArray(apiTickets)) {
+            setSupportTickets(
+              apiTickets.map((t: any) => ({
+                id: t.id,
+                ticketNumber: t.ticketNumber || `#TICK-${t.id}`,
+                subject: t.subject || 'General Inquiry',
+                customerName: t.customerName || 'Customer',
+                customerEmail: t.customerEmail || '',
+                customerPhone: t.customerPhone || undefined,
+                message: t.message || '',
+                priority: t.priority || 'Medium',
+                status: t.status || 'Open',
+                category: t.category || 'General',
+                createdAt: t.createdAt?.slice(0, 16).replace('T', ' ') || new Date().toISOString().slice(0, 16).replace('T', ' '),
               }))
             );
           }
@@ -946,16 +967,35 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
     };
     setSupportTickets((prev) => [newTicket, ...prev]);
+
+    fetch('/api/support-tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTicket),
+    }).catch(() => addToast('error', 'Ticket saved locally, but failed to reach the server.'));
+
     addToast('success', `Ticket ${newTicket.ticketNumber} created`);
   };
 
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
     setSupportTickets((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
+
+    fetch(`/api/support-tickets/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
+
     addToast('info', `Ticket updated to ${status}`);
   };
 
   const deleteSupportTicket = (id: string) => {
     setSupportTickets((prev) => prev.filter((t) => t.id !== id));
+
+    fetch(`/api/support-tickets/${id}`, { method: 'DELETE' }).catch(() =>
+      addToast('error', 'Deleted locally, but failed to reach the server.')
+    );
+
     addToast('warning', 'Ticket deleted');
   };
 
