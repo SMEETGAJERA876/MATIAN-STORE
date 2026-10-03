@@ -10,9 +10,10 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.8,
     reviewCount: 142,
-    image: "/images/products/detergent.webp",
+    image: "/images/products/liquid-detergent-front.webp",
     galleryImages: [
-      "/images/products/detergent.webp",
+      "/images/products/liquid-detergent-front.webp",
+      "/images/products/liquid-detergent-back.webp",
     ],
     description:
       "Ultra Liquid Detergent delivers powerful stain removal with advanced fabric care technology. Formulated to keep whites bright and colors vibrant while leaving a fresh ocean breeze scent.",
@@ -107,10 +108,10 @@ export const products: Product[] = [
     discountPercentage: 20,
     rating: 4.7,
     reviewCount: 84,
-    image: "/images/products/matrin-floor-cleaner-real.webp",
+    image: "/images/products/floor-cleaner-5l-front.webp",
     galleryImages: [
-      "/images/products/matrin-floor-cleaner-real.webp",
-      "/images/products/floor-cleaner.webp",
+      "/images/products/floor-cleaner-5l-front.webp",
+      "/images/products/floor-cleaner-5l-back.webp",
     ],
     description:
       "Floor Shine Lavender kills 99.9% of germs while restoring high shine to marble, tile, and granite floors. Leaves a long-lasting calming lavender fragrance.",
@@ -154,11 +155,11 @@ export const products: Product[] = [
     discountPercentage: 18,
     rating: 4.8,
     reviewCount: 110,
-    image: "/images/products/matrin-toilet-cleaner-front-real.webp",
+    image: "/images/products/toilet-cleaner-500ml-front.webp",
     galleryImages: [
-      "/images/products/matrin-toilet-cleaner-front-real.webp",
-      "/images/products/matrin-toilet-cleaner-back-real.webp",
-      "/images/products/toilet-cleaner.webp",
+      "/images/products/toilet-cleaner-500ml-front.webp",
+      "/images/products/toilet-cleaner-1l-front.webp",
+      "/images/products/toilet-cleaner-1l-back.webp",
     ],
     description:
       "Toilet Fresh features a thick power-cling gel formula that removes limescale, yellow stains, and tough grime with ease. Guarantees 10x deeper cleaning and freshness.",
@@ -202,11 +203,10 @@ export const products: Product[] = [
     discountPercentage: 17,
     rating: 4.9,
     reviewCount: 74,
-    image: "/images/products/matrin-bathroom-cleaner-real.webp",
+    image: "/images/products/bathroom-cleaner-front.webp",
     galleryImages: [
-      "/images/products/matrin-bathroom-cleaner-real.webp",
-      "/images/products/matrin-bathroom-cleaner-banner-real.webp",
-      "/images/products/bathroom-cleaner.webp",
+      "/images/products/bathroom-cleaner-front.webp",
+      "/images/products/bathroom-cleaner-back.webp",
     ],
     description:
       "Bathroom Shield is an all-in-one bathroom cleaner spray that dissolves soap scum, hard water spots, and mold from tiles, taps, and shower doors.",

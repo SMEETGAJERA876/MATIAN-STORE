@@ -165,14 +165,7 @@ export default function ProductDetailsPage() {
   }
 
   const isFav = isInWishlist(product.id);
-  const gallery = [
-    product.image,
-    "/images/hero.webp",
-    "/images/products/detergent.webp",
-    "/images/products/dishwash.webp",
-    "/images/products/floor-cleaner.webp",
-    "/images/products/toilet-cleaner.webp",
-  ];
+  const gallery = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [product.image];
 
   const handleSizeChange = (sz: string) => {
     setSelectedSize(sz);
