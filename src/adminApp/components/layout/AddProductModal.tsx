@@ -345,7 +345,7 @@ export const AddProductModal: React.FC = () => {
           <span>{isEditMode ? 'Edit Product Details' : 'Add New MATRIN Product'}</span>
         </div>
       }
-      maxWidth="xl"
+      maxWidth="4xl"
     >
       <form onSubmit={handleSubmit} className="space-y-5 max-h-[80vh] overflow-y-auto pr-1">
         {/* Section 1: Basic Info */}
@@ -464,13 +464,13 @@ export const AddProductModal: React.FC = () => {
 
         {/* Section 2: Direct PC File Upload & Multiple Photos */}
         <div className="space-y-4 pt-2">
-          <div className="flex items-center justify-between border-b border-matrin-border dark:border-matrin-darkborder pb-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-matrin-border dark:border-matrin-darkborder pb-2">
             <h4 className="text-xs font-black uppercase tracking-wider text-matrin-primary dark:text-blue-400 flex items-center gap-1.5">
               <ImageIcon className="w-4 h-4" /> 2. Upload Photos Directly From PC (JPEG, PNG)
             </h4>
 
             {/* Mode Switcher */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-[11px] font-bold">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-[11px] font-bold shrink-0">
               <button
                 type="button"
                 onClick={() => setPhotoInputMode('file')}
