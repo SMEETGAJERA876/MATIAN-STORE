@@ -29,6 +29,7 @@ export interface SecuritySettings {
 
 export interface StockMovementLog {
   id: string;
+  productId?: string;
   productName: string;
   sku: string;
   quantityChange: number;
@@ -100,6 +101,7 @@ interface AdminContextType {
   stockLogs: StockMovementLog[];
   securitySettings: SecuritySettings;
   activeSessions: SecuritySession[];
+  warehouses: string[];
 
   // Mutators / Actions
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -107,6 +109,11 @@ interface AdminContextType {
   deleteProduct: (id: string) => void;
   bulkDeleteProducts: (ids: string[]) => void;
   importProducts: (products: Partial<Product>[]) => void;
+
+  // Warehouse Management
+  addWarehouse: (name: string) => void;
+  deleteWarehouse: (name: string) => void;
+  cancelStockLog: (logId: string) => void;
 
   // Stock Management Action
   adjustProductStockByName: (
@@ -375,10 +382,10 @@ const initialActiveSessions: SecuritySession[] = [
   { id: 'sess-3', device: 'Firefox on macOS', location: 'Chicago, IL', ipAddress: '192.0.2.88', lastActive: '1 day ago' },
 ];
 
-const initialStockLogs: StockMovementLog[] = [
-  { id: 'log-1', productName: 'MATRIN X1 Robotic Vacuum', sku: 'MTR-X1-ROBOT', quantityChange: 50, warehouse: 'San Jose Logistics Hub', reason: 'Restock Purchase Order PO-901', timestamp: '2 hours ago', performedBy: 'Alex Thompson (Super Admin)' },
-  { id: 'log-2', productName: 'MATRIN Eco-Clean Refill Bundle', sku: 'MTR-ECO-99', quantityChange: 100, warehouse: 'Austin Distribution Facility', reason: 'Supplier Shipment Received', timestamp: '5 hours ago', performedBy: 'Jessica Taylor (Manager)' },
-];
+// Starts empty rather than seeded with demo entries: those referenced the
+// placeholder catalog's fictional products, which don't exist once the real
+// product sync replaces it, so their "Cancel" action could never resolve.
+const initialStockLogs: StockMovementLog[] = [];
 
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -428,8 +435,23 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [stockLogs, setStockLogs] = useState<StockMovementLog[]>(initialStockLogs);
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(initialSecuritySettings);
   const [activeSessions, setActiveSessions] = useState<SecuritySession[]>(initialActiveSessions);
+  const [warehouses, setWarehouses] = useState<string[]>([]);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Keep the warehouse list in sync with whatever warehouses real products
+  // actually reference (once the backend sync below replaces the initial
+  // placeholder catalog), without losing warehouses an admin created ahead
+  // of assigning any stock to them. Skipped while `products` is still the
+  // placeholder seed so its unrelated demo warehouse names never leak in.
+  useEffect(() => {
+    if (products === initialProducts) return;
+    const namesInUse = Array.from(new Set(products.map((p) => p.warehouse).filter(Boolean)));
+    setWarehouses((prev) => {
+      const missing = namesInUse.filter((n) => !prev.includes(n));
+      return missing.length > 0 ? [...prev, ...missing] : prev;
+    });
+  }, [products]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -703,6 +725,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // 3. Record Movement Log
     const newLog: StockMovementLog = {
       id: 'log-' + Date.now(),
+      productId: targetProd.id,
       productName: targetProd.name,
       sku: targetProd.sku,
       quantityChange: quantityToAdd,
@@ -713,10 +736,92 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setStockLogs((prev) => [newLog, ...prev]);
 
+    // 4. Sync to the backend so the change is reflected on the live storefront,
+    // not just in this admin session's local state.
+    fetch('/api/inventory/adjust', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: targetProd.id,
+        quantityToAdd,
+        reason: reason || 'Manual Stock Adjustment',
+        performedBy: user.name + ' (' + user.role + ')',
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) addToast('error', 'Stock updated locally, but the server did not confirm it.');
+      })
+      .catch(() => addToast('error', 'Stock updated locally, but failed to reach the server.'));
+
     addToast(
       'success',
       `Stock updated for "${targetProd.name}": ${quantityToAdd >= 0 ? '+' : ''}${quantityToAdd} units (New Total: ${updatedStock})`
     );
+  };
+
+  // Warehouses
+  const addWarehouse = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      addToast('error', 'Warehouse name cannot be empty.');
+      return;
+    }
+    if (warehouses.some((w) => w.toLowerCase() === trimmed.toLowerCase())) {
+      addToast('error', `Warehouse "${trimmed}" already exists.`);
+      return;
+    }
+    setWarehouses((prev) => [...prev, trimmed]);
+    addToast('success', `Warehouse "${trimmed}" added.`);
+  };
+
+  const deleteWarehouse = (name: string) => {
+    const hasProducts = products.some((p) => p.warehouse === name);
+    if (hasProducts) {
+      addToast('error', `Cannot delete "${name}" — it still has products assigned. Restock them to another warehouse first.`);
+      return;
+    }
+    setWarehouses((prev) => prev.filter((w) => w !== name));
+    addToast('warning', `Warehouse "${name}" removed.`);
+  };
+
+  // Reverses a single stock movement: restores the product's prior stock and
+  // removes the log entry, both locally and on the backend.
+  const cancelStockLog = (logId: string) => {
+    const log = stockLogs.find((l) => l.id === logId);
+    if (!log) return;
+
+    const targetProd = products.find(
+      (p) => p.id === log.productId || p.sku === log.sku || p.name === log.productName
+    );
+    if (!targetProd) {
+      addToast('error', `Could not find "${log.productName}" in the catalog to reverse this change.`);
+      return;
+    }
+
+    const reversedStock = Math.max(0, targetProd.stock - log.quantityChange);
+    const reversedStatus = reversedStock > 10 ? 'In Stock' : reversedStock > 0 ? 'Low Stock' : 'Out of Stock';
+
+    setProducts((prev) =>
+      prev.map((p) => (p.id === targetProd.id ? { ...p, stock: reversedStock, status: reversedStatus } : p))
+    );
+    setStockLogs((prev) => prev.filter((l) => l.id !== logId));
+
+    fetch('/api/inventory/adjust', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: targetProd.id,
+        quantityToAdd: -log.quantityChange,
+        reason: `Cancelled: ${log.reason}`,
+        performedBy: user.name + ' (' + user.role + ')',
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) addToast('error', 'Reversed locally, but the server did not confirm it.');
+      })
+      .catch(() => addToast('error', 'Reversed locally, but failed to reach the server.'));
+
+    addToast('success', `Cancelled stock change for "${targetProd.name}" (New Total: ${reversedStock})`);
   };
 
   const addCategory = (catData: Omit<Category, 'id'>) => {
@@ -949,11 +1054,15 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         stockLogs,
         securitySettings,
         activeSessions,
+        warehouses,
         addProduct,
         updateProduct,
         deleteProduct,
         bulkDeleteProducts,
         importProducts,
+        addWarehouse,
+        deleteWarehouse,
+        cancelStockLog,
         adjustProductStockByName,
         addCategory,
         updateCategory,

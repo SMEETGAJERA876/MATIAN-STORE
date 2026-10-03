@@ -9,6 +9,7 @@ export const StockAdjustmentModal: React.FC = () => {
     isStockAdjustmentModalOpen,
     setStockAdjustmentModalOpen,
     products,
+    warehouses,
     adjustProductStockByName,
     addToast,
     selectedProductId,
@@ -17,14 +18,17 @@ export const StockAdjustmentModal: React.FC = () => {
 
   const [selectedProdId, setSelectedProdId] = useState(products[0]?.id || '');
   const [quantity, setQuantity] = useState<number>(50);
-  const [warehouse, setWarehouse] = useState<string>('San Jose Logistics Hub');
+  const [warehouse, setWarehouse] = useState<string>(warehouses[0] || '');
   const [reason, setReason] = useState<string>('Purchase Order Restock');
 
   // Pre-select whichever product the user clicked "Add Stock" on; default to the first product otherwise
   useEffect(() => {
     if (!isStockAdjustmentModalOpen) return;
-    setSelectedProdId(selectedProductId || products[0]?.id || '');
+    const prod = products.find((p) => p.id === selectedProductId) || products[0];
+    setSelectedProdId(prod?.id || '');
+    setWarehouse(prod?.warehouse || warehouses[0] || '');
     setQuantity(50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStockAdjustmentModalOpen, selectedProductId, products]);
 
   const selectedProduct = products.find((p) => p.id === selectedProdId) || products[0];
@@ -152,9 +156,9 @@ export const StockAdjustmentModal: React.FC = () => {
             onChange={(e) => setWarehouse(e.target.value)}
             className="w-full px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
           >
-            <option>San Jose Logistics Hub</option>
-            <option>Austin Distribution Facility</option>
-            <option>Chicago Regional Hub</option>
+            {warehouses.map((w) => (
+              <option key={w}>{w}</option>
+            ))}
           </select>
         </div>
 
