@@ -248,7 +248,7 @@ export default function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-48 lg:w-60 max-w-xs rounded-full border border-slate-200 bg-slate-50 h-10 py-2 pl-9 pr-4 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:outline-hidden transition-all shadow-2xs"
               />
-              <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
 
               {/* Autocomplete Dropdown */}
               {searchQuery.trim() && (
@@ -456,7 +456,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-[#0645B5] focus:outline-hidden shadow-2xs"
                 />
-                <Search size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </form>
             </motion.div>
           )}

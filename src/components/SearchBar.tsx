@@ -11,7 +11,7 @@ export default function SearchBar({ search, setSearch }: SearchBarProps) {
   return (
     <div className="relative w-full max-w-xl mx-auto">
       <div className="relative flex items-center">
-        <Search size={18} className="absolute left-4 text-slate-400" />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           placeholder="Search products by name, fragrance, or category..."
@@ -22,7 +22,7 @@ export default function SearchBar({ search, setSearch }: SearchBarProps) {
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-3.5 text-slate-400 hover:text-slate-600"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
           >
             <X size={16} />
           </button>
