@@ -51,7 +51,7 @@ export default function CategoriesPage() {
       title: "Dishwash",
       description: "Cuts through grease effortlessly. Tough on oil, gentle on hands.",
       count: "6 Products",
-      image: "/images/products/dishwash.webp",
+      image: "/images/products/dishwash-liquid-500ml-front.webp",
       bgGradient: "from-[#ECFDF5] via-[#F4FBF7] to-white",
       href: "/products?category=Dish Care",
     },

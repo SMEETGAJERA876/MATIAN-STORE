@@ -728,7 +728,7 @@ export default function ProductDetailsPage() {
                   id: 2,
                   name: "Matrin Dishwash Liquid 500ml",
                   price: "₹149",
-                  image: "/images/products/dishwash.webp",
+                  image: "/images/products/dishwash-liquid-500ml-front.webp",
                 },
                 {
                   id: 3,

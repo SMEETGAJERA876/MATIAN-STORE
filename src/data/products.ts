@@ -59,12 +59,12 @@ export const products: Product[] = [
     discountPercentage: 25,
     rating: 4.9,
     reviewCount: 98,
-    image: "/images/products/matrin-dishwash-front-real.webp",
+    image: "/images/products/dishwash-liquid-500ml-front.webp",
     galleryImages: [
-      "/images/products/matrin-dishwash-front-real.webp",
-      "/images/products/matrin-dishwash-lifestyle-real.webp",
-      "/images/products/matrin-dishwash-howto-real.webp",
-      "/images/products/dishwash.webp",
+      "/images/products/dishwash-liquid-500ml-front.webp",
+      "/images/products/dishwash-liquid-500ml-back.webp",
+      "/images/products/dishwash-liquid-1l-front.webp",
+      "/images/products/dishwash-liquid-1l-back.webp",
     ],
     description:
       "Dishwash Lemon effortlessly cuts through tough grease and burnt-on food. Enriched with real lemon extracts, it leaves utensils squeaky clean without drying your hands.",
