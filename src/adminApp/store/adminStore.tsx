@@ -583,11 +583,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const deleteProduct = (id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    fetch(`/api/products/${id}`, { method: 'DELETE' })
+      .then((res) => {
+        if (!res.ok) addToast('error', 'Deleted locally, but the server did not confirm the deletion.');
+      })
+      .catch(() => addToast('error', 'Deleted locally, but failed to reach the server.'));
     addToast('warning', 'Product deleted from catalog');
   };
 
   const bulkDeleteProducts = (ids: string[]) => {
     setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
+    Promise.all(ids.map((id) => fetch(`/api/products/${id}`, { method: 'DELETE' })))
+      .catch(() => addToast('error', 'Deleted locally, but failed to sync some deletions to the server.'));
     addToast('warning', `${ids.length} products deleted`);
   };
 

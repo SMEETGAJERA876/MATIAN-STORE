@@ -121,6 +121,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const isDemoCustomer = cleanEmail === "user@matrin.com" && pass === "User123!";
 
     if (isAdminAccount) {
+      try {
+        // Establishes a real server-verifiable session (a JWT cookie) for this
+        // mock admin login, since there is no Supabase session behind it.
+        // Admin-only API routes (product/category/coupon writes) check for
+        // this cookie — without it every admin mutation silently fails.
+        await fetch("/api/auth/admin-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: cleanEmail, password: pass }),
+        });
+      } catch (e) {
+        console.warn("Could not establish admin session cookie:", e);
+      }
+
       const adminUser: User = {
         id: "usr_admin_01",
         name: "MATRIN Administrator",
@@ -228,6 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async (redirectTo?: string) => {
     try {
       await supabase.auth.signOut();
+      await fetch("/api/auth/admin-session", { method: "DELETE" });
     } catch (e) {
       console.error("Logout error:", e);
     } finally {

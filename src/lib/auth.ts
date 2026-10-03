@@ -41,24 +41,35 @@ export function verifyToken(token: string): TokenPayload | null {
 // current access token into a plain "sb-access-token" cookie so same-origin
 // fetch() calls from the admin dashboard keep working without every call
 // site having to attach an Authorization header.
+function parseCookies(req: Request): Record<string, string> {
+  const cookieHeader = req.headers.get("cookie");
+  if (!cookieHeader) return {};
+  return Object.fromEntries(
+    cookieHeader.split("; ").map((c) => {
+      const [k, ...v] = c.split("=");
+      return [k, decodeURIComponent(v.join("="))];
+    })
+  );
+}
+
 export async function getAuthFromReq(req: Request): Promise<TokenPayload | null> {
+  // Fast path: the demo "Quick Admin Login" JWT session cookie (see
+  // /api/auth/admin-session). That login never creates a Supabase session,
+  // so without this check every admin-only write route would 403 it.
+  const cookies = parseCookies(req);
+  if (cookies[TOKEN_NAME]) {
+    const payload = verifyToken(cookies[TOKEN_NAME]);
+    if (payload) return payload;
+  }
+
   const baseEnv = resolveSupabaseEnv();
   if (!baseEnv.url) return null;
 
   let creds = extractCredentials(req);
 
   if (!creds.token) {
-    const cookieHeader = req.headers.get("cookie");
-    if (cookieHeader) {
-      const cookies = Object.fromEntries(
-        cookieHeader.split("; ").map((c) => {
-          const [k, ...v] = c.split("=");
-          return [k, decodeURIComponent(v.join("="))];
-        })
-      );
-      if (cookies["sb-access-token"]) {
-        creds = { token: cookies["sb-access-token"], apikey: null };
-      }
+    if (cookies["sb-access-token"]) {
+      creds = { token: cookies["sb-access-token"], apikey: null };
     }
   }
 
