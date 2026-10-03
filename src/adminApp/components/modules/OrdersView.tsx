@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ShoppingCart,
   FileText,
@@ -80,6 +80,12 @@ export const OrdersView: React.FC = () => {
     { id: 'unpaid', label: 'Unpaid', count: ordersData.filter(o => o.paymentStatus !== 'PAID').length },
   ];
 
+  const filteredOrders = useMemo(() => {
+    if (activeTab === 'unfulfilled') return ordersData.filter((o) => o.fulfillment !== 'FULFILLED');
+    if (activeTab === 'unpaid') return ordersData.filter((o) => o.paymentStatus !== 'PAID');
+    return ordersData;
+  }, [ordersData, activeTab]);
+
   const columns: Column<typeof ordersData[0]>[] = [
     {
       header: 'ORDER ID',
@@ -155,7 +161,7 @@ export const OrdersView: React.FC = () => {
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            setSelectedOrderId('ord-1');
+            setSelectedOrderId(row.id);
           }}
         >
           Print Invoice
@@ -198,14 +204,14 @@ export const OrdersView: React.FC = () => {
       {/* Main Orders DataTable (Matching Reference Image 2) */}
       <DataTable
         title="Orders Directory"
-        data={ordersData}
+        data={filteredOrders}
         columns={columns}
         searchKey="orderNumber"
         searchPlaceholder="Filter orders by customer, SKU, or order ID..."
         filterTabs={filterTabs}
         activeTab={activeTab}
         onTabChange={(t) => setActiveTab(t)}
-        onRowClick={() => setSelectedOrderId('ord-1')}
+        onRowClick={(row) => setSelectedOrderId(row.id)}
         exportFilename="matrin_orders_fulfillment"
       />
 
