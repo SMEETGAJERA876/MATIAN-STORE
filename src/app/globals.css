@@ -23,6 +23,9 @@
 
 @theme {
   --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Widen the site's shared max-w-7xl page container so content fills large
+     screens instead of leaving large unused gutters on both sides. */
+  --container-7xl: 100rem;
   --color-[#0B2545]: #102A5C;
   --color-[#1E40AF]: #0645B5;
   --color-[#F8FAFC]: #F5FAFF;
