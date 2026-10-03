@@ -100,7 +100,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#EDF5FD] via-[#F6FAFF] to-[#E5F0FC] flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-[#EDF5FD] via-[#F6FAFF] to-[#E5F0FC] flex flex-col py-8 px-4 sm:px-6 lg:px-8 font-sans">
       
       {/* Centered Auth Card Container */}
       <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-blue-900/10 border border-slate-100 grid lg:grid-cols-12 min-h-[640px]">
@@ -179,7 +179,7 @@ export default function LoginScreen() {
         </div>
 
         {/* Right Column: Authentication Card (7 cols on Desktop) */}
-        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between bg-white">
+        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col bg-white">
           
           {/* Top Bar: Back to Home Link */}
           <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Form Content Area */}
-          <div className="my-auto max-w-md w-full mx-auto py-4">
+          <div className="max-w-md w-full mx-auto py-4 mt-6 lg:mt-8">
             
             {/* Title Section */}
             <div className="text-center space-y-1.5 mb-6">
@@ -491,7 +491,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Bottom Security Footer */}
-          <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
+          <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
             <div className="flex items-center gap-2 rounded-xl p-2">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
                 <Shield size={14} className="text-[#0645B5]" />
