@@ -42,7 +42,7 @@ export const initialUsers: MemoryUser[] = [
 ];
 
 export const initialCategories = [
-  { id: "cat_1", name: "Laundry Care", slug: "laundry-care", description: "Detergents & Fabric Softeners", iconName: "Shirt", productCount: 4, isActive: true, status: "Active" as const },
+  { id: "cat_1", name: "Laundry Care", slug: "laundry-care", description: "Detergents & Fabric Softeners", iconName: "Shirt", productCount: 1, isActive: true, status: "Active" as const },
   { id: "cat_2", name: "Dish Care", slug: "dish-care", description: "Dishwash Gels & Paste", iconName: "Sparkles", productCount: 2, isActive: true, status: "Active" as const },
   { id: "cat_3", name: "Floor Care", slug: "floor-care", description: "Disinfectant Floor Cleaners", iconName: "Brush", productCount: 2, isActive: true, status: "Active" as const },
   { id: "cat_4", name: "Toilet Care", slug: "toilet-care", description: "Power Cleaner Gels", iconName: "Droplet", productCount: 2, isActive: true, status: "Active" as const },

@@ -32,7 +32,6 @@ export default function CategoriesPage() {
     { id: "toilet-cleaner", label: "Toilet Cleaner", icon: Bath },
     { id: "glass-cleaner", label: "Glass Cleaner", icon: SprayCan },
     { id: "kitchen-cleaner", label: "Kitchen Cleaner", icon: Sparkles },
-    { id: "fabric-softener", label: "Fabric Softener", icon: Droplet },
     { id: "combo-kits", label: "Combo & Kits", icon: Package },
   ];
 
@@ -90,15 +89,6 @@ export default function CategoriesPage() {
       image: "/images/products/dish-cleaner.webp",
       bgGradient: "from-[#FEF3C7] via-[#FFFBEB] to-white",
       href: "/products?category=Dish Care",
-    },
-    {
-      id: "fabric-softener",
-      title: "Fabric Softener",
-      description: "Makes clothes soft, fresh and fragrant for longer.",
-      count: "4 Products",
-      image: "/images/products/detergent.webp",
-      bgGradient: "from-[#FCE7F3] via-[#FDF2F8] to-white",
-      href: "/products?category=Laundry Care",
     },
     {
       id: "combo-kits",
