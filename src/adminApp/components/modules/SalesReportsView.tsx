@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TrendingUp, ShoppingBag, Layers, Award } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -23,6 +23,7 @@ interface ProductSalesRow {
 
 export const SalesReportsView: React.FC = () => {
   const { orders, products } = useAdminStore();
+  const [activeTab, setActiveTab] = useState('all');
 
   const validOrders = useMemo(
     () => orders.filter((o) => o.paymentStatus !== 'Failed' && o.shippingStatus !== 'Cancelled'),
@@ -71,6 +72,23 @@ export const SalesReportsView: React.FC = () => {
     });
     return Object.values(map).sort((a, b) => b.revenue - a.revenue);
   }, [validOrders, products]);
+
+  const filterTabs = useMemo(
+    () => [
+      { id: 'all', label: 'All', count: productSales.length },
+      ...categoryData.map((c) => ({
+        id: c.category,
+        label: c.category,
+        count: productSales.filter((p) => p.category === c.category).length,
+      })),
+    ],
+    [categoryData, productSales]
+  );
+
+  const filteredProductSales = useMemo(() => {
+    if (activeTab === 'all') return productSales;
+    return productSales.filter((p) => p.category === activeTab);
+  }, [productSales, activeTab]);
 
   const columns: Column<ProductSalesRow>[] = [
     {
@@ -175,11 +193,14 @@ export const SalesReportsView: React.FC = () => {
 
       <DataTable
         title="Top Selling Products"
-        data={productSales}
+        data={filteredProductSales}
         columns={columns}
         searchKey="name"
         searchPlaceholder="Search products..."
         exportFilename="matrin_sales_by_product"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );

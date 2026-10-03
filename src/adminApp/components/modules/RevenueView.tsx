@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -24,6 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export const RevenueView: React.FC = () => {
   const { orders } = useAdminStore();
+  const [activeTab, setActiveTab] = useState('all');
 
   const grossRevenue = useMemo(() => orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0), [orders]);
 
@@ -51,6 +52,19 @@ export const RevenueView: React.FC = () => {
     });
     return Object.entries(map).map(([status, value]) => ({ name: status, value }));
   }, [orders]);
+
+  const filterTabs = [
+    { id: 'all', label: 'All', count: orders.length },
+    { id: 'Paid', label: 'Paid', count: orders.filter((o) => o.paymentStatus === 'Paid').length },
+    { id: 'Pending', label: 'Pending', count: orders.filter((o) => o.paymentStatus === 'Pending').length },
+    { id: 'Refunded', label: 'Refunded', count: orders.filter((o) => o.paymentStatus === 'Refunded').length },
+    { id: 'Failed', label: 'Failed', count: orders.filter((o) => o.paymentStatus === 'Failed').length },
+  ];
+
+  const filteredOrders = useMemo(() => {
+    if (activeTab === 'all') return orders;
+    return orders.filter((o) => o.paymentStatus === activeTab);
+  }, [orders, activeTab]);
 
   const columns: Column<Order>[] = [
     {
@@ -171,11 +185,14 @@ export const RevenueView: React.FC = () => {
 
       <DataTable
         title="Transaction Ledger"
-        data={orders}
+        data={filteredOrders}
         columns={columns}
         searchKey="orderNumber"
         searchPlaceholder="Search order number or customer..."
         exportFilename="matrin_revenue_ledger"
+        filterTabs={filterTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );
