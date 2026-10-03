@@ -92,7 +92,7 @@ export const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     addToast('info', 'Logging out of MATRIN Enterprise session...');
-    await logout('/admin/login');
+    await logout('/login');
   };
 
   const renderNavGroup = (title: string, items: NavItem[]) => (

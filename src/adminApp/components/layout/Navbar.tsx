@@ -236,7 +236,7 @@ export const Navbar: React.FC = () => {
                 onClick={async () => {
                   setProfileOpen(false);
                   addToast('info', 'Logging out of MATRIN Enterprise session...');
-                  await logout('/admin/login');
+                  await logout('/login');
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors"
               >
