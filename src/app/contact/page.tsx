@@ -316,7 +316,7 @@ export default function ContactPage() {
                   <div>
                     <div className="text-xs font-extrabold text-[#102A5C]">Visit Us</div>
                     <div className="text-[11px] font-bold text-slate-700 mt-0.5">MATRIN INDUSTRIAL TECHNOLOGY, Madhav Industrial Estate, Ankleshwar, Jitali, Gujarat 393002</div>
-                    <a href="https://maps.google.com/?q=Madhav+Industrial+Estate+Ankleshwar+Jitali+Gujarat+393002" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold text-[#0645B5] hover:underline block mt-1">View on Google Maps</a>
+                    <a href="https://maps.app.goo.gl/sBgZc4paBFdS6C3EA" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold text-[#0645B5] hover:underline block mt-1">View on Google Maps</a>
                   </div>
                 </div>
               </div>
@@ -397,9 +397,9 @@ export default function ContactPage() {
           {/* TODO: Replace with your real Google Maps Embed URL or lat/long when available */}
           {!mapError ? (
             <iframe
-              title="Matrin House Office Location Map"
-              // Google Maps Embed URL for Matrin House placeholder address (Mumbai 400001)
-              src="https://maps.google.com/maps?q=Mumbai+Maharashtra+400001&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              title="Matrin Industrial Technology Office Location Map"
+              // Google Maps Embed URL for Matrin Industrial Technology (Ankleshwar, Gujarat)
+              src="https://maps.google.com/maps?q=21.6046217,73.0453795&t=&z=16&ie=UTF8&iwloc=&output=embed"
               className="absolute inset-0 h-full w-full border-0 rounded-3xl"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -412,13 +412,13 @@ export default function ContactPage() {
                 <MapPin size={24} className="text-emerald-400" />
               </div>
               <div>
-                <h4 className="text-lg font-extrabold">Matrin House Office Location</h4>
+                <h4 className="text-lg font-extrabold">Matrin Industrial Technology</h4>
                 <p className="text-xs text-blue-100 mt-1 max-w-md">
-                  Clean City, Mumbai, Maharashtra – 400001
+                  Madhav Industrial Estate, Ankleshwar, Jitali, Gujarat – 393002
                 </p>
               </div>
               <a
-                href="https://maps.google.com/?q=Mumbai+Maharashtra+400001"
+                href="https://maps.app.goo.gl/sBgZc4paBFdS6C3EA"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-bold text-[#0645B5] shadow-md hover:bg-slate-50 transition"
@@ -436,7 +436,7 @@ export default function ContactPage() {
                 <MapPin size={16} /> Our Office
               </div>
               <a
-                href="https://maps.google.com/?q=Mumbai+Maharashtra+400001"
+                href="https://maps.app.goo.gl/sBgZc4paBFdS6C3EA"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[10px] font-extrabold text-[#0645B5] hover:underline flex items-center gap-1"
@@ -446,8 +446,8 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <div className="text-sm font-extrabold text-[#102A5C]">Matrin House, Clean City</div>
-              <div className="text-xs text-slate-500 font-medium">Mumbai, Maharashtra – 400001</div>
+              <div className="text-sm font-extrabold text-[#102A5C]">MATRIN INDUSTRIAL TECHNOLOGY</div>
+              <div className="text-xs text-slate-500 font-medium">Madhav Industrial Estate, Ankleshwar, Jitali, Gujarat – 393002</div>
             </div>
 
             <div className="space-y-1.5 pt-1 text-xs font-semibold text-slate-700">
