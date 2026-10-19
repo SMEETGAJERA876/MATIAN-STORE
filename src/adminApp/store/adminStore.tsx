@@ -614,13 +614,25 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Support tickets (including Contact Us form messages) are polled so new
   // customer messages reach the Notifications Center without a page reload.
   const knownTicketIds = useRef<Set<string> | null>(null);
+  const ticketLoadErrorShown = useRef(false);
   useEffect(() => {
     let cancelled = false;
 
     async function syncSupportTickets() {
       try {
         const res = await fetch('/api/support-tickets');
-        if (!res.ok || cancelled) return;
+        if (cancelled) return;
+        if (!res.ok) {
+          if (res.status >= 500 && !ticketLoadErrorShown.current) {
+            ticketLoadErrorShown.current = true;
+            const data = await res.json().catch(() => null);
+            const toastId = 'toast-ticket-error-' + Date.now();
+            const message = `Could not load customer messages: ${data?.error || res.statusText}`;
+            setToasts((prev) => [...prev, { id: toastId, type: 'error', message }]);
+            setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== toastId)), 8000);
+          }
+          return;
+        }
         const apiTickets = await res.json();
         if (!Array.isArray(apiTickets) || cancelled) return;
 

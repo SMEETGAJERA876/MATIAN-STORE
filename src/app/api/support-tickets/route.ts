@@ -1,7 +1,5 @@
-import { connectToDatabase } from "@/lib/db";
-import { SupportTicketModel } from "@/models/SupportTicket";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import { listSupportTickets, createSupportTicket } from "@/lib/supportTicketsStore";
 
 // Admin-only: these records hold customer PII (email, phone, message), unlike
 // the public product/review endpoints.
@@ -11,13 +9,13 @@ export async function GET(req: Request) {
     return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
-  const db = await connectToDatabase();
-  if (db) {
-    const tickets = await SupportTicketModel.find().sort({ createdAt: -1 });
-    return jsonResponse(tickets);
+  try {
+    return jsonResponse(await listSupportTickets());
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error("Failed to load support tickets:", error.message);
+    return jsonResponse({ error: error.message || "Failed to load support tickets" }, 500);
   }
-
-  return jsonResponse(inMemoryStore.supportTickets);
 }
 
 // Public: the storefront Contact Us form submits here without being logged in.
@@ -47,17 +45,12 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    const db = await connectToDatabase();
-    if (db) {
-      const created = await SupportTicketModel.create(ticketData);
-      return jsonResponse({ success: true, ticket: created }, 201);
-    }
-
-    inMemoryStore.supportTickets.unshift(ticketData as unknown as (typeof inMemoryStore.supportTickets)[0]);
-    return jsonResponse({ success: true, ticket: ticketData }, 201);
+    const created = await createSupportTicket(ticketData);
+    return jsonResponse({ success: true, ticket: created }, 201);
   } catch (err: unknown) {
     const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to submit message" }, 500);
+    console.error("Failed to save contact message:", error.message);
+    return jsonResponse({ error: "Could not send your message right now. Please email us at carematrin@gmail.com." }, 500);
   }
 }
 
