@@ -190,9 +190,16 @@ export interface NotificationItem {
   title: string;
   description: string;
   timestamp: string;
-  type: 'order' | 'inventory' | 'review' | 'system' | 'security';
+  type: 'order' | 'inventory' | 'review' | 'system' | 'security' | 'message';
   read: boolean;
   priority: 'high' | 'medium' | 'normal';
+  // Set on 'message' notifications, which come from the storefront Contact Us form
+  ticketId?: string;
+  senderName?: string;
+  senderEmail?: string;
+  senderPhone?: string;
+  subject?: string;
+  fullMessage?: string;
 }
 
 export interface UserProfile {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import {
   ModuleType,
   Product,
@@ -367,6 +367,45 @@ const initialEmployees: Employee[] = [
 // submit through the storefront Contact Us form) via the sync effect below.
 const initialSupportTickets: SupportTicket[] = [];
 
+const mapApiTicket = (t: any): SupportTicket => ({
+  id: t.id,
+  ticketNumber: t.ticketNumber || `#TICK-${t.id}`,
+  subject: t.subject || 'General Inquiry',
+  customerName: t.customerName || 'Customer',
+  customerEmail: t.customerEmail || '',
+  customerPhone: t.customerPhone || undefined,
+  message: t.message || '',
+  priority: t.priority || 'Medium',
+  status: t.status || 'Open',
+  category: t.category || 'General',
+  createdAt: t.createdAt?.slice(0, 16).replace('T', ' ') || new Date().toISOString().slice(0, 16).replace('T', ' '),
+});
+
+// Contact-form messages show up in the Notifications Center. Their read /
+// dismissed state is kept per admin browser, since the ticket itself already
+// tracks its own workflow status.
+const MESSAGE_NOTIFICATION_PREFIX = 'msg-';
+const READ_MESSAGES_KEY = 'matrin_read_message_ids';
+const DISMISSED_MESSAGES_KEY = 'matrin_dismissed_message_ids';
+const TICKET_POLL_INTERVAL_MS = 30000;
+
+const loadStoredIds = (key: string): string[] => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveStoredIds = (key: string, ids: string[]) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(ids));
+  } catch {
+    // Storage unavailable (private mode etc.) - state just won't persist
+  }
+};
+
 const initialNotifications: NotificationItem[] = [
   { id: 'n-1', title: 'Low Stock Alert', description: 'MATRIN Eco-Clean Refill Bundle has dropped to 3 units.', timestamp: '10 minutes ago', type: 'inventory', read: false, priority: 'high' },
 ];
@@ -431,7 +470,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(initialSupportTickets);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
+  const [systemNotifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
+  const [readMessageIds, setReadMessageIds] = useState<string[]>(() => loadStoredIds(READ_MESSAGES_KEY));
+  const [dismissedMessageIds, setDismissedMessageIds] = useState<string[]>(() => loadStoredIds(DISMISSED_MESSAGES_KEY));
   const [stockLogs, setStockLogs] = useState<StockMovementLog[]>(initialStockLogs);
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(initialSecuritySettings);
   const [activeSessions, setActiveSessions] = useState<SecuritySession[]>(initialActiveSessions);
@@ -468,11 +509,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     async function syncBackendData() {
       try {
         const apiBase = '/api';
-        const [resProd, resOrd, resCust, resTickets] = await Promise.all([
+        const [resProd, resOrd, resCust] = await Promise.all([
           fetch(`${apiBase}/products`),
           fetch(`${apiBase}/orders`),
           fetch(`${apiBase}/customers`),
-          fetch(`${apiBase}/support-tickets`),
         ]);
 
         if (resProd.ok) {
@@ -563,26 +603,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             );
           }
         }
-        if (resTickets.ok) {
-          const apiTickets = await resTickets.json();
-          if (Array.isArray(apiTickets)) {
-            setSupportTickets(
-              apiTickets.map((t: any) => ({
-                id: t.id,
-                ticketNumber: t.ticketNumber || `#TICK-${t.id}`,
-                subject: t.subject || 'General Inquiry',
-                customerName: t.customerName || 'Customer',
-                customerEmail: t.customerEmail || '',
-                customerPhone: t.customerPhone || undefined,
-                message: t.message || '',
-                priority: t.priority || 'Medium',
-                status: t.status || 'Open',
-                category: t.category || 'General',
-                createdAt: t.createdAt?.slice(0, 16).replace('T', ' ') || new Date().toISOString().slice(0, 16).replace('T', ' '),
-              }))
-            );
-          }
-        }
       } catch (err) {
         console.log('Using local fallback state for Admin Panel');
       }
@@ -590,6 +610,72 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     syncBackendData();
   }, []);
+
+  // Support tickets (including Contact Us form messages) are polled so new
+  // customer messages reach the Notifications Center without a page reload.
+  const knownTicketIds = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncSupportTickets() {
+      try {
+        const res = await fetch('/api/support-tickets');
+        if (!res.ok || cancelled) return;
+        const apiTickets = await res.json();
+        if (!Array.isArray(apiTickets) || cancelled) return;
+
+        const tickets = apiTickets.map(mapApiTicket);
+        const previous = knownTicketIds.current;
+        if (previous) {
+          const fresh = tickets.filter((t) => !previous.has(t.id));
+          if (fresh.length > 0) {
+            const toastId = 'toast-msg-' + Date.now();
+            const message =
+              fresh.length === 1
+                ? `New message from ${fresh[0].customerName}: "${fresh[0].subject}"`
+                : `${fresh.length} new customer messages received`;
+            setToasts((prev) => [...prev, { id: toastId, type: 'info', message }]);
+            setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== toastId)), 4000);
+          }
+        }
+        knownTicketIds.current = new Set(tickets.map((t) => t.id));
+        setSupportTickets(tickets);
+      } catch {
+        // Offline / fallback mode - keep current tickets
+      }
+    }
+
+    syncSupportTickets();
+    const interval = setInterval(syncSupportTickets, TICKET_POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => saveStoredIds(READ_MESSAGES_KEY, readMessageIds), [readMessageIds]);
+  useEffect(() => saveStoredIds(DISMISSED_MESSAGES_KEY, dismissedMessageIds), [dismissedMessageIds]);
+
+  const notifications = useMemo<NotificationItem[]>(() => {
+    const messageNotifications = supportTickets
+      .filter((t) => !dismissedMessageIds.includes(t.id))
+      .map<NotificationItem>((t) => ({
+        id: MESSAGE_NOTIFICATION_PREFIX + t.id,
+        title: `New message: ${t.subject}`,
+        description: `${t.customerName} (${t.customerEmail}) - ${t.message.length > 90 ? t.message.slice(0, 90) + '...' : t.message}`,
+        timestamp: t.createdAt,
+        type: 'message',
+        read: readMessageIds.includes(t.id),
+        priority: t.priority === 'Urgent' || t.priority === 'High' ? 'high' : 'medium',
+        ticketId: t.id,
+        senderName: t.customerName,
+        senderEmail: t.customerEmail,
+        senderPhone: t.customerPhone,
+        subject: t.subject,
+        fullMessage: t.message,
+      }));
+    return [...messageNotifications, ...systemNotifications];
+  }, [supportTickets, readMessageIds, dismissedMessageIds, systemNotifications]);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
   const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -909,11 +995,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const markNotificationRead = (id: string) => {
+    if (id.startsWith(MESSAGE_NOTIFICATION_PREFIX)) {
+      const ticketId = id.slice(MESSAGE_NOTIFICATION_PREFIX.length);
+      setReadMessageIds((prev) => (prev.includes(ticketId) ? prev : [...prev, ticketId]));
+      return;
+    }
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
   const clearNotifications = () => {
     setNotifications([]);
+    setDismissedMessageIds((prev) => Array.from(new Set([...prev, ...supportTickets.map((t) => t.id)])));
     addToast('info', 'All notifications cleared');
   };
 

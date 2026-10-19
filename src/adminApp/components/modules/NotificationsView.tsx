@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Package, Star, ShoppingCart, Shield, Info, CheckCheck, Trash2 } from 'lucide-react';
+import { Bell, Package, Star, ShoppingCart, Shield, Info, CheckCheck, Trash2, Mail, Phone, Reply, LifeBuoy } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
@@ -12,6 +12,7 @@ const typeIcons: Record<NotificationItem['type'], React.ReactNode> = {
   review: <Star className="w-4 h-4" />,
   system: <Info className="w-4 h-4" />,
   security: <Shield className="w-4 h-4" />,
+  message: <Mail className="w-4 h-4" />,
 };
 
 const typeColors: Record<NotificationItem['type'], string> = {
@@ -20,14 +21,24 @@ const typeColors: Record<NotificationItem['type'], string> = {
   review: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40',
   system: 'bg-slate-100 text-slate-600 dark:bg-slate-800',
   security: 'bg-rose-50 text-rose-600 dark:bg-rose-950/40',
+  message: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40',
 };
 
 export const NotificationsView: React.FC = () => {
-  const { notifications, markNotificationRead, clearNotifications } = useAdminStore();
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const { notifications, markNotificationRead, clearNotifications, setActiveModule } = useAdminStore();
+  const [filter, setFilter] = useState<'all' | 'unread' | 'messages'>('all');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const filtered = notifications.filter((n) => (filter === 'unread' ? !n.read : true));
+  const filtered = notifications.filter((n) =>
+    filter === 'unread' ? !n.read : filter === 'messages' ? n.type === 'message' : true
+  );
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const messageCount = notifications.filter((n) => n.type === 'message').length;
+
+  const handleClick = (n: NotificationItem) => {
+    if (!n.read) markNotificationRead(n.id);
+    if (n.type === 'message') setExpandedId((prev) => (prev === n.id ? null : n.id));
+  };
 
   return (
     <div className="space-y-6 pb-12">
@@ -37,7 +48,7 @@ export const NotificationsView: React.FC = () => {
             Notifications Center
           </h2>
           <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-            Real-time feed of order, inventory, review, and security alerts.
+            Real-time feed of customer messages, order, inventory, review, and security alerts.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -60,7 +71,7 @@ export const NotificationsView: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card">
           <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray">Total Notifications</div>
           <div className="text-3xl font-extrabold text-matrin-text dark:text-white mt-1 flex items-center gap-2">
@@ -71,11 +82,17 @@ export const NotificationsView: React.FC = () => {
           <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray">Unread</div>
           <div className="text-3xl font-extrabold text-rose-600 mt-1">{unreadCount}</div>
         </div>
+        <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card">
+          <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray">Customer Messages</div>
+          <div className="text-3xl font-extrabold text-emerald-600 mt-1 flex items-center gap-2">
+            <Mail className="w-6 h-6" /> {messageCount}
+          </div>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-3xl shadow-card overflow-hidden">
         <div className="p-4 border-b border-matrin-border dark:border-matrin-darkborder flex items-center gap-1">
-          {(['all', 'unread'] as const).map((f) => (
+          {(['all', 'unread', 'messages'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -98,7 +115,7 @@ export const NotificationsView: React.FC = () => {
               {filtered.map((n) => (
                 <div
                   key={n.id}
-                  onClick={() => !n.read && markNotificationRead(n.id)}
+                  onClick={() => handleClick(n)}
                   className={`flex items-start gap-4 p-4 rounded-2xl border transition-colors cursor-pointer ${
                     n.read
                       ? 'border-transparent hover:bg-matrin-bg/60 dark:hover:bg-slate-800/40'
@@ -116,6 +133,58 @@ export const NotificationsView: React.FC = () => {
                     </div>
                     <p className="text-xs text-matrin-gray dark:text-slate-400 mt-0.5">{n.description}</p>
                     <span className="text-[10px] text-matrin-gray mt-1 block">{n.timestamp}</span>
+
+                    {n.type === 'message' && expandedId === n.id && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder space-y-3 cursor-default"
+                      >
+                        <div className="grid gap-2 sm:grid-cols-2 text-xs">
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">From</div>
+                            <div className="font-semibold text-matrin-text dark:text-white">{n.senderName}</div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Email</div>
+                            <a href={`mailto:${n.senderEmail}`} className="font-semibold text-matrin-primary hover:underline break-all inline-flex items-center gap-1">
+                              <Mail className="w-3 h-3" /> {n.senderEmail}
+                            </a>
+                          </div>
+                          {n.senderPhone && (
+                            <div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Phone</div>
+                              <a href={`tel:${n.senderPhone}`} className="font-semibold text-matrin-primary hover:underline inline-flex items-center gap-1">
+                                <Phone className="w-3 h-3" /> {n.senderPhone}
+                              </a>
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray">Subject</div>
+                            <div className="font-semibold text-matrin-text dark:text-white">{n.subject}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-matrin-gray mb-1">Message</div>
+                          <p className="text-sm text-matrin-text dark:text-slate-200 whitespace-pre-wrap break-words">{n.fullMessage}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <a
+                            href={`mailto:${n.senderEmail}?subject=${encodeURIComponent('Re: ' + (n.subject || ''))}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-matrin-primary text-white text-xs font-semibold hover:opacity-90"
+                          >
+                            <Reply className="w-3.5 h-3.5" /> Reply via Email
+                          </a>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            icon={<LifeBuoy className="w-3.5 h-3.5" />}
+                            onClick={() => setActiveModule('support-tickets')}
+                          >
+                            Open in Support Tickets
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
