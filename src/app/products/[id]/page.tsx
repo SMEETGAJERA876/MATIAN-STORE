@@ -36,7 +36,13 @@ export default function ProductDetailsPage() {
   const router = useRouter();
   const id = params?.id;
 
-  const product = products.find((p) => p.id === Number(id)) || products[0];
+  const product =
+    products.find(
+      (p) =>
+        p.id === Number(id) ||
+        String(p.id) === String(id) ||
+        (p as unknown as { slug?: string }).slug === id
+    ) || products[0];
 
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();

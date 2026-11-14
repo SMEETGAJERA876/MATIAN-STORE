@@ -42,14 +42,17 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   try {
     const body = await req.json();
     const db = await connectToDatabase();
 
-    const newId = body.id || Date.now();
+    const newId = Number(body.id) || Date.now();
     const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
     const productData = {

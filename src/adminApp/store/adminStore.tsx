@@ -104,7 +104,7 @@ interface AdminContextType {
   warehouses: string[];
 
   // Mutators / Actions
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   bulkDeleteProducts: (ids: string[]) => void;
@@ -387,6 +387,15 @@ const initialActiveSessions: SecuritySession[] = [
 // product sync replaces it, so their "Cancel" action could never resolve.
 const initialStockLogs: StockMovementLog[] = [];
 
+const getLocalCustomProducts = (): any[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('matrin_custom_products');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
@@ -421,7 +430,47 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isAIChatOpen, setAIChatOpen] = useState<boolean>(false);
   const [isStockAdjustmentModalOpen, setStockAdjustmentModalOpen] = useState<boolean>(false);
 
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>(() => {
+    const custom = getLocalCustomProducts();
+    if (custom.length > 0) {
+      const mapped: Product[] = custom.map((p: any) => ({
+        id: String(p.id),
+        name: p.name,
+        sku: p.sku || `MTR-${p.id}`,
+        barcode: p.barcode || `890123456789${p.id}`,
+        category: p.category || 'General',
+        brand: p.brand || 'MATRIN Enterprise',
+        price: Number(p.price) || 299,
+        discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
+        gst: 18,
+        stock: Number(p.stock ?? p.stockCount) || 100,
+        reservedStock: 0,
+        warehouse: p.warehouse || 'Central Logistics Hub',
+        vendor: p.vendor || 'MATRIN Systems',
+        weight: p.weight || '1.2 kg',
+        dimensions: p.dimensions || '20x15x30 cm',
+        visibility: (p.visibility || 'Published') as 'Published',
+        status: (Number(p.stock ?? p.stockCount) > 10 ? 'In Stock' : Number(p.stock ?? p.stockCount) > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock',
+        rating: Number(p.rating) || 5.0,
+        reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
+        createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
+        updatedAt: p.updatedAt || new Date().toISOString().slice(0, 10),
+        image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
+        galleryImages: p.galleryImages || p.images || [p.image],
+        description: p.description || '',
+        features: p.features || [],
+        specifications: p.specifications || {},
+      }));
+      const merged: Product[] = [...mapped];
+      initialProducts.forEach((ip) => {
+        if (!merged.some((m) => m.id === ip.id || m.name.toLowerCase() === ip.name.toLowerCase())) {
+          merged.push(ip);
+        }
+      });
+      return merged;
+    }
+    return initialProducts;
+  });
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
@@ -478,37 +527,77 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (resProd.ok) {
           const apiProducts = await resProd.json();
           if (Array.isArray(apiProducts) && apiProducts.length > 0) {
-            setProducts(
-              apiProducts.map((p: any) => ({
+            const mappedApi: Product[] = apiProducts.map((p: any) => ({
+              id: String(p.id),
+              name: p.name,
+              sku: p.sku || `MTR-${p.id}`,
+              barcode: `890123456789${p.id}`,
+              category: p.category || 'General',
+              brand: 'MATRIN Enterprise',
+              price: Number(p.price) || 299,
+              gst: 18,
+              stock: Number(p.stock) || 100,
+              reservedStock: 2,
+              warehouse: 'Main Central Hub',
+              vendor: 'MATRIN Systems',
+              weight: '1.2 kg',
+              dimensions: '20x15x30 cm',
+              visibility: p.inStock ? 'Published' : 'Draft',
+              status:
+                Number(p.stock) > 10
+                  ? 'In Stock'
+                  : Number(p.stock) > 0
+                  ? 'Low Stock'
+                  : 'Out of Stock',
+              rating: p.rating || 4.8,
+              reviewsCount: p.reviewsCount || 10,
+              createdAt: p.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+              updatedAt: p.updatedAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+              image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
+              description: p.description || '',
+            }));
+
+            const custom = getLocalCustomProducts();
+            if (custom.length > 0) {
+              const mappedCustom: Product[] = custom.map((p: any) => ({
                 id: String(p.id),
                 name: p.name,
                 sku: p.sku || `MTR-${p.id}`,
-                barcode: `890123456789${p.id}`,
+                barcode: p.barcode || `890123456789${p.id}`,
                 category: p.category || 'General',
-                brand: 'MATRIN Enterprise',
+                brand: p.brand || 'MATRIN Enterprise',
                 price: Number(p.price) || 299,
+                discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
                 gst: 18,
-                stock: Number(p.stock) || 100,
-                reservedStock: 2,
-                warehouse: 'Main Central Hub',
-                vendor: 'MATRIN Systems',
-                weight: '1.2 kg',
-                dimensions: '20x15x30 cm',
-                visibility: p.inStock ? 'Published' : 'Draft',
-                status:
-                  Number(p.stock) > 10
-                    ? 'In Stock'
-                    : Number(p.stock) > 0
-                    ? 'Low Stock'
-                    : 'Out of Stock',
-                rating: p.rating || 4.8,
-                reviewsCount: p.reviewsCount || 10,
-                createdAt: p.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
-                updatedAt: p.updatedAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+                stock: Number(p.stock ?? p.stockCount) || 100,
+                reservedStock: 0,
+                warehouse: p.warehouse || 'Central Logistics Hub',
+                vendor: p.vendor || 'MATRIN Systems',
+                weight: p.weight || '1.2 kg',
+                dimensions: p.dimensions || '20x15x30 cm',
+                visibility: (p.visibility || 'Published') as 'Published',
+                status: (Number(p.stock ?? p.stockCount) > 10 ? 'In Stock' : Number(p.stock ?? p.stockCount) > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock',
+                rating: Number(p.rating) || 5.0,
+                reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
+                createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
+                updatedAt: p.updatedAt || new Date().toISOString().slice(0, 10),
                 image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
+                galleryImages: p.galleryImages || p.images || [p.image],
                 description: p.description || '',
-              }))
-            );
+                features: p.features || [],
+                specifications: p.specifications || {},
+              }));
+
+              const merged = [...mappedCustom];
+              mappedApi.forEach((apiP) => {
+                if (!merged.some((m) => m.id === apiP.id || m.name.toLowerCase() === apiP.name.toLowerCase())) {
+                  merged.push(apiP);
+                }
+              });
+              setProducts(merged);
+            } else {
+              setProducts(mappedApi);
+            }
           }
         }
 
@@ -606,14 +695,23 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const addProduct = (newProdData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addProduct = (newProdData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => {
+    const newId = newProdData.id || String(Date.now());
     const newProduct: Product = {
       ...newProdData,
-      id: 'prod-' + (products.length + 1),
+      id: newId,
       createdAt: new Date().toISOString().slice(0, 10),
       updatedAt: new Date().toISOString().slice(0, 10),
     };
-    setProducts((prev) => [newProduct, ...prev]);
+    setProducts((prev) => [newProduct, ...prev.filter((p) => p.id !== newProduct.id)]);
+    try {
+      const localCustom = getLocalCustomProducts();
+      const updated = [newProduct, ...localCustom.filter((p: any) => String(p.id) !== newId)];
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
     addToast('success', `Product "${newProduct.name}" created successfully!`);
   };
 
@@ -621,11 +719,29 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, ...updatedData, updatedAt: new Date().toISOString().slice(0, 10) } : p))
     );
+    try {
+      const localCustom = getLocalCustomProducts();
+      const updated = localCustom.map((p: any) =>
+        String(p.id) === id ? { ...p, ...updatedData, updatedAt: new Date().toISOString().slice(0, 10) } : p
+      );
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
     addToast('info', 'Product details updated');
   };
 
   const deleteProduct = (id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const localCustom = getLocalCustomProducts();
+      const updated = localCustom.filter((p: any) => String(p.id) !== id);
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
     fetch(`/api/products/${id}`, { method: 'DELETE' })
       .then((res) => {
         if (!res.ok) addToast('error', 'Deleted locally, but the server did not confirm the deletion.');
@@ -636,6 +752,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const bulkDeleteProducts = (ids: string[]) => {
     setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
+    try {
+      const localCustom = getLocalCustomProducts();
+      const updated = localCustom.filter((p: any) => !ids.includes(String(p.id)));
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
     Promise.all(ids.map((id) => fetch(`/api/products/${id}`, { method: 'DELETE' })))
       .catch(() => addToast('error', 'Deleted locally, but failed to sync some deletions to the server.'));
     addToast('warning', `${ids.length} products deleted`);

@@ -191,8 +191,62 @@ interface ProductStoreContextType {
 
 const ProductStoreContext = createContext<ProductStoreContextType | undefined>(undefined);
 
+const getStoredCustomProducts = (): Product[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("matrin_custom_products");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((p: any) => ({
+      id: Number(p.id) || Date.now(),
+      name: p.name,
+      category: (p.category || "General") as ProductCategory,
+      price: Number(p.price) || 0,
+      oldPrice: Number(p.oldPrice || p.originalPrice || p.discountPrice) || Math.round(Number(p.price) * 1.25),
+      discountPercentage:
+        p.oldPrice || p.originalPrice || p.discountPrice
+          ? Math.round((((Number(p.oldPrice || p.originalPrice || p.discountPrice)) - Number(p.price)) / Number(p.oldPrice || p.originalPrice || p.discountPrice)) * 100)
+          : 20,
+      rating: Number(p.rating) || 5.0,
+      reviewCount: Number(p.reviewCount ?? p.reviewsCount) || 12,
+      image: p.image || "/images/products/detergent.webp",
+      galleryImages: Array.isArray(p.galleryImages) && p.galleryImages.length > 0
+        ? p.galleryImages
+        : Array.isArray(p.images) && p.images.length > 0
+        ? p.images
+        : [p.image || "/images/products/detergent.webp"],
+      description: p.description || "",
+      features: Array.isArray(p.features) ? p.features : [],
+      specifications: p.specifications || {},
+      inStock: p.inStock !== false && (p.stockCount ?? p.stock ?? 1) > 0,
+      stockCount: Number(p.stockCount ?? p.stock) || 50,
+      isFeatured: true,
+      isBestSeller: p.isBestSeller ?? p.badge === "Bestseller",
+      isNewArrival: p.isNewArrival ?? p.badge === "New",
+      tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : ["Cleaning", p.category || "General"],
+    }));
+  } catch {
+    return [];
+  }
+};
+
+function mergeWithCustom(baseProducts: Product[], customProducts: Product[]): Product[] {
+  if (!customProducts.length) return baseProducts;
+  const merged = [...customProducts];
+  baseProducts.forEach((bp) => {
+    if (!merged.some((m) => m.id === bp.id || m.name.toLowerCase() === bp.name.toLowerCase())) {
+      merged.push(bp);
+    }
+  });
+  return merged;
+}
+
 export function ProductStoreProvider({ children }: { children: React.ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [products, setProducts] = useState<Product[]>(() => {
+    const custom = getStoredCustomProducts();
+    return mergeWithCustom(defaultProducts, custom);
+  });
   const [categories, setCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES);
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [orders, setOrders] = useState<OrderInvoice[]>([]);
@@ -251,6 +305,7 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
   // Fetch storefront data from APIs on load
   const refreshStoreData = async () => {
     try {
+      const storedCustom = getStoredCustomProducts();
       const results = await Promise.allSettled([
         fetch("/api/products"),
         fetch("/api/categories"),
@@ -263,30 +318,33 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
       if (resProd.status === "fulfilled" && resProd.value.ok) {
         const prodData = await resProd.value.json();
         if (Array.isArray(prodData) && prodData.length > 0) {
-          setProducts(
-            prodData.map((p) => ({
-              id: p.id,
-              name: p.name,
-              category: p.category as ProductCategory,
-              price: p.price,
-              oldPrice: p.originalPrice,
-              discountPercentage: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0,
-              rating: p.rating || 4.8,
-              reviewCount: p.reviewsCount || 10,
-              image: p.image,
-              galleryImages: p.images || [p.image],
-              description: p.description,
-              features: p.features || [],
-              specifications: p.specifications || {},
-              inStock: p.inStock,
-              stockCount: p.stock,
-              isFeatured: true,
-              isBestSeller: p.badge === "Bestseller",
-              isNewArrival: p.badge === "New",
-              tags: ["Cleaning", p.category],
-            }))
-          );
+          const apiMapped: Product[] = prodData.map((p) => ({
+            id: Number(p.id) || p.id,
+            name: p.name,
+            category: p.category as ProductCategory,
+            price: Number(p.price),
+            oldPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+            discountPercentage: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0,
+            rating: p.rating || 4.8,
+            reviewCount: p.reviewsCount || 10,
+            image: p.image,
+            galleryImages: p.images || [p.image],
+            description: p.description,
+            features: p.features || [],
+            specifications: p.specifications || {},
+            inStock: p.inStock,
+            stockCount: p.stock,
+            isFeatured: true,
+            isBestSeller: p.badge === "Bestseller",
+            isNewArrival: p.badge === "New",
+            tags: ["Cleaning", p.category],
+          }));
+          setProducts(mergeWithCustom(apiMapped, storedCustom));
+        } else {
+          setProducts(mergeWithCustom(defaultProducts, storedCustom));
         }
+      } else {
+        setProducts(mergeWithCustom(defaultProducts, storedCustom));
       }
 
       if (resCat.status === "fulfilled" && resCat.value.ok) {
@@ -305,32 +363,60 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
       }
     } catch (err) {
       console.warn("Using offline catalog fallback:", err);
+      const storedCustom = getStoredCustomProducts();
+      setProducts(mergeWithCustom(defaultProducts, storedCustom));
     }
   };
 
   useEffect(() => {
     refreshStoreData();
+
+    const handleSync = () => {
+      refreshStoreData();
+    };
+
+    window.addEventListener("matrin_products_updated", handleSync);
+    window.addEventListener("storage", handleSync);
+
+    return () => {
+      window.removeEventListener("matrin_products_updated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
   }, []);
 
   // Products CRUD
   const addProduct = async (prod: Omit<Product, "id">) => {
+    const newId = Date.now();
+    const newProduct: Product = { ...prod, id: newId };
     try {
+      if (typeof window !== "undefined") {
+        const custom = getStoredCustomProducts();
+        const updated = [newProduct, ...custom.filter((p) => p.id !== newId)];
+        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("matrin_products_updated"));
+      }
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(prod),
+        body: JSON.stringify({ ...prod, id: newId }),
       });
       if (res.ok) {
         toast.success("Product added successfully!");
-        refreshStoreData();
       }
     } catch (e) {
       console.error(e);
     }
+    refreshStoreData();
   };
 
   const updateProduct = async (id: number, prod: Partial<Product>) => {
     try {
+      if (typeof window !== "undefined") {
+        const custom = getStoredCustomProducts();
+        const updated = custom.map((p) => (p.id === id ? { ...p, ...prod } : p));
+        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("matrin_products_updated"));
+      }
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -338,23 +424,29 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
       });
       if (res.ok) {
         toast.success("Product updated!");
-        refreshStoreData();
       }
     } catch (e) {
       console.error(e);
     }
+    refreshStoreData();
   };
 
   const deleteProduct = async (id: number) => {
     try {
+      if (typeof window !== "undefined") {
+        const custom = getStoredCustomProducts();
+        const updated = custom.filter((p) => p.id !== id);
+        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("matrin_products_updated"));
+      }
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Product deleted");
-        refreshStoreData();
       }
     } catch (e) {
       console.error(e);
     }
+    refreshStoreData();
   };
 
   const toggleStock = (id: number) => {

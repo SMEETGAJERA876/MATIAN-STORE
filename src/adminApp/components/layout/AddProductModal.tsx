@@ -305,22 +305,30 @@ export const AddProductModal: React.FC = () => {
         console.log('Synced locally in Admin Store');
       }
 
+      window.dispatchEvent(new Event('matrin_products_updated'));
       addToast('success', `Product "${name.trim()}" updated successfully!`);
     } else {
+      const numericId = Date.now();
+      const idString = String(numericId);
+
       // 1. Add to Admin Store State
-      addProduct(newProdPayload);
+      addProduct({
+        ...newProdPayload,
+        id: idString,
+      });
 
       // 2. Post to Next.js API for backend sync
       try {
         await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(apiSyncBody),
+          body: JSON.stringify({ ...apiSyncBody, id: numericId }),
         });
       } catch (err) {
         console.log('Synced locally in Admin Store');
       }
 
+      window.dispatchEvent(new Event('matrin_products_updated'));
       addToast('success', `Product "${name.trim()}" published with ${allPhotos.length} photos!`);
     }
 

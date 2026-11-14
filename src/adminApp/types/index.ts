@@ -49,6 +49,9 @@ export interface Product {
   image: string;
   description?: string;
   features?: string[];
+  galleryImages?: string[];
+  specifications?: Record<string, string>;
+  badge?: string;
 }
 
 export interface Category {
