@@ -49,6 +49,8 @@ export type Product = {
   isNewArrival?: boolean;
   tags: string[];
   reviews?: Review[];
+  sizes?: string[];
+  selectedSize?: string;
 };
 
 export type CartItem = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductCategory } from "@/types/product";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Layers } from "lucide-react";
 
 const categories: ProductCategory[] = [
   "All",
@@ -12,11 +12,21 @@ const categories: ProductCategory[] = [
   "Multi-Surface",
 ];
 
+const sizeOptions = [
+  "All Sizes",
+  "500 ml",
+  "1 L",
+  "2 L",
+  "5 L",
+];
+
 export type SortOption = "featured" | "price-low" | "price-high" | "rating";
 
 type CategoryFilterProps = {
   selectedCategory: ProductCategory;
   onSelectCategory: (category: ProductCategory) => void;
+  selectedSize?: string;
+  onSelectSize?: (size: string) => void;
   sortBy: SortOption;
   onSelectSort: (sort: SortOption) => void;
 };
@@ -24,45 +34,76 @@ type CategoryFilterProps = {
 export default function CategoryFilter({
   selectedCategory,
   onSelectCategory,
+  selectedSize = "All Sizes",
+  onSelectSize,
   sortBy,
   onSelectSort,
 }: CategoryFilterProps) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8 border-b border-[#EFEAE4] pb-6">
-      {/* Category Pills */}
-      <div className="flex flex-wrap items-center gap-2">
-        {categories.map((category) => {
-          const isActive = selectedCategory === category;
-          return (
-            <button
-              key={category}
-              onClick={() => onSelectCategory(category)}
-              className={`rounded-full px-5 py-2 text-xs font-semibold tracking-wider transition-all duration-200 ${
-                isActive
-                  ? "bg-[#0A2E4E] text-[#FAF7F2] shadow-xs scale-102"
-                  : "bg-[#F5F1EB] text-slate-700 hover:bg-[#EFEAE4]"
-              }`}
-            >
-              {category}
-            </button>
-          );
-        })}
+    <div className="space-y-4 mb-8 border-b border-[#DCE8F5] pb-6">
+      {/* Category Pills & Sort Selector Row */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        {/* Category Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {categories.map((category) => {
+            const isActive = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                onClick={() => onSelectCategory(category)}
+                className={`rounded-full px-5 py-2 text-xs font-bold tracking-wider transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#0645B5] text-white shadow-xs scale-102"
+                    : "bg-[#EAF5FF] text-[#102A5C] hover:bg-[#DCE8F5] border border-[#DCE8F5]"
+                }`}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sort Selector */}
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <SlidersHorizontal size={15} className="text-[#0645B5]" />
+          <select
+            value={sortBy}
+            onChange={(e) => onSelectSort(e.target.value as SortOption)}
+            className="rounded-xl border border-[#DCE8F5] bg-white px-3.5 py-2 text-xs font-bold text-[#102A5C] focus:border-[#0645B5] focus:outline-hidden shadow-2xs"
+          >
+            <option value="featured">Sort by: Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+        </div>
       </div>
 
-      {/* Sort Selector */}
-      <div className="flex items-center gap-2 self-end md:self-auto">
-        <SlidersHorizontal size={15} className="text-slate-500" />
-        <select
-          value={sortBy}
-          onChange={(e) => onSelectSort(e.target.value as SortOption)}
-          className="rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] px-3.5 py-2 text-xs font-semibold text-slate-800 focus:border-[#0A2E4E] focus:outline-hidden"
-        >
-          <option value="featured">Sort by: Featured</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="rating">Highest Rated</option>
-        </select>
-      </div>
+      {/* Size / Variant Filter Row */}
+      {onSelectSize && (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-black text-[#102A5C] uppercase tracking-wider mr-2">
+            <Layers size={14} className="text-[#0645B5]" />
+            <span>Filter By Size:</span>
+          </div>
+          {sizeOptions.map((sz) => {
+            const isSizeActive = selectedSize === sz;
+            return (
+              <button
+                key={sz}
+                onClick={() => onSelectSize(sz)}
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  isSizeActive
+                    ? "bg-[#102A5C] text-white shadow-xs font-black ring-1 ring-[#102A5C]"
+                    : "bg-white text-[#5F6B7A] hover:text-[#102A5C] hover:bg-[#F0F5FA] border border-[#DCE8F5]"
+                }`}
+              >
+                {sz}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

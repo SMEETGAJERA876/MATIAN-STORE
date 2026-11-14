@@ -8,23 +8,35 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductImage from "./ProductImage";
+import { getProductSizes, getProductSizePrice, getVariantProduct } from "@/utils/productVariants";
 
 type QuickViewModalProps = {
   product: Product | null;
+  initialSize?: string;
   onClose: () => void;
 };
 
-export default function QuickViewModal({ product, onClose }: QuickViewModalProps) {
+export default function QuickViewModal({ product, initialSize, onClose }: QuickViewModalProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
 
+  const availableSizes = product ? getProductSizes(product) : ["1 L"];
+  const [selectedSize, setSelectedSize] = useState<string>(
+    initialSize || (product ? product.selectedSize || availableSizes[0] : "1 L")
+  );
+
   if (!product) return null;
 
   const isFav = isInWishlist(product.id);
+  const sizePricing = getProductSizePrice(product.price, selectedSize);
+  const currentPrice = sizePricing.price;
+  const currentOldPrice = sizePricing.oldPrice;
+  const currentDiscount = sizePricing.discount;
+  const variantProduct = getVariantProduct(product, selectedSize);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    addToCart(variantProduct, quantity);
     onClose();
   };
 
@@ -50,11 +62,9 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
           <div className="grid md:grid-cols-2">
             {/* Product Image View */}
             <div className="relative bg-[#F5F1EB] p-8 flex items-center justify-center">
-              {product.discountPercentage && (
-                <span className="absolute top-4 left-4 rounded-md bg-[#0A2E4E] px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
-                  {product.discountPercentage}% OFF
-                </span>
-              )}
+              <span className="absolute top-4 left-4 rounded-md bg-[#0645B5] px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
+                {currentDiscount || "NEW"}
+              </span>
 
               <ProductImage
                 src={product.image}
@@ -70,8 +80,8 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                   {product.category}
                 </span>
 
-                <h3 className="mt-1 font-sans text-2xl font-extrabold text-[#0A2E4E]">
-                  {product.name}
+                <h3 className="mt-1 font-sans text-2xl font-extrabold text-[#102A5C]">
+                  {product.name.replace(/\s*\([^)]*\)/g, "")}
                 </h3>
 
                 {/* Rating */}
@@ -90,14 +100,40 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                   </span>
                 </div>
 
+                {/* Size Variant Selector */}
+                <div className="mt-4">
+                  <label className="block text-xs font-bold text-[#102A5C] mb-1.5">
+                    Select Size: <span className="text-[#0645B5] font-black">{selectedSize}</span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {availableSizes.map((sz) => {
+                      const isSelected = selectedSize === sz;
+                      return (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => setSelectedSize(sz)}
+                          className={`py-2 text-xs font-bold rounded-xl border text-center transition ${
+                            isSelected
+                              ? "border-[#0645B5] bg-blue-50 text-[#0645B5] font-black ring-1 ring-[#0645B5]"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Price */}
                 <div className="mt-4 flex items-baseline gap-3">
-                  <span className="text-2xl font-extrabold text-[#0A2E4E]">
-                    ₹{product.price}
+                  <span className="text-2xl font-extrabold text-[#0645B5]">
+                    ₹{currentPrice}
                   </span>
-                  {product.oldPrice && (
+                  {currentOldPrice && (
                     <span className="text-sm font-medium text-slate-400 line-through">
-                      ₹{product.oldPrice}
+                      ₹{currentOldPrice}
                     </span>
                   )}
                 </div>
@@ -109,11 +145,13 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 {/* Specs Pill */}
                 <div className="mt-4 flex flex-wrap gap-2 text-xs">
                   <span className="rounded-lg bg-slate-200/80 px-3 py-1.5 font-bold text-slate-900 border border-slate-300">
-                    Volume: {product.specifications.volume}
+                    Volume: {selectedSize}
                   </span>
-                  <span className="rounded-lg bg-slate-200/80 px-3 py-1.5 font-bold text-slate-900 border border-slate-300">
-                    Scent: {product.specifications.scent}
-                  </span>
+                  {product.specifications.scent && (
+                    <span className="rounded-lg bg-slate-200/80 px-3 py-1.5 font-bold text-slate-900 border border-slate-300">
+                      Scent: {product.specifications.scent}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -154,7 +192,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 <div className="mt-4 flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0A2E4E] py-3 px-5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#13426B]"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3 px-5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#043694]"
                   >
                     <ShoppingBag size={15} /> Add to Cart
                   </button>
@@ -162,7 +200,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                   <Link
                     href={`/products/${product.id}`}
                     onClick={onClose}
-                    className="flex items-center justify-center rounded-xl border border-[#0A2E4E] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#0A2E4E] hover:bg-[#0A2E4E] hover:text-white"
+                    className="flex items-center justify-center rounded-xl border border-[#0645B5] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#0645B5] hover:bg-[#0645B5] hover:text-white"
                   >
                     Details
                   </Link>

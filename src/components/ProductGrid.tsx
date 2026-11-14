@@ -9,6 +9,7 @@ import { ProductCategory } from "@/types/product";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { getProductSizePrice } from "@/utils/productVariants";
 
 interface ProductGridProps {
   isTeaser?: boolean;
@@ -28,16 +29,21 @@ function ProductGridInner({
 
   const [search, setSearch] = useState(initialQuery);
   const [category, setCategory] = useState<ProductCategory>(initialCategory);
+  const [selectedSize, setSelectedSize] = useState<string>("All Sizes");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
 
   useEffect(() => {
     const q = searchParams ? searchParams.get("search") : null;
     const cat = searchParams ? searchParams.get("category") : null;
+    const sz = searchParams ? searchParams.get("size") : null;
     if (q !== null) {
       setSearch(q);
     }
     if (cat !== null) {
       setCategory(cat as ProductCategory);
+    }
+    if (sz !== null) {
+      setSelectedSize(sz);
     }
   }, [searchParams]);
 
@@ -69,12 +75,14 @@ function ProductGridInner({
         return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
-        if (sortBy === "price-low") return a.price - b.price;
-        if (sortBy === "price-high") return b.price - a.price;
+        const priceA = selectedSize !== "All Sizes" ? getProductSizePrice(a.price, selectedSize).price : a.price;
+        const priceB = selectedSize !== "All Sizes" ? getProductSizePrice(b.price, selectedSize).price : b.price;
+        if (sortBy === "price-low") return priceA - priceB;
+        if (sortBy === "price-high") return priceB - priceA;
         if (sortBy === "rating") return b.rating - a.rating;
         return (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0);
       });
-  }, [products, search, category, sortBy]);
+  }, [products, search, category, sortBy, selectedSize]);
 
   // Teaser mode displays a curated 4-product preview
   const displayedProducts = isTeaser
@@ -113,6 +121,8 @@ function ProductGridInner({
           <CategoryFilter
             selectedCategory={category}
             onSelectCategory={setCategory}
+            selectedSize={selectedSize}
+            onSelectSize={setSelectedSize}
             sortBy={sortBy}
             onSelectSort={setSortBy}
           />
@@ -124,7 +134,11 @@ function ProductGridInner({
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {displayedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                defaultSize={selectedSize !== "All Sizes" ? selectedSize : undefined}
+              />
             ))}
           </div>
 

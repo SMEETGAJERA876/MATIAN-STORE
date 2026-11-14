@@ -3,17 +3,38 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import Link from "next/link";
 import { Star, Heart, ShoppingBag, Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import QuickViewModal from "./QuickViewModal";
-
 import ProductImage from "./ProductImage";
+import { getProductSizes, getProductSizePrice, getVariantProduct } from "@/utils/productVariants";
 
-export default function ProductCard({ product }: { product: Product }) {
+interface ProductCardProps {
+  product: Product;
+  defaultSize?: string;
+}
+
+export default function ProductCard({ product, defaultSize }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
+  const availableSizes = getProductSizes(product);
+  const [selectedSize, setSelectedSize] = useState<string>(
+    defaultSize || product.selectedSize || availableSizes[0] || "1 L"
+  );
+
+  useEffect(() => {
+    if (defaultSize && availableSizes.includes(defaultSize)) {
+      setSelectedSize(defaultSize);
+    }
+  }, [defaultSize, availableSizes]);
+
   const isFav = isInWishlist(product.id);
+  const sizePricing = getProductSizePrice(product.price, selectedSize);
+  const currentPrice = sizePricing.price;
+  const currentOldPrice = sizePricing.oldPrice;
+  const currentDiscount = sizePricing.discount;
+  const variantProduct = getVariantProduct(product, selectedSize);
 
   return (
     <>
@@ -23,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* NEW / Discount Badge matching reference image */}
           <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
-            {product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW"}
+            {currentDiscount || (product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW")}
           </span>
 
           {/* Wishlist Button */}
@@ -52,7 +73,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="absolute inset-x-0 bottom-2 flex justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 px-3 z-10">
             <button
               onClick={() => setIsQuickViewOpen(true)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-white/95 backdrop-blur-xs py-1.5 text-[11px] font-extrabold text-[#0645B5] shadow-md hover:bg-white transition"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-white/95 backdrop-blur-xs py-1.5 text-[11px] font-extrabold text-[#0645B5] shadow-md hover:bg-white transition cursor-pointer"
             >
               <Eye size={14} /> Quick View
             </button>
@@ -64,7 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div>
             <Link href={`/products/${product.id}`} className="block">
               <h3 className="text-base font-bold text-[#0645B5] transition hover:text-[#043694] line-clamp-1 leading-snug">
-                {product.name}
+                {product.name.replace(/\s*\([^)]*\)/g, "")}
               </h3>
             </Link>
 
@@ -85,22 +106,53 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
 
-          {/* Price Callout & Action Pill Button matching Reference Image */}
+          {/* Size Variant Selector Buttons */}
+          <div className="pt-1">
+            <div className="flex items-center justify-between text-[10px] font-bold text-[#5F6B7A] mb-1.5">
+              <span className="uppercase tracking-wider">Size Variant:</span>
+              <span className="text-[#0645B5] font-black">{selectedSize}</span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5">
+              {availableSizes.map((sz) => {
+                const isSelected = selectedSize === sz;
+                return (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedSize(sz);
+                    }}
+                    className={`py-1 text-[10px] font-extrabold rounded-lg transition-all text-center border cursor-pointer ${
+                      isSelected
+                        ? "border-[#0645B5] bg-[#EAF5FF] text-[#0645B5] shadow-2xs font-black ring-1 ring-[#0645B5]"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300"
+                    }`}
+                  >
+                    {sz}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Callout & Action Pill Button */}
           <div className="pt-2 flex items-center justify-between border-t border-slate-100">
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-[#102A5C]">
-                ₹{product.price}
+                ₹{currentPrice}
               </span>
-              {product.oldPrice && (
+              {currentOldPrice && (
                 <span className="text-xs font-semibold text-slate-400 line-through">
-                  ₹{product.oldPrice}
+                  ₹{currentOldPrice}
                 </span>
               )}
             </div>
 
             <button
-              onClick={() => addToCart(product)}
-              className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] bg-white px-3.5 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white shadow-2xs"
+              onClick={() => addToCart(variantProduct)}
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] bg-white px-3.5 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white shadow-2xs cursor-pointer active:scale-95"
             >
               <span>Add to Cart</span>
               <ShoppingBag size={13} />
@@ -112,7 +164,8 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Quick View Modal */}
       {isQuickViewOpen && (
         <QuickViewModal
-          product={product}
+          product={variantProduct}
+          initialSize={selectedSize}
           onClose={() => setIsQuickViewOpen(false)}
         />
       )}
