@@ -36,11 +36,21 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const db = await connectToDatabase();
     if (db) {
       const query = !isNaN(numId) ? { $or: [{ id: numId }, { slug: id }] } : { slug: id };
-      const updated = await ProductModel.findOneAndUpdate(
+      let updated = await ProductModel.findOneAndUpdate(
         query,
         { $set: body },
         { new: true }
       );
+      if (!updated && !isNaN(numId)) {
+        updated = await ProductModel.create({
+          id: numId,
+          slug: body.slug || (body.name ? body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : `product-${numId}`),
+          image: body.image || "/images/products/detergent.webp",
+          images: body.images || [body.image || "/images/products/detergent.webp"],
+          category: body.category || "General",
+          ...body,
+        });
+      }
       if (updated) return jsonResponse({ success: true, product: updated });
     }
 
@@ -50,9 +60,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (index !== -1) {
       inMemoryStore.products[index] = { ...inMemoryStore.products[index], ...body };
       return jsonResponse({ success: true, product: inMemoryStore.products[index] });
+    } else {
+      const newProd = {
+        id: !isNaN(numId) ? numId : Date.now(),
+        slug: body.slug || (body.name ? body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : `product-${numId}`),
+        image: body.image || "/images/products/detergent.webp",
+        images: body.images || [body.image || "/images/products/detergent.webp"],
+        category: body.category || "General",
+        ...body,
+      };
+      inMemoryStore.products.unshift(newProd as any);
+      return jsonResponse({ success: true, product: newProd });
     }
-
-    return jsonResponse({ error: "Product not found" }, 404);
   } catch (err: unknown) {
     const error = err as Error;
     return jsonResponse({ error: error.message || "Failed to update product" }, 500);

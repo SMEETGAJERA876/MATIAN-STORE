@@ -180,16 +180,15 @@ export const AddProductModal: React.FC = () => {
     }
 
     if (newPhotos.length > 0) {
-      // First uploaded photo becomes primary cover if using default or empty
-      if (!primaryImage || primaryImage.includes('unsplash.com')) {
-        setPrimaryImage(newPhotos[0]);
-        if (newPhotos.length > 1) {
-          setGalleryImages((prev) => [...prev, ...newPhotos.slice(1)]);
-        }
+      const previousCover = primaryImage;
+      setPrimaryImage(newPhotos[0]);
+      const additional = newPhotos.slice(1);
+      if (previousCover && !previousCover.includes('unsplash.com')) {
+        setGalleryImages((prev) => [previousCover, ...additional, ...prev]);
       } else {
-        setGalleryImages((prev) => [...prev, ...newPhotos]);
+        setGalleryImages((prev) => [...additional, ...prev]);
       }
-      addToast('success', `Uploaded ${newPhotos.length} JPEG/PNG photo(s) from PC!`);
+      addToast('success', `Uploaded ${newPhotos.length} photo(s)! Cover photo updated.`);
     }
 
     setIsProcessingFiles(false);
@@ -199,12 +198,13 @@ export const AddProductModal: React.FC = () => {
   // Add gallery photo URL link
   const handleAddUrlPhoto = () => {
     if (!urlInput.trim()) return;
-    if (!primaryImage || primaryImage.includes('unsplash.com')) {
-      setPrimaryImage(urlInput.trim());
-    } else {
-      setGalleryImages((prev) => [...prev, urlInput.trim()]);
+    const previousCover = primaryImage;
+    setPrimaryImage(urlInput.trim());
+    if (previousCover && !previousCover.includes('unsplash.com')) {
+      setGalleryImages((prev) => [previousCover, ...prev]);
     }
     setUrlInput('');
+    addToast('success', 'Cover photo updated!');
   };
 
   // Remove photo from gallery
@@ -563,6 +563,21 @@ export const AddProductModal: React.FC = () => {
                   <span className="absolute bottom-0 inset-x-0 bg-matrin-primary text-white text-[9px] font-black text-center py-0.5 uppercase tracking-tighter">
                     Cover
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (galleryImages.length > 0) {
+                        setPrimaryImage(galleryImages[0]);
+                        setGalleryImages((prev) => prev.slice(1));
+                      } else {
+                        setPrimaryImage('');
+                      }
+                    }}
+                    className="absolute top-1 right-1 p-1 bg-rose-600 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Remove or swap cover image"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </div>
               )}
 

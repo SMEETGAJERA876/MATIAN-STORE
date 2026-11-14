@@ -232,14 +232,56 @@ const getStoredCustomProducts = (): Product[] => {
 };
 
 function mergeWithCustom(baseProducts: Product[], customProducts: Product[]): Product[] {
-  if (!customProducts.length) return baseProducts;
-  const merged = [...customProducts];
-  baseProducts.forEach((bp) => {
-    if (!merged.some((m) => m.id === bp.id || m.name.toLowerCase() === bp.name.toLowerCase())) {
-      merged.push(bp);
+  let deletedIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const rawDeleted = localStorage.getItem("matrin_deleted_products");
+      if (rawDeleted) {
+        const parsed = JSON.parse(rawDeleted);
+        if (Array.isArray(parsed)) {
+          deletedIds = new Set(parsed.map((id) => String(id)));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // Filter out any explicitly deleted products
+  const activeBaseProducts = baseProducts.filter(
+    (bp) => !deletedIds.has(String(bp.id)) && !deletedIds.has(bp.name.toLowerCase().trim())
+  );
+
+  if (!customProducts.length) return activeBaseProducts;
+
+  const customById = new Map<number, Product>();
+  const customByName = new Map<string, Product>();
+
+  customProducts.forEach((cp) => {
+    if (!deletedIds.has(String(cp.id))) {
+      customById.set(cp.id, cp);
+      customByName.set(cp.name.toLowerCase().trim(), cp);
     }
   });
-  return merged;
+
+  const usedCustomIds = new Set<number>();
+
+  // Replace matched baseProducts in-place with the updated custom product (photo, price, title, etc.)
+  const result: Product[] = activeBaseProducts.map((bp) => {
+    const updated = customById.get(bp.id) || customByName.get(bp.name.toLowerCase().trim());
+    if (updated) {
+      usedCustomIds.add(updated.id);
+      return { ...bp, ...updated };
+    }
+    return bp;
+  });
+
+  // Any custom products that are brand new (not replacing an existing product) are prepended
+  const brandNew = customProducts.filter(
+    (cp) => !deletedIds.has(String(cp.id)) && !usedCustomIds.has(cp.id)
+  );
+
+  return [...brandNew, ...result];
 }
 
 export function ProductStoreProvider({ children }: { children: React.ReactNode }) {
@@ -413,8 +455,16 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
     try {
       if (typeof window !== "undefined") {
         const custom = getStoredCustomProducts();
-        const updated = custom.map((p) => (p.id === id ? { ...p, ...prod } : p));
-        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
+        const existingIndex = custom.findIndex((p) => p.id === id);
+        let updatedList: Product[];
+        if (existingIndex !== -1) {
+          updatedList = custom.map((p) => (p.id === id ? { ...p, ...prod } : p));
+        } else {
+          const currentProd = products.find((p) => p.id === id);
+          const full = { ...(currentProd || {}), ...prod, id } as Product;
+          updatedList = [full, ...custom];
+        }
+        localStorage.setItem("matrin_custom_products", JSON.stringify(updatedList));
         window.dispatchEvent(new Event("matrin_products_updated"));
       }
       const res = await fetch(`/api/products/${id}`, {
@@ -437,6 +487,14 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
         const custom = getStoredCustomProducts();
         const updated = custom.filter((p) => p.id !== id);
         localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
+
+        const rawDeleted = localStorage.getItem("matrin_deleted_products");
+        const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+        if (!deletedIds.includes(String(id))) {
+          deletedIds.push(String(id));
+          localStorage.setItem("matrin_deleted_products", JSON.stringify(deletedIds));
+        }
+
         window.dispatchEvent(new Event("matrin_products_updated"));
       }
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });

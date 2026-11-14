@@ -50,7 +50,7 @@ export interface Product {
   description?: string;
   features?: string[];
   galleryImages?: string[];
-  specifications?: Record<string, string>;
+  specifications?: Record<string, string | undefined>;
   badge?: string;
 }
 

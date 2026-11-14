@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { products as defaultProducts } from '@/data/products';
 import {
   ModuleType,
   Product,
@@ -173,154 +174,35 @@ interface AdminContextType {
   removeToast: (id: string) => void;
 }
 
-const initialProducts: Product[] = [
-  {
-    id: 'prod-1',
-    name: 'MATRIN X1 Robotic Vacuum & Mop',
-    sku: 'MTR-X1-ROBOT',
-    barcode: '8901234567891',
-    category: 'Floor Care',
-    brand: 'MATRIN Enterprise',
-    price: 899.00,
-    discountPrice: 799.00,
-    gst: 18,
-    stock: 14,
-    reservedStock: 2,
-    warehouse: 'San Jose Logistics Hub',
-    vendor: 'MATRIN Robotics Division',
-    weight: '4.2 kg',
-    dimensions: '35x35x9.8 cm',
-    visibility: 'Published',
-    status: 'In Stock',
-    rating: 4.9,
-    reviewsCount: 142,
-    createdAt: '2023-01-15',
-    updatedAt: '2023-10-20',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&auto=format&fit=crop&q=80',
-    description: 'Precision lidar navigation, 5000Pa suction power, auto-empty station, and intelligent ultrasonic carpet detection.',
-  },
-  {
-    id: 'prod-2',
-    name: 'MATRIN Eco-Clean Refill Bundle',
-    sku: 'MTR-ECO-99',
-    barcode: '8901234567892',
-    category: 'Eco-Series',
-    brand: 'MATRIN Pure',
-    price: 45.00,
-    gst: 12,
-    stock: 3,
-    reservedStock: 1,
-    warehouse: 'Austin Distribution Facility',
-    vendor: 'GreenChem Industries',
-    weight: '1.1 kg',
-    dimensions: '20x10x15 cm',
-    visibility: 'Published',
-    status: 'Low Stock',
-    rating: 4.8,
-    reviewsCount: 98,
-    createdAt: '2023-03-10',
-    updatedAt: '2023-10-24',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
-    description: '100% plant-based concentrate Pods. Makes 10 liters of non-toxic multi-surface cleaning formula.',
-  },
-  {
-    id: 'prod-3',
-    name: 'MATRIN Fabric Care Pro Sanitizer',
-    sku: 'MTR-FAB-88',
-    barcode: '8901234567893',
-    category: 'Fabric Care',
-    brand: 'MATRIN Care',
-    price: 219.00,
-    discountPrice: 189.00,
-    gst: 18,
-    stock: 342,
-    reservedStock: 15,
-    warehouse: 'San Jose Logistics Hub',
-    vendor: 'MATRIN Tech Ltd',
-    weight: '3.5 kg',
-    dimensions: '30x25x40 cm',
-    visibility: 'Published',
-    status: 'In Stock',
-    rating: 4.9,
-    reviewsCount: 342,
-    createdAt: '2023-02-01',
-    updatedAt: '2023-10-18',
-    image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=600&auto=format&fit=crop&q=80',
-    description: 'Dry steam technology eliminates 99.9% of bacteria and allergens from bedsheets, upholstery, and delicate garments.',
-  },
-  {
-    id: 'prod-4',
-    name: 'MATRIN Pro Dishwashing Hub',
-    sku: 'MTR-DISH-01',
-    barcode: '8901234567894',
-    category: 'Dishwashing',
-    brand: 'MATRIN Enterprise',
-    price: 349.00,
-    gst: 18,
-    stock: 128,
-    reservedStock: 8,
-    warehouse: 'Chicago Regional Hub',
-    vendor: 'MATRIN Home Appliance',
-    weight: '8.5 kg',
-    dimensions: '45x45x50 cm',
-    visibility: 'Published',
-    status: 'In Stock',
-    rating: 4.7,
-    reviewsCount: 88,
-    createdAt: '2023-04-12',
-    updatedAt: '2023-10-22',
-    image: 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
-    description: 'Countertop ultra-sonic dishwashing and UV sterilizing station with eco air drying mode.',
-  },
-  {
-    id: 'prod-5',
-    name: 'MATRIN Universal Surface Cleaner 5L',
-    sku: 'MTR-SURF-50',
-    barcode: '8901234567895',
-    category: 'Surface Cleaners',
-    brand: 'MATRIN Pure',
-    price: 68.00,
-    gst: 12,
-    stock: 215,
-    reservedStock: 10,
-    warehouse: 'Austin Distribution Facility',
-    vendor: 'MATRIN Chemicals',
-    weight: '5.2 kg',
-    dimensions: '25x18x35 cm',
-    visibility: 'Published',
-    status: 'In Stock',
-    rating: 4.6,
-    reviewsCount: 154,
-    createdAt: '2023-05-18',
-    updatedAt: '2023-10-25',
-    image: 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=600&auto=format&fit=crop&q=80',
-    description: 'Commercial grade streak-free formula suitable for marble, granite, stainless steel, and glass.',
-  },
-  {
-    id: 'prod-6',
-    name: 'MATRIN Pure Fragrance Diffuser',
-    sku: 'MTR-FRAG-12',
-    barcode: '8901234567896',
-    category: 'Fragrance',
-    brand: 'MATRIN Essence',
-    price: 129.00,
-    gst: 18,
-    stock: 54,
-    reservedStock: 4,
-    warehouse: 'San Jose Logistics Hub',
-    vendor: 'MATRIN Aroma Labs',
-    weight: '0.8 kg',
-    dimensions: '12x12x20 cm',
-    visibility: 'Published',
-    status: 'In Stock',
-    rating: 4.8,
-    reviewsCount: 62,
-    createdAt: '2023-06-05',
-    updatedAt: '2023-10-15',
-    image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop&q=80',
-    description: 'Cold-air nebulizing technology distributes essential oil micro-droplets without heat or water dilution.',
-  },
-];
+const initialProducts: Product[] = defaultProducts.map((p) => ({
+  id: String(p.id),
+  name: p.name,
+  sku: p.sku || `MTR-${p.category.substring(0, 4).toUpperCase()}-${p.id}`,
+  barcode: `890123456789${p.id}`,
+  category: p.category || 'General',
+  brand: 'MATRIN Enterprise',
+  price: Number(p.price) || 299,
+  discountPrice: p.oldPrice,
+  gst: 18,
+  stock: p.stockCount || 50,
+  reservedStock: 2,
+  warehouse: 'Central Logistics Hub',
+  vendor: 'MATRIN Systems',
+  weight: p.specifications?.volume || '1.2 kg',
+  dimensions: '20x15x30 cm',
+  visibility: p.inStock ? 'Published' : 'Draft',
+  status: (p.stockCount || 50) > 10 ? 'In Stock' : 'Low Stock',
+  rating: p.rating || 4.8,
+  reviewsCount: p.reviewCount || 10,
+  createdAt: '2026-01-01',
+  updatedAt: '2026-01-01',
+  image: p.image,
+  galleryImages: p.galleryImages || [p.image],
+  description: p.description || '',
+  features: p.features || [],
+  specifications: p.specifications || {},
+  badge: p.isBestSeller ? 'Bestseller' : p.isNewArrival ? 'New' : undefined,
+}));;
 
 const initialCategories: Category[] = [
   { id: 'cat-1', name: 'Fabric Care', image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=600&auto=format&fit=crop&q=80', parentCategory: '—', productCount: 342, revenue: 184200, status: 'Active', topLevel: true, subcategories: ['Steam Sanitizers', 'Garment Steamer', 'Detergent Sheets'] },
@@ -716,15 +598,44 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateProduct = (id: string, updatedData: Partial<Product>) => {
+    let fullUpdatedProd: Product | null = null;
+
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updatedData, updatedAt: new Date().toISOString().slice(0, 10) } : p))
+      prev.map((p) => {
+        if (p.id === id) {
+          fullUpdatedProd = {
+            ...p,
+            ...updatedData,
+            updatedAt: new Date().toISOString().slice(0, 10),
+          };
+          return fullUpdatedProd;
+        }
+        return p;
+      })
     );
+
     try {
       const localCustom = getLocalCustomProducts();
-      const updated = localCustom.map((p: any) =>
-        String(p.id) === id ? { ...p, ...updatedData, updatedAt: new Date().toISOString().slice(0, 10) } : p
-      );
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(id));
+
+      const currentProd = products.find((p) => String(p.id) === String(id));
+      const targetProd: Product = fullUpdatedProd || ({
+        ...(currentProd || {}),
+        ...updatedData,
+        id: String(id),
+        updatedAt: new Date().toISOString().slice(0, 10),
+      } as Product);
+
+      let updatedList: any[];
+      if (existingIndex !== -1) {
+        updatedList = localCustom.map((p: any) =>
+          String(p.id) === String(id) ? { ...p, ...targetProd } : p
+        );
+      } else {
+        updatedList = [targetProd, ...localCustom];
+      }
+
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
       window.dispatchEvent(new Event('matrin_products_updated'));
     } catch (e) {
       console.warn('LocalStorage error:', e);
@@ -736,8 +647,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProducts((prev) => prev.filter((p) => p.id !== id));
     try {
       const localCustom = getLocalCustomProducts();
-      const updated = localCustom.filter((p: any) => String(p.id) !== id);
+      const updated = localCustom.filter((p: any) => String(p.id) !== String(id));
       localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+
+      const rawDeleted = localStorage.getItem('matrin_deleted_products');
+      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+      if (!deletedIds.includes(String(id))) {
+        deletedIds.push(String(id));
+        localStorage.setItem('matrin_deleted_products', JSON.stringify(deletedIds));
+      }
+
       window.dispatchEvent(new Event('matrin_products_updated'));
     } catch (e) {
       console.warn('LocalStorage error:', e);
@@ -756,6 +675,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const localCustom = getLocalCustomProducts();
       const updated = localCustom.filter((p: any) => !ids.includes(String(p.id)));
       localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
+
+      const rawDeleted = localStorage.getItem('matrin_deleted_products');
+      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+      ids.forEach((id) => {
+        if (!deletedIds.includes(String(id))) deletedIds.push(String(id));
+      });
+      localStorage.setItem('matrin_deleted_products', JSON.stringify(deletedIds));
+
       window.dispatchEvent(new Event('matrin_products_updated'));
     } catch (e) {
       console.warn('LocalStorage error:', e);
