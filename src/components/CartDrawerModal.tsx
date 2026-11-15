@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
+import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import ProductImage from "./ProductImage";
 import { ShoppingBag, X, Plus, Minus, Trash2, ArrowRight, Truck, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -140,24 +140,45 @@ export default function CartDrawerModal() {
                         <h4 className="text-xs font-extrabold text-[#102A5C] truncate">{product.name}</h4>
                         <div className="text-xs font-extrabold text-[#0645B5] mt-0.5">₹{product.price * quantity}</div>
 
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50">
-                            <button
-                              onClick={() => updateQuantity(product.id, quantity - 1)}
-                              className="h-6 w-6 flex items-center justify-center text-slate-600 hover:text-slate-900 transition"
-                            >
-                              <Minus size={12} />
-                            </button>
-                            <span className="w-6 text-center text-xs font-bold text-slate-800">{quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(product.id, quantity + 1)}
-                              className="h-6 w-6 flex items-center justify-center text-slate-600 hover:text-slate-900 transition"
-                            >
-                              <Plus size={12} />
-                            </button>
-                          </div>
-                        </div>
+                        {/* Quantity Controls & Stock Warning */}
+                        {(() => {
+                          const availableStock = getProductAvailableStock(product);
+                          const isMaxReached = quantity >= availableStock;
+                          return (
+                            <div className="mt-2">
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50">
+                                  <button
+                                    type="button"
+                                    onClick={() => updateQuantity(product.id, quantity - 1)}
+                                    className="h-6 w-6 flex items-center justify-center text-slate-600 hover:text-slate-900 transition"
+                                  >
+                                    <Minus size={12} />
+                                  </button>
+                                  <span className="w-6 text-center text-xs font-bold text-slate-800">{quantity}</span>
+                                  <button
+                                    type="button"
+                                    disabled={isMaxReached}
+                                    onClick={() => updateQuantity(product.id, quantity + 1)}
+                                    className={`h-6 w-6 flex items-center justify-center transition ${
+                                      isMaxReached
+                                        ? "text-slate-300 cursor-not-allowed"
+                                        : "text-slate-600 hover:text-slate-900"
+                                    }`}
+                                    title={isMaxReached ? `Maximum available stock is ${availableStock}` : "Add one more"}
+                                  >
+                                    <Plus size={12} />
+                                  </button>
+                                </div>
+                                {isMaxReached && (
+                                  <span className="text-[10px] font-bold text-amber-600">
+                                    (Max {availableStock} in stock)
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Trash Remove Action */}

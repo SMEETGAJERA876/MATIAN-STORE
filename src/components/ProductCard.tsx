@@ -1,5 +1,5 @@
 import { Product } from "@/types/product";
-import { useCart } from "@/context/CartContext";
+import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import Link from "next/link";
 import { Star, Heart, ShoppingBag, Eye } from "lucide-react";
@@ -36,16 +36,35 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
   const currentDiscount = sizePricing.discount;
   const variantProduct = getVariantProduct(product, selectedSize);
 
+  const availableStock = getProductAvailableStock(product);
+  const isOutOfStock = availableStock <= 0 || product.inStock === false;
+  const isLowStock = availableStock > 0 && availableStock <= 10;
+
   return (
     <>
       <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-[#EAF0F8] p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-        {/* Product Image Box Container (Exact bg-[#F0F5FA] Light Blue Box from Reference Image) */}
+        {/* Product Image Box Container */}
         <div className="relative w-full rounded-2xl bg-[#F0F5FA] p-4 sm:p-5 flex items-center justify-center overflow-hidden aspect-square mb-3 shadow-2xs">
 
-          {/* NEW / Discount Badge matching reference image */}
-          <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
-            {currentDiscount || (product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW")}
-          </span>
+          {/* Badges */}
+          {isOutOfStock ? (
+            <span className="absolute top-2 left-2 z-10 rounded-md bg-rose-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
+              OUT OF STOCK
+            </span>
+          ) : isLowStock ? (
+            <div className="absolute top-2 left-2 z-10 flex flex-col gap-1 items-start">
+              <span className="rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
+                {currentDiscount || (product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW")}
+              </span>
+              <span className="rounded-md bg-amber-500 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs animate-pulse">
+                Only {availableStock} left
+              </span>
+            </div>
+          ) : (
+            <span className="absolute top-2 left-2 z-10 rounded-md bg-[#0645B5] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
+              {currentDiscount || (product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW")}
+            </span>
+          )}
 
           {/* Wishlist Button */}
           <button
@@ -89,20 +108,37 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
               </h3>
             </Link>
 
-            {/* Rating Stars & Count matching reference image */}
-            <div className="mt-1 flex items-center gap-1 text-amber-500 text-xs">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={13}
-                    className={i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "text-slate-200"}
-                  />
-                ))}
+            {/* Rating Stars & Count */}
+            <div className="mt-1 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1 text-amber-500">
+                <div className="flex text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={13}
+                      className={i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "text-slate-200"}
+                    />
+                  ))}
+                </div>
+                <span className="text-[11px] text-[#5F6B7A] font-medium">
+                  ({product.reviewCount})
+                </span>
               </div>
-              <span className="text-[11px] text-[#5F6B7A] font-medium">
-                ({product.reviewCount})
-              </span>
+
+              {/* Stock Indicator Line */}
+              {isOutOfStock ? (
+                <span className="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider">
+                  Out of Stock
+                </span>
+              ) : isLowStock ? (
+                <span className="text-[10px] font-extrabold text-amber-600">
+                  {availableStock} left
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold text-emerald-600">
+                  In Stock
+                </span>
+              )}
             </div>
           </div>
 
@@ -150,13 +186,24 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
               )}
             </div>
 
-            <button
-              onClick={() => addToCart(variantProduct)}
-              className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] bg-white px-3.5 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white shadow-2xs cursor-pointer active:scale-95"
-            >
-              <span>Add to Cart</span>
-              <ShoppingBag size={13} />
-            </button>
+            {isOutOfStock ? (
+              <button
+                type="button"
+                disabled
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-3.5 py-1.5 text-xs font-bold text-slate-400 cursor-not-allowed opacity-90"
+              >
+                <span>Out of Stock</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => addToCart(variantProduct)}
+                className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0645B5] bg-white px-3.5 py-1.5 text-xs font-bold text-[#0645B5] transition-all hover:bg-[#0645B5] hover:text-white shadow-2xs cursor-pointer active:scale-95"
+              >
+                <span>Add to Cart</span>
+                <ShoppingBag size={13} />
+              </button>
+            )}
           </div>
         </div>
       </div>

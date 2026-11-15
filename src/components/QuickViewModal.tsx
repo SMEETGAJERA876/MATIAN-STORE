@@ -1,11 +1,12 @@
 "use client";
 
 import { Product } from "@/types/product";
-import { useCart } from "@/context/CartContext";
+import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { X, Star, Heart, ShoppingBag, Check } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductImage from "./ProductImage";
 import { getProductSizes, getProductSizePrice, getVariantProduct } from "@/utils/productVariants";
@@ -28,6 +29,10 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
 
   if (!product) return null;
 
+  const availableStock = getProductAvailableStock(product);
+  const isOutOfStock = availableStock <= 0 || product.inStock === false;
+  const isLowStock = availableStock > 0 && availableStock <= 10;
+
   const isFav = isInWishlist(product.id);
   const sizePricing = getProductSizePrice(product.price, selectedSize);
   const currentPrice = sizePricing.price;
@@ -36,6 +41,10 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
   const variantProduct = getVariantProduct(product, selectedSize);
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      toast.error(`"${product.name}" is currently Out of Stock!`);
+      return;
+    }
     addToCart(variantProduct, quantity);
     onClose();
   };
@@ -95,9 +104,19 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
                   <span className="text-[11px] font-semibold text-slate-700">
                     ({product.reviewCount} reviews)
                   </span>
-                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 ml-auto">
-                    <Check size={12} /> In Stock
-                  </span>
+                  {isOutOfStock ? (
+                    <span className="text-[11px] font-extrabold text-rose-600 uppercase tracking-wider ml-auto">
+                      Out of Stock
+                    </span>
+                  ) : isLowStock ? (
+                    <span className="text-[11px] font-extrabold text-amber-600 ml-auto">
+                      Only {availableStock} left in stock!
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 ml-auto">
+                      <Check size={12} /> In Stock ({availableStock} available)
+                    </span>
+                  )}
                 </div>
 
                 {/* Size Variant Selector */}
@@ -160,17 +179,27 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
                 <div className="flex items-center gap-3">
                   <div className="flex items-center rounded-xl border border-[#EFEAE4] bg-[#F5F1EB] p-1">
                     <button
+                      type="button"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs"
+                      disabled={isOutOfStock || quantity <= 1}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       -
                     </button>
                     <span className="w-8 text-center font-bold text-slate-800 text-xs">
-                      {quantity}
+                      {isOutOfStock ? 0 : quantity}
                     </span>
                     <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs"
+                      type="button"
+                      onClick={() => {
+                        if (quantity < availableStock) {
+                          setQuantity(quantity + 1);
+                        } else {
+                          toast.error(`Only ${availableStock} bottle${availableStock === 1 ? "" : "s"} available in stock!`);
+                        }
+                      }}
+                      disabled={isOutOfStock || quantity >= availableStock}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       +
                     </button>
@@ -190,12 +219,23 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
                 </div>
 
                 <div className="mt-4 flex gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3 px-5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#043694]"
-                  >
-                    <ShoppingBag size={15} /> Add to Cart
-                  </button>
+                  {isOutOfStock ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-200 py-3 px-5 text-xs font-semibold uppercase tracking-wider text-slate-400 shadow-xs cursor-not-allowed"
+                    >
+                      Out of Stock
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleAddToCart}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3 px-5 text-xs font-semibold uppercase tracking-wider text-white shadow-xs hover:bg-[#043694] active:scale-95 transition"
+                    >
+                      <ShoppingBag size={15} /> Add to Cart
+                    </button>
+                  )}
 
                   <Link
                     href={`/products/${product.id}`}

@@ -43,6 +43,8 @@ export type Product = {
   specifications: ProductSpec;
   inStock: boolean;
   stockCount: number;
+  stock?: number;
+  baseProductId?: number;
   sku?: string;
   isFeatured?: boolean;
   isBestSeller?: boolean;

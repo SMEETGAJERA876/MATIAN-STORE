@@ -1,7 +1,7 @@
 "use client";
 
 import { useProductStore } from "@/context/ProductStoreContext";
-import { useCart } from "@/context/CartContext";
+import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
@@ -152,8 +152,13 @@ export default function ProductDetailsPage() {
   const baseName = product ? product.name.replace(/\s*\([^)]*\)/g, "").trim() : "Liquid Detergent";
   const currentTitle = `${baseName} (${selectedSize})`;
 
+  const availableStock = product ? getProductAvailableStock(product) : 0;
+  const isOutOfStock = availableStock <= 0 || (product && product.inStock === false);
+  const isLowStock = availableStock > 0 && availableStock <= 10;
+
   const customVariantProduct = product ? {
     ...product,
+    baseProductId: product.baseProductId || product.id,
     name: currentTitle,
     price: currentSizeInfo.price,
     oldPrice: currentSizeInfo.oldPrice,
@@ -178,13 +183,20 @@ export default function ProductDetailsPage() {
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) {
+      toast.error(`"${product.name}" is currently Out of Stock!`, { icon: "⚠️" });
+      return;
+    }
     addToCart(customVariantProduct, quantity);
     router.push("/cart");
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      toast.error(`"${product.name}" is currently Out of Stock!`, { icon: "⚠️" });
+      return;
+    }
     addToCart(customVariantProduct, quantity);
-    toast.success(`Added ${quantity}x ${currentTitle} to your cart!`, { icon: "🛒" });
   };
 
   const handlePrevImage = () => {
@@ -331,8 +343,8 @@ export default function ProductDetailsPage() {
                 {currentTitle}
               </h1>
 
-              {/* Rating & Sales count (Exact Match with Image 3) */}
-              <div className="mt-2 flex items-center gap-3 text-xs">
+              {/* Rating & Sales count & Stock Status */}
+              <div className="mt-2 flex items-center gap-3 text-xs flex-wrap">
                 <div className="flex items-center gap-1 text-amber-500 font-extrabold">
                   <Star size={14} className="fill-amber-400 text-amber-400" />
                   <span className="text-[#102A5C]">4.8</span>
@@ -340,6 +352,20 @@ export default function ProductDetailsPage() {
                 </div>
                 <span className="text-slate-300">|</span>
                 <span className="font-extrabold text-[#0645B5]">10K+ Sold</span>
+                <span className="text-slate-300">|</span>
+                {isOutOfStock ? (
+                  <span className="rounded-full bg-rose-100 text-rose-700 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider">
+                    Out of Stock
+                  </span>
+                ) : isLowStock ? (
+                  <span className="rounded-full bg-amber-100 text-amber-800 px-2.5 py-0.5 text-[11px] font-extrabold animate-pulse">
+                    Only {availableStock} left in stock!
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-[11px] font-bold">
+                    In Stock ({availableStock} available)
+                  </span>
+                )}
               </div>
 
               {/* Short Description */}
@@ -451,43 +477,97 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
 
+              {/* Stock Status Banner in Sidebar */}
+              {isOutOfStock ? (
+                <div className="rounded-2xl bg-rose-50 p-3 border border-rose-200 text-xs font-bold text-rose-700 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-rose-600 inline-block shrink-0"></span>
+                  <span>Currently Out of Stock. Admin is restocking soon!</span>
+                </div>
+              ) : isLowStock ? (
+                <div className="rounded-2xl bg-amber-50 p-3 border border-amber-200 text-xs font-bold text-amber-800 flex items-center justify-between">
+                  <span>Hurry! Only {availableStock} bottle{availableStock === 1 ? "" : "s"} left</span>
+                  <span className="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Limited Stock</span>
+                </div>
+              ) : null}
+
               {/* Quantity Stepper */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Quantity</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Quantity</label>
+                  {!isOutOfStock && (
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      Max: {availableStock} {availableStock === 1 ? "bottle" : "bottles"}
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1 w-full justify-between">
                   <button
+                    type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center"
+                    disabled={isOutOfStock || quantity <= 1}
+                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     -
                   </button>
-                  <span className="font-extrabold text-sm text-[#102A5C]">{quantity}</span>
+                  <span className="font-extrabold text-sm text-[#102A5C]">
+                    {isOutOfStock ? 0 : quantity}
+                  </span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center"
+                    type="button"
+                    onClick={() => {
+                      if (quantity < availableStock) {
+                        setQuantity(quantity + 1);
+                      } else {
+                        toast.error(`Only ${availableStock} bottle${availableStock === 1 ? "" : "s"} available in stock!`, { icon: "⚠️" });
+                      }
+                    }}
+                    disabled={isOutOfStock || quantity >= availableStock}
+                    className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     +
                   </button>
                 </div>
               </div>
 
-              {/* Add to Cart Button (Solid Blue) */}
-              <button
-                onClick={handleAddToCart}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98"
-              >
-                <ShoppingBag size={16} />
-                <span>Add to Cart</span>
-              </button>
+              {/* Add to Cart Button */}
+              {isOutOfStock ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-200 py-3.5 text-xs font-bold text-slate-400 cursor-not-allowed shadow-none"
+                >
+                  <span>Out of Stock</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#1a3899] transition active:scale-98 cursor-pointer"
+                >
+                  <ShoppingBag size={16} />
+                  <span>Add to Cart</span>
+                </button>
+              )}
 
-              {/* Buy Now Button (Outlined Blue with Lightning) */}
-              <button
-                onClick={handleBuyNow}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[#0645B5] py-3 text-xs font-bold text-[#0645B5] hover:bg-blue-50 transition active:scale-98"
-              >
-                <Zap size={16} />
-                <span>Buy Now</span>
-              </button>
+              {/* Buy Now Button */}
+              {isOutOfStock ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs font-bold text-slate-400 cursor-not-allowed"
+                >
+                  <span>Sold Out</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-[#0645B5] py-3 text-xs font-bold text-[#0645B5] hover:bg-blue-50 transition active:scale-98 cursor-pointer"
+                >
+                  <Zap size={16} />
+                  <span>Buy Now</span>
+                </button>
+              )}
 
               {/* Wishlist Link */}
               <div className="text-center pt-1">

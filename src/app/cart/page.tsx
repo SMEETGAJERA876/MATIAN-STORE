@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
+import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import { useProductStore } from "@/context/ProductStoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { PaymentMethod, OrderInvoice, ShippingAddress } from "@/types/order";
@@ -216,6 +216,62 @@ export default function CartPage() {
       }).catch(() => {});
     } catch {
       // ignore backup error
+    }
+
+    // Immediately decrement product stock across all purchased items
+    try {
+      const rawCustom = localStorage.getItem("matrin_custom_products");
+      let customList: any[] = rawCustom ? JSON.parse(rawCustom) : [];
+
+      cart.forEach(({ product, quantity: purchasedQty }) => {
+        const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
+        const existingIdx = customList.findIndex(
+          (p: any) =>
+            String(p.id) === String(baseId) ||
+            p.name.toLowerCase().trim() === product.name.replace(/\s*\([^)]*\)/g, "").trim().toLowerCase()
+        );
+
+        const currentStock = getProductAvailableStock(product);
+        const remainingStock = Math.max(0, currentStock - purchasedQty);
+        const inStock = remainingStock > 0;
+        const status = remainingStock > 10 ? "In Stock" : remainingStock > 0 ? "Low Stock" : "Out of Stock";
+
+        if (existingIdx !== -1) {
+          customList[existingIdx] = {
+            ...customList[existingIdx],
+            stock: remainingStock,
+            stockCount: remainingStock,
+            inStock,
+            status,
+          };
+        } else {
+          customList.push({
+            ...product,
+            id: baseId,
+            stock: remainingStock,
+            stockCount: remainingStock,
+            inStock,
+            status,
+          });
+        }
+
+        // Also sync stock change to the backend inventory endpoint
+        fetch("/api/inventory/adjust", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: String(baseId),
+            quantityToAdd: -purchasedQty,
+            reason: `Order #${newInvoice.invoiceNumber} purchase`,
+            performedBy: "Storefront Checkout",
+          }),
+        }).catch(() => {});
+      });
+
+      localStorage.setItem("matrin_custom_products", JSON.stringify(customList));
+      window.dispatchEvent(new Event("matrin_products_updated"));
+    } catch (e) {
+      console.warn("Stock decrement error:", e);
     }
 
     setGeneratedInvoice(newInvoice);
@@ -554,23 +610,44 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex items-center justify-between w-full sm:w-auto gap-6 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-100">
-                        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
-                          <button
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-200 font-bold text-xs"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center font-bold text-[#102A5C] text-xs">
-                            {quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-200 font-bold text-xs"
-                          >
-                            +
-                          </button>
-                        </div>
+                        {(() => {
+                          const availableStock = getProductAvailableStock(product);
+                          const isMaxReached = quantity >= availableStock;
+                          return (
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(product.id, quantity - 1)}
+                                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-200 font-bold text-xs"
+                                >
+                                  -
+                                </button>
+                                <span className="w-8 text-center font-bold text-[#102A5C] text-xs">
+                                  {quantity}
+                                </span>
+                                <button
+                                  type="button"
+                                  disabled={isMaxReached}
+                                  onClick={() => updateQuantity(product.id, quantity + 1)}
+                                  className={`flex h-8 w-8 items-center justify-center rounded-lg font-bold text-xs transition ${
+                                    isMaxReached
+                                      ? "text-slate-300 cursor-not-allowed hover:bg-transparent"
+                                      : "text-slate-600 hover:bg-slate-200"
+                                  }`}
+                                  title={isMaxReached ? `Only ${availableStock} in stock` : "Add one"}
+                                >
+                                  +
+                                </button>
+                              </div>
+                              {isMaxReached && (
+                                <span className="text-[10px] font-bold text-amber-600 mt-1">
+                                  (Max {availableStock} in stock)
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
 
                         <span className="text-base font-extrabold text-[#102A5C] w-20 text-right">
                           ₹{product.price * quantity}

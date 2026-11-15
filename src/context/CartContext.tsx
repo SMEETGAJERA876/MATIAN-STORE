@@ -27,6 +27,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = "matrin_cart_items";
 
+export function getProductAvailableStock(product: Product): number {
+  if (product.inStock === false) return 0;
+  if (product.stockCount !== undefined && !isNaN(Number(product.stockCount))) {
+    return Math.max(0, Number(product.stockCount));
+  }
+  if (product.stock !== undefined && !isNaN(Number(product.stock))) {
+    return Math.max(0, Number(product.stock));
+  }
+  return 50;
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
@@ -62,29 +73,65 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const closeCartDrawer = () => setIsCartDrawerOpen(false);
 
   const addToCart = (product: Product, quantity = 1) => {
+    const availableStock = getProductAvailableStock(product);
+
+    if (availableStock <= 0) {
+      toast.error(`"${product.name}" is currently Out of Stock!`, { icon: "⚠️" });
+      return;
+    }
+
+    const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
+    const currentTotalForProduct = cart
+      .filter(
+        (item) =>
+          (item.product.baseProductId || (item.product.id > 1000 ? item.product.id % 10000 : item.product.id)) === baseId
+      )
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+    if (currentTotalForProduct >= availableStock) {
+      toast.error(
+        `Cannot add more. All ${availableStock} available bottle${availableStock === 1 ? "" : "s"} of this product are already in your cart!`,
+        { icon: "⚠️" }
+      );
+      setIsCartDrawerOpen(true);
+      return;
+    }
+
+    const maxCanAdd = Math.max(0, availableStock - currentTotalForProduct);
+    const quantityToAdd = Math.min(quantity, maxCanAdd);
+
     setCart((prev) => {
       const existingIndex = prev.findIndex((item) => item.product.id === product.id);
 
       if (existingIndex > -1) {
         const updated = [...prev];
-        updated[existingIndex].quantity += quantity;
+        updated[existingIndex].quantity += quantityToAdd;
         return updated;
       }
 
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity: quantityToAdd }];
     });
 
-    // Auto-open Cart Drawer Slide-Over Modal when item is added!
     setIsCartDrawerOpen(true);
 
-    toast.success(`Added ${product.name} to cart!`, {
-      icon: "🛒",
-      style: {
-        borderRadius: "12px",
-        background: "#0f172a",
-        color: "#fff",
-      },
-    });
+    if (quantityToAdd < quantity) {
+      toast(
+        `Added ${quantityToAdd} bottle${quantityToAdd === 1 ? "" : "s"} (reached maximum available stock of ${availableStock})`,
+        { icon: "⚠️" }
+      );
+    } else {
+      toast.success(
+        `Added ${quantityToAdd > 1 ? `${quantityToAdd} bottles of ` : ""}${product.name} to cart!`,
+        {
+          icon: "🛒",
+          style: {
+            borderRadius: "12px",
+            background: "#0f172a",
+            color: "#fff",
+          },
+        }
+      );
+    }
   };
 
   const removeFromCart = (productId: number) => {
@@ -98,11 +145,40 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setCart((prev) =>
-      prev.map((item) =>
+    setCart((prev) => {
+      const targetItem = prev.find((item) => item.product.id === productId);
+      if (!targetItem) return prev;
+
+      const availableStock = getProductAvailableStock(targetItem.product);
+      const baseId =
+        targetItem.product.baseProductId ||
+        (targetItem.product.id > 1000 ? targetItem.product.id % 10000 : targetItem.product.id);
+
+      const otherItemsQty = prev
+        .filter(
+          (item) =>
+            item.product.id !== productId &&
+            (item.product.baseProductId || (item.product.id > 1000 ? item.product.id % 10000 : item.product.id)) ===
+              baseId
+        )
+        .reduce((sum, item) => sum + item.quantity, 0);
+
+      const maxAllowedForThisItem = Math.max(0, availableStock - otherItemsQty);
+
+      if (quantity > maxAllowedForThisItem) {
+        toast.error(
+          `Maximum stock limit reached! Only ${availableStock} bottle${availableStock === 1 ? "" : "s"} in stock.`,
+          { icon: "⚠️" }
+        );
+        return prev.map((item) =>
+          item.product.id === productId ? { ...item, quantity: maxAllowedForThisItem } : item
+        );
+      }
+
+      return prev.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
+      );
+    });
   };
 
   const clearCart = () => {

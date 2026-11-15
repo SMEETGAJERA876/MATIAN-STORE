@@ -219,8 +219,15 @@ const getStoredCustomProducts = (): Product[] => {
       description: p.description || "",
       features: Array.isArray(p.features) ? p.features : [],
       specifications: p.specifications || {},
-      inStock: p.inStock !== false && (p.stockCount ?? p.stock ?? 1) > 0,
-      stockCount: Number(p.stockCount ?? p.stock) || 50,
+      inStock: (() => {
+        const rawStock = p.stockCount ?? p.stock;
+        const count = rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Number(rawStock) : 50;
+        return p.inStock !== false && count > 0;
+      })(),
+      stockCount: (() => {
+        const rawStock = p.stockCount ?? p.stock;
+        return rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Math.max(0, Number(rawStock)) : 50;
+      })(),
       isFeatured: true,
       isBestSeller: p.isBestSeller ?? p.badge === "Bestseller",
       isNewArrival: p.isNewArrival ?? p.badge === "New",
@@ -374,8 +381,15 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
             description: p.description,
             features: p.features || [],
             specifications: p.specifications || {},
-            inStock: p.inStock,
-            stockCount: p.stock,
+            inStock: (() => {
+              const rawStock = p.stock ?? p.stockCount;
+              const count = rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Number(rawStock) : 50;
+              return p.inStock !== false && count > 0;
+            })(),
+            stockCount: (() => {
+              const rawStock = p.stock ?? p.stockCount;
+              return rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Math.max(0, Number(rawStock)) : 50;
+            })(),
             isFeatured: true,
             isBestSeller: p.badge === "Bestseller",
             isNewArrival: p.badge === "New",

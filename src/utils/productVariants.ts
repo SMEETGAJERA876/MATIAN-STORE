@@ -45,10 +45,12 @@ export function getVariantProduct(product: Product, size: string): Product {
   const baseName = product.name.replace(/\s*\([^)]*\)/g, "").trim();
   const sizeIdx = DEFAULT_PRODUCT_SIZES.indexOf(size as any);
   const variantIdOffset = sizeIdx >= 0 ? (sizeIdx + 1) * 10000 : 0;
+  const originalId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
 
   return {
     ...product,
-    id: product.id + variantIdOffset,
+    id: originalId + variantIdOffset,
+    baseProductId: originalId,
     name: `${baseName} (${size})`,
     price,
     oldPrice,

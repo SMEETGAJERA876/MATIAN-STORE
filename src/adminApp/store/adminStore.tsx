@@ -345,14 +345,21 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         price: Number(p.price) || 299,
         discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
         gst: 18,
-        stock: Number(p.stock ?? p.stockCount) || 100,
+        stock: (() => {
+          const raw = p.stock ?? p.stockCount;
+          return raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Math.max(0, Number(raw)) : 100;
+        })(),
         reservedStock: 0,
         warehouse: p.warehouse || 'Central Logistics Hub',
         vendor: p.vendor || 'MATRIN Systems',
         weight: p.weight || '1.2 kg',
         dimensions: p.dimensions || '20x15x30 cm',
         visibility: (p.visibility || 'Published') as 'Published',
-        status: (Number(p.stock ?? p.stockCount) > 10 ? 'In Stock' : Number(p.stock ?? p.stockCount) > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock',
+        status: (() => {
+          const raw = p.stock ?? p.stockCount;
+          const s = raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Number(raw) : 100;
+          return (s > 10 ? 'In Stock' : s > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock';
+        })(),
         rating: Number(p.rating) || 5.0,
         reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
         createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
@@ -464,13 +471,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               brand: 'MATRIN Enterprise',
               price: Number(p.price) || 299,
               gst: 18,
-              stock: Number(p.stock) || 100,
+              stock: p.stock !== undefined && p.stock !== null && !isNaN(Number(p.stock)) ? Math.max(0, Number(p.stock)) : 100,
               reservedStock: 2,
               warehouse: 'Main Central Hub',
               vendor: 'MATRIN Systems',
               weight: '1.2 kg',
               dimensions: '20x15x30 cm',
-              visibility: p.inStock ? 'Published' : 'Draft',
+              visibility: (p.stock !== undefined && Number(p.stock) <= 0) ? 'Draft' : (p.inStock ? 'Published' : 'Draft'),
               status:
                 Number(p.stock) > 10
                   ? 'In Stock'
@@ -497,14 +504,21 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 price: Number(p.price) || 299,
                 discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
                 gst: 18,
-                stock: Number(p.stock ?? p.stockCount) || 100,
+                stock: (() => {
+                  const raw = p.stock ?? p.stockCount;
+                  return raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Math.max(0, Number(raw)) : 100;
+                })(),
                 reservedStock: 0,
                 warehouse: p.warehouse || 'Central Logistics Hub',
                 vendor: p.vendor || 'MATRIN Systems',
                 weight: p.weight || '1.2 kg',
                 dimensions: p.dimensions || '20x15x30 cm',
                 visibility: (p.visibility || 'Published') as 'Published',
-                status: (Number(p.stock ?? p.stockCount) > 10 ? 'In Stock' : Number(p.stock ?? p.stockCount) > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock',
+                status: (() => {
+                  const raw = p.stock ?? p.stockCount;
+                  const s = raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Number(raw) : 100;
+                  return (s > 10 ? 'In Stock' : s > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock';
+                })(),
                 rating: Number(p.rating) || 5.0,
                 reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
                 createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
