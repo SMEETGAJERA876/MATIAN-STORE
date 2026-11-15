@@ -1,7 +1,5 @@
 export const firebaseWebConfig = {
-  apiKey:
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
-    "AIzaSyAqLbS68RiuP2NIYmhQuY-Mx9Az1PTLgJs",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain:
     process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
     "matrin-product.firebaseapp.com",

@@ -22,6 +22,16 @@ import toast from "react-hot-toast";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+async function readJsonResponse(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.includes("json")) {
+    throw new Error(
+      `The server returned a non-JSON response (HTTP ${response.status}). Check the deployment's API logs.`
+    );
+  }
+  return response.json();
+}
+
 async function establishServerSession(firebaseUser: FirebaseUser, name?: string) {
   const idToken = await firebaseUser.getIdToken();
   const response = await fetch("/api/auth/session", {
@@ -29,18 +39,36 @@ async function establishServerSession(firebaseUser: FirebaseUser, name?: string)
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken, name }),
   });
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result.error || "Could not establish your Firebase session.");
+  const result = await readJsonResponse(response);
+  if (typeof result !== "object" || result === null || Array.isArray(result)) {
+    throw new Error("The server returned an invalid session response.");
   }
-  return { idToken, user: result.user as User };
+  const sessionResult = result as { error?: unknown; user?: unknown };
+  if (!response.ok) {
+    throw new Error(
+      typeof sessionResult.error === "string"
+        ? sessionResult.error
+        : "Could not establish your Firebase session."
+    );
+  }
+  if (typeof sessionResult.user !== "object" || sessionResult.user === null) {
+    throw new Error("The server returned an invalid session response.");
+  }
+  return { idToken, user: sessionResult.user as User };
 }
 
 async function restoreServerSession() {
   const response = await fetch("/api/auth/session", { cache: "no-store" });
   if (!response.ok) return null;
-  const result = await response.json();
-  return result.user as User;
+  const result = await readJsonResponse(response);
+  if (typeof result !== "object" || result === null || Array.isArray(result)) {
+    throw new Error("The server returned an invalid session response.");
+  }
+  const sessionResult = result as { user?: unknown };
+  if (typeof sessionResult.user !== "object" || sessionResult.user === null) {
+    throw new Error("The server returned an invalid session response.");
+  }
+  return sessionResult.user as User;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

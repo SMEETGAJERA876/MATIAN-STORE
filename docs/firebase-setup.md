@@ -25,7 +25,7 @@ Existing Supabase accounts and passwords are not automatically transferred. Cust
 
 ## Vercel environment variables
 
-The public Web App settings have the values from the registered `matrin-product` app as code defaults, so missing `NEXT_PUBLIC_FIREBASE_*` variables will not disable the login page. You can still set or override them in Vercel. The server-side service-account JSON and admin email below are required and must be configured in Vercel before sign-in can establish an app session.
+The Web App settings are read from environment variables, not hardcoded in source. `NEXT_PUBLIC_FIREBASE_API_KEY` is a public Firebase web-app identifier and will be included in the browser bundle; it is not a private service-account key. Restrict its allowed APIs and website referrers in Google Cloud. The server-side service-account JSON and admin email below are required and must be configured in Vercel before sign-in can establish an app session.
 
 Set these variables for the Vercel deployment and redeploy:
 
