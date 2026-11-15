@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCcw, CheckCircle2, DollarSign } from 'lucide-react';
+import { RotateCcw, CheckCircle2, IndianRupee } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DataTable, Column } from '../ui/DataTable';
@@ -95,7 +95,7 @@ export const ReturnsView: React.FC = () => {
             <CheckCircle2 className="w-4 h-4" /> Refund Complete
           </span>
         ) : (
-          <Button variant="secondary" size="sm" icon={<DollarSign className="w-3.5 h-3.5" />} onClick={() => processRefund(row.id)}>
+          <Button variant="secondary" size="sm" icon={<IndianRupee className="w-3.5 h-3.5" />} onClick={() => processRefund(row.id)}>
             Process Refund
           </Button>
         ),
@@ -156,7 +156,7 @@ export const ReturnsView: React.FC = () => {
               <SimpleTable columns={columnsActive} data={returnableOrders} />
             )
           ) : returnedOrders.length === 0 ? (
-            <EmptyState title="No Returns Yet" description="Returned orders awaiting refund will appear here." icon={<DollarSign className="w-8 h-8" />} />
+            <EmptyState title="No Returns Yet" description="Returned orders awaiting refund will appear here." icon={<IndianRupee className="w-8 h-8" />} />
           ) : (
             <SimpleTable columns={columnsReturned} data={returnedOrders} />
           )}

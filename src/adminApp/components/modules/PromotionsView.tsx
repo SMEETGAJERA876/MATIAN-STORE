@@ -322,7 +322,7 @@ export const PromotionsView: React.FC = () => {
               Bestselling Discount
             </h4>
             <p className="text-xs text-matrin-gray dark:text-slate-400 mt-1">
-              Coupons with "₹20 Off" have 40% higher conversion than "15% Off" this week.
+              Coupons with ₹20 Off have 40% higher conversion than 15% Off this week.
             </p>
           </div>
 

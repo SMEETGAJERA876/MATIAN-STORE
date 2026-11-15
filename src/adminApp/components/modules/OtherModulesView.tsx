@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TrendingUp,
-  DollarSign,
+  IndianRupee,
   Megaphone,
   Bot,
   Truck,
@@ -26,7 +26,7 @@ export const OtherModulesView: React.FC<{ module: ModuleType }> = ({ module }) =
 
   const moduleMeta: Record<string, { title: string; desc: string; icon: React.ReactNode }> = {
     'sales-reports': { title: 'Sales & Cohort Reports', desc: 'Granular sales breakdowns by category, geographic region, and customer cohort.', icon: <TrendingUp className="w-6 h-6 text-matrin-primary" /> },
-    revenue: { title: 'Revenue & Financial Ledgers', desc: 'Real-time gross margin tracking, tax liabilities, payouts, and net profit analytics.', icon: <DollarSign className="w-6 h-6 text-emerald-600" /> },
+    revenue: { title: 'Revenue & Financial Ledgers', desc: 'Real-time gross margin tracking, tax liabilities, payouts, and net profit analytics.', icon: <IndianRupee className="w-6 h-6 text-emerald-600" /> },
     marketing: { title: 'Marketing Campaigns', desc: 'Email automation, push notification triggers, SMS engagement, and referral tracking.', icon: <Megaphone className="w-6 h-6 text-indigo-600" /> },
     'ai-insights': { title: 'AI Predictive Intelligence', desc: 'Neural demand forecasting, stock replenishment recommendations, and customer churn prediction.', icon: <Bot className="w-6 h-6 text-matrin-secondary" /> },
     shipping: { title: 'Shipping & Courier Integrations', desc: 'Courier dispatch rules for FedEx, UPS, and DHL Express with automated label printing.', icon: <Truck className="w-6 h-6 text-blue-600" /> },

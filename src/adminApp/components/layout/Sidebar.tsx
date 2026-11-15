@@ -10,7 +10,7 @@ import {
   Tag,
   BarChart3,
   TrendingUp,
-  DollarSign,
+  IndianRupee,
   Megaphone,
   Truck,
   RotateCcw,
@@ -72,7 +72,7 @@ export const Sidebar: React.FC = () => {
   const analyticsNavItems: NavItem[] = [
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-5 h-5" /> },
     { id: 'sales-reports', label: 'Sales Reports', icon: <TrendingUp className="w-5 h-5" /> },
-    { id: 'revenue', label: 'Revenue', icon: <DollarSign className="w-5 h-5" /> },
+    { id: 'revenue', label: 'Revenue', icon: <IndianRupee className="w-5 h-5" /> },
     { id: 'marketing', label: 'Marketing', icon: <Megaphone className="w-5 h-5" /> },
     { id: 'ai-insights', label: 'AI Insights', icon: <Bot className="w-5 h-5" />, badge: 'New' },
   ];

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { IndianRupee, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import {
   ResponsiveContainer,
   PieChart,
@@ -126,7 +126,7 @@ export const RevenueView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card">
           <div className="flex items-center gap-2 text-xs font-bold text-matrin-gray dark:text-slate-400">
-            <DollarSign className="w-4 h-4" /> Gross Revenue
+            <IndianRupee className="w-4 h-4" /> Gross Revenue
           </div>
           <div className="text-2xl font-extrabold text-matrin-text dark:text-white mt-1">
             {formatCurrency(grossRevenue)}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet, TrendingUp, TrendingDown, DollarSign, RotateCcw } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, IndianRupee, RotateCcw } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DataTable, Column } from '../ui/DataTable';
@@ -98,7 +98,7 @@ export const FinanceView: React.FC = () => {
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card">
           <div className="text-xs font-bold uppercase tracking-wider text-matrin-gray">Pending Settlement</div>
           <div className="text-2xl font-extrabold text-amber-600 mt-1 flex items-center gap-2">
-            <DollarSign className="w-5 h-5" /> {formatCurrency(pendingAmount)}
+            <IndianRupee className="w-5 h-5" /> {formatCurrency(pendingAmount)}
           </div>
         </div>
         <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-5 shadow-card">
