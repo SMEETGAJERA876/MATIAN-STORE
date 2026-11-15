@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
 
     setIsLoading(true);
     try {
-      const success = await login(email.trim(), password);
+      const success = await login(email.trim(), password, "ADMIN");
       if (success) {
         toast.success("Admin authenticated successfully!");
         router.push("/admin/dashboard");
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
     setPassword(adminPassword);
     setIsLoading(true);
     try {
-      const success = await login("admin@matrin.com", adminPassword);
+      const success = await login("admin@matrin.com", adminPassword, "ADMIN");
       if (success) {
         toast.success("Logged in with Quick Admin account!");
         router.push("/admin/dashboard");
@@ -160,9 +160,12 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Footer Links */}
-        <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 font-medium">
+        <div className="pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-medium">
           <Link href="/" className="hover:text-cyan-400 transition">
             ← Back to Storefront
+          </Link>
+          <Link href="/login" className="hover:text-cyan-400 transition">
+            Customer sign-in
           </Link>
           <span className="text-slate-600">MATRIN v1.0 Enterprise</span>
         </div>

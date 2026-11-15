@@ -120,7 +120,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const closeAuthModal = () => {};
 
-  const login = async (identifier: string, pass: string): Promise<boolean> => {
+  const login = async (
+    identifier: string,
+    pass: string,
+    expectedRole: "ADMIN" | "CUSTOMER"
+  ): Promise<boolean> => {
     const cleanEmail = identifier.trim().toLowerCase();
 
     // Built-in admin and demo accounts for instant access
@@ -132,6 +136,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const isDemoCustomer = cleanEmail === "user@matrin.com" && pass === "User123!";
 
     if (isAdminAccount) {
+      if (expectedRole !== "ADMIN") {
+        toast.error("Please use the admin sign-in page.");
+        return false;
+      }
+
       try {
         // Establishes a real server-verifiable session (a JWT cookie) for this
         // mock admin login, since there is no Supabase session behind it.
@@ -164,6 +173,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (isDemoCustomer) {
+      if (expectedRole !== "CUSTOMER") {
+        toast.error("Use an admin account to sign in.");
+        return false;
+      }
+
       const demoUser: User = {
         id: "usr_cust_01",
         name: "Demo Customer",
@@ -193,6 +207,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const profile = await fetchProfile(data.user.id, data.user.email || "");
+      if (!profile || profile.role?.toString().toUpperCase() !== expectedRole) {
+        await supabase.auth.signOut();
+        setUser(null);
+        setToken(null);
+        setAccessTokenCookie(null);
+        toast.error(
+          profile
+            ? expectedRole === "ADMIN"
+              ? "This account does not have admin access."
+              : "Admin accounts must use the admin sign-in page."
+            : "Could not verify this account. Please try again."
+        );
+        return false;
+      }
+
       setUser(profile);
 
       toast.success(`Welcome back, ${profile?.name || "there"}!`, { icon: "👤" });
@@ -212,7 +241,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const quickUserLogin = () => {
-    login("user@matrin.com", "User123!");
+    login("user@matrin.com", "User123!", "CUSTOMER");
   };
 
   const register = async (name: string, email: string, pass: string): Promise<boolean> => {
@@ -271,7 +300,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const quickAdminLogin = () => {
-    login("admin@matrin.com", process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!");
+    login("admin@matrin.com", process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!", "ADMIN");
   };
 
   return (

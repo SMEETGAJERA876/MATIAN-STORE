@@ -19,7 +19,6 @@ import {
   Shield,
   Truck,
   Headphones,
-  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -50,7 +49,7 @@ export default function LoginScreen() {
 
     setIsSubmitting(true);
     try {
-      await login(email.trim(), password);
+      await login(email.trim(), password, "CUSTOMER");
     } finally {
       setIsSubmitting(false);
     }
@@ -81,19 +80,7 @@ export default function LoginScreen() {
     setPassword("User123!");
     setIsSubmitting(true);
     try {
-      await login("user@matrin.com", "User123!");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDemoAdminLogin = async () => {
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!";
-    setEmail("admin@matrin.com");
-    setPassword(adminPassword);
-    setIsSubmitting(true);
-    try {
-      await login("admin@matrin.com", adminPassword);
+      await login("user@matrin.com", "User123!", "CUSTOMER");
     } finally {
       setIsSubmitting(false);
     }
@@ -248,11 +235,11 @@ export default function LoginScreen() {
                 <div className="flex items-center justify-between text-[11px] font-bold text-[#0645B5]">
                   <span className="flex items-center gap-1">
                     <KeyRound size={13} />
-                    Quick 1-Click Demo Logins
+                    Quick Demo Customer Login
                   </span>
                   <span className="text-[10px] text-slate-400 font-normal">Pre-filled access</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <button
                     type="button"
                     onClick={handleDemoCustomerLogin}
@@ -262,18 +249,6 @@ export default function LoginScreen() {
                     <span className="flex items-center gap-1.5">
                       <User size={13} className="text-[#0645B5]" />
                       Customer
-                    </span>
-                    <ArrowRight size={12} className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDemoAdminLogin}
-                    disabled={isSubmitting}
-                    className="p-2 rounded-xl bg-white border border-blue-200/80 hover:bg-blue-50 text-left transition flex items-center justify-between text-[11px] font-bold text-slate-800 shadow-2xs group disabled:opacity-50"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Crown size={13} className="text-[#0645B5]" />
-                      Admin
                     </span>
                     <ArrowRight size={12} className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform" />
                   </button>
@@ -487,6 +462,15 @@ export default function LoginScreen() {
                 </span>
               )}
             </div>
+
+            {mode === "login" && (
+              <p className="mt-4 text-center text-xs text-slate-500">
+                Admin?{" "}
+                <Link href="/admin/login" className="font-bold text-[#0645B5] hover:underline">
+                  Sign in to the Admin Console
+                </Link>
+              </p>
+            )}
 
           </div>
 

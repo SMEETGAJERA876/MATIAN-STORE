@@ -93,7 +93,7 @@ export const Sidebar: React.FC<{ mobileCollapsed?: boolean }> = ({ mobileCollaps
 
   const handleLogout = async () => {
     addToast('info', 'Logging out of MATRIN Enterprise session...');
-    await logout('/login');
+    await logout('/admin/login');
   };
 
   const renderNavGroup = (title: string, items: NavItem[]) => (
