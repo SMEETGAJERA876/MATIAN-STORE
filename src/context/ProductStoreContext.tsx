@@ -155,7 +155,7 @@ interface ProductStoreContextType {
   deleteBanner: (id: string) => void;
   toggleBannerStatus: (id: string) => void;
 
-  addOrder: (order: OrderInvoice) => void;
+  addOrder: (order: OrderInvoice) => Promise<void>;
   updateOrderStatus: (id: string, status: "Paid" | "Pending" | "Shipped" | "Cash on Delivery" | "Delivered" | "Cancelled" | "Refunded") => void;
   cancelOrder: (id: string) => void;
   processRefund: (id: string) => void;
@@ -583,18 +583,18 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
 
   // Orders CRUD
   const addOrder = async (order: OrderInvoice) => {
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(order),
-      });
-      if (res.ok) {
-        refreshStoreData();
-      }
-    } catch (e) {
-      console.error(e);
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    });
+
+    const result = await res.json();
+    if (!res.ok) {
+      throw new Error(result.error || "Failed to save the order.");
     }
+
+    void refreshStoreData();
   };
 
   const updateOrderStatus = async (id: string, status: "Paid" | "Pending" | "Shipped" | "Cash on Delivery" | "Delivered" | "Cancelled" | "Refunded") => {

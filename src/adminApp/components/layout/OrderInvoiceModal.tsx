@@ -60,6 +60,9 @@ export const OrderInvoiceModal: React.FC = () => {
             <div className="font-bold text-matrin-gray uppercase mb-1">Billed To</div>
             <div className="font-bold text-sm text-matrin-text dark:text-white">{order.customerName}</div>
             <div className="text-matrin-gray mt-0.5">{order.customerEmail}</div>
+            {order.customerPhone && (
+              <div className="text-matrin-gray mt-0.5">{order.customerPhone}</div>
+            )}
             <div className="text-matrin-gray mt-1">{order.shippingAddress}</div>
           </div>
 

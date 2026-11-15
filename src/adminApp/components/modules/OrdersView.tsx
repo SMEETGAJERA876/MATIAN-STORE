@@ -32,6 +32,7 @@ export const OrdersView: React.FC = () => {
       customerName: 'Rahul Patel',
       customerInitials: 'RP',
       customerEmail: 'rahul@example.com',
+      customerPhone: '',
       paymentStatus: 'PAID',
       fulfillment: 'PROCESSING',
       totalAmount: 1240.00,
@@ -43,6 +44,7 @@ export const OrdersView: React.FC = () => {
       customerName: 'Smeet Gajera',
       customerInitials: 'SG',
       customerEmail: 'smeet@example.com',
+      customerPhone: '',
       paymentStatus: 'PAID',
       fulfillment: 'FULFILLED',
       totalAmount: 845.50,
@@ -65,6 +67,7 @@ export const OrdersView: React.FC = () => {
           customerName: name,
           customerInitials: initials || 'C',
           customerEmail: o.customerEmail || 'N/A',
+          customerPhone: o.customerPhone || '',
           paymentStatus: (o.paymentStatus || 'PAID').toUpperCase(),
           fulfillment: (o.shippingStatus || 'PROCESSING').toUpperCase(),
           totalAmount: o.totalAmount || 0,
@@ -114,9 +117,19 @@ export const OrdersView: React.FC = () => {
           <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-950 text-matrin-primary font-bold text-xs flex items-center justify-center">
             {row.customerInitials}
           </div>
-          <span className="font-bold text-xs text-matrin-text dark:text-white">
-            {row.customerName}
-          </span>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-matrin-text dark:text-white">
+              {row.customerName}
+            </div>
+            <div className="text-[10px] text-matrin-gray dark:text-slate-400">
+              {row.customerEmail}
+            </div>
+            {row.customerPhone && (
+              <div className="text-[10px] text-matrin-gray dark:text-slate-400">
+                {row.customerPhone}
+              </div>
+            )}
+          </div>
         </div>
       ),
     },

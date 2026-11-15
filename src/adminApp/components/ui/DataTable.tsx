@@ -170,12 +170,12 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className="bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-3xl shadow-card overflow-hidden transition-all duration-200">
+    <div className="min-w-0 bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-3xl shadow-card overflow-hidden transition-all duration-200">
       {/* Top Header & Toolbar */}
-      <div className="p-6 border-b border-matrin-border dark:border-matrin-darkborder space-y-4">
+      <div className="p-4 sm:p-6 border-b border-matrin-border dark:border-matrin-darkborder space-y-4">
         {(title || subtitle) && (
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               {title && (
                 <h3 className="text-xl font-bold text-matrin-text dark:text-matrin-darktext">
                   {title}
@@ -187,7 +187,7 @@ export function DataTable<T extends Record<string, any>>({
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -218,7 +218,7 @@ export function DataTable<T extends Record<string, any>>({
 
         {/* Filter Tabs if present */}
         {filterTabs && filterTabs.length > 0 && (
-          <div className="flex items-center gap-1 border-b border-matrin-border dark:border-matrin-darkborder pb-2 overflow-x-auto">
+          <div className="flex min-w-0 items-center gap-1 border-b border-matrin-border dark:border-matrin-darkborder pb-2 overflow-x-auto">
             {filterTabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -254,7 +254,7 @@ export function DataTable<T extends Record<string, any>>({
 
         {/* Search Input & Action Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="relative flex-1 min-w-[240px]">
+          <div className="relative flex-1 min-w-0 sm:min-w-[240px]">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-matrin-gray dark:text-slate-400" />
             <input
               type="text"
@@ -270,7 +270,7 @@ export function DataTable<T extends Record<string, any>>({
 
           {/* Bulk Action indicator */}
           {selectedRowIds.size > 0 && (
-            <div className="flex items-center gap-3 bg-matrin-primary/10 border border-matrin-primary/20 px-4 py-1.5 rounded-xl">
+            <div className="flex flex-wrap items-center gap-3 min-w-0 bg-matrin-primary/10 border border-matrin-primary/20 px-4 py-1.5 rounded-xl">
               <span className="text-xs font-semibold text-matrin-primary dark:text-blue-400">
                 {selectedRowIds.size} Selected
               </span>
@@ -290,7 +290,7 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Main Table Content */}
-      <div className="overflow-x-auto">
+      <div className="max-w-full overflow-x-auto">
         {isLoading ? (
           <TableSkeleton rows={pageSize} cols={columns.length + 1} />
         ) : sortedData.length === 0 ? (
@@ -381,7 +381,7 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Pagination Footer */}
-      <div className="px-6 py-4 border-t border-matrin-border dark:border-matrin-darkborder flex flex-wrap items-center justify-between gap-4 text-sm text-matrin-gray">
+      <div className="px-4 sm:px-6 py-4 border-t border-matrin-border dark:border-matrin-darkborder flex flex-wrap items-center justify-between gap-4 text-sm text-matrin-gray">
         <div>
           Showing{' '}
           <span className="font-semibold text-matrin-text dark:text-white">
@@ -398,7 +398,7 @@ export function DataTable<T extends Record<string, any>>({
           entries
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <div className="flex items-center gap-2">
             <span className="text-xs">Per page:</span>
             <select

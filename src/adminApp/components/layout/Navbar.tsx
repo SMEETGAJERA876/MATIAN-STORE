@@ -67,25 +67,25 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="h-20 bg-white/80 dark:bg-matrin-darkcard/80 backdrop-blur-md border-b border-matrin-border dark:border-matrin-darkborder px-6 flex items-center justify-between sticky top-0 z-30 transition-all">
+    <header className="min-h-16 sm:h-20 bg-white/80 dark:bg-matrin-darkcard/80 backdrop-blur-md border-b border-matrin-border dark:border-matrin-darkborder px-2 sm:px-4 lg:px-6 flex items-center justify-between gap-2 sticky top-0 z-30 transition-all">
       {/* Left: Breadcrumbs & Page Title */}
-      <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-matrin-gray dark:text-slate-400">
-            <span>MATRIN Enterprise</span>
-            <span>/</span>
-            <span className="capitalize text-matrin-primary dark:text-blue-400 font-bold">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+        <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-2 text-[10px] sm:text-xs font-semibold text-matrin-gray dark:text-slate-400">
+            <span className="hidden sm:inline">MATRIN Enterprise</span>
+            <span className="hidden sm:inline">/</span>
+            <span className="truncate capitalize text-matrin-primary dark:text-blue-400 font-bold">
               {activeModule.replace('-', ' ')}
             </span>
           </div>
-          <h1 className="text-xl font-extrabold text-matrin-text dark:text-white tracking-tight">
+          <h1 className="truncate text-sm sm:text-xl font-extrabold text-matrin-text dark:text-white tracking-tight">
             {moduleTitles[activeModule] || 'Enterprise Admin'}
           </h1>
         </div>
       </div>
 
       {/* Center: Global Search / Command Palette shortcut */}
-      <div className="flex-1 max-w-md mx-8 hidden md:block">
+      <div className="hidden xl:block flex-1 min-w-0 max-w-md mx-8">
         <div
           onClick={() => setCommandPaletteOpen(true)}
           className="relative flex items-center bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-2xl px-4 py-2 text-sm text-matrin-gray cursor-pointer hover:border-matrin-primary transition-colors group"
@@ -105,11 +105,11 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Right Actions Toolbar */}
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
         {/* AI Assistant Button */}
         <button
           onClick={() => setAIChatOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs shadow-soft hover:brightness-110 transition-all"
+          className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs shadow-soft hover:brightness-110 transition-all"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">AI Assistant</span>
@@ -173,24 +173,24 @@ export const Navbar: React.FC = () => {
         {/* Help Center */}
         <button
           onClick={() => setActiveModule('support-tickets')}
-          className="p-2.5 rounded-2xl text-matrin-gray hover:text-matrin-text dark:text-slate-300 dark:hover:text-white hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors hidden sm:block"
+          className="p-2.5 rounded-2xl text-matrin-gray hover:text-matrin-text dark:text-slate-300 dark:hover:text-white hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors hidden lg:block"
         >
           <HelpCircle className="w-5 h-5" />
         </button>
 
-        <div className="h-6 w-px bg-matrin-border dark:bg-matrin-darkborder mx-1" />
+        <div className="hidden lg:block h-6 w-px bg-matrin-border dark:bg-matrin-darkborder mx-1" />
 
         {/* User Profile Menu */}
         <div className="relative">
           <button
             onClick={() => setProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-3 p-1 rounded-2xl hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 lg:gap-3 p-1 rounded-2xl hover:bg-matrin-bg dark:hover:bg-slate-800 transition-colors"
           >
             <div className="relative">
               <img
                 src={user.avatar}
                 alt={user.name}
-                className="w-9 h-9 rounded-2xl object-cover ring-2 ring-matrin-primary/20"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl object-cover ring-2 ring-matrin-primary/20"
               />
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
             </div>
@@ -203,7 +203,7 @@ export const Navbar: React.FC = () => {
                 {user.role}
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-matrin-gray" />
+            <ChevronDown className="hidden lg:block w-4 h-4 text-matrin-gray" />
           </button>
 
           {/* Profile Dropdown */}
@@ -236,7 +236,7 @@ export const Navbar: React.FC = () => {
                 onClick={async () => {
                   setProfileOpen(false);
                   addToast('info', 'Logging out of MATRIN Enterprise session...');
-                  await logout('/admin/login');
+                  await logout('/login');
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors"
               >

@@ -49,7 +49,7 @@ export default function LoginScreen() {
 
     setIsSubmitting(true);
     try {
-      await login(email.trim(), password, "CUSTOMER");
+      await login(email.trim(), password, "AUTO");
     } finally {
       setIsSubmitting(false);
     }
@@ -462,15 +462,6 @@ export default function LoginScreen() {
                 </span>
               )}
             </div>
-
-            {mode === "login" && (
-              <p className="mt-4 text-center text-xs text-slate-500">
-                Admin?{" "}
-                <Link href="/admin/login" className="font-bold text-[#0645B5] hover:underline">
-                  Sign in to the Admin Console
-                </Link>
-              </p>
-            )}
 
           </div>
 

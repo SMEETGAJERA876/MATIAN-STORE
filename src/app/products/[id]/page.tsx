@@ -634,7 +634,7 @@ export default function ProductDetailsPage() {
         <div className="mt-14 grid gap-8 lg:grid-cols-12">
           
           {/* Tabbed Info Box (Col 8) */}
-          <div className="lg:col-span-8 rounded-3xl bg-white p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+          <div className="min-w-0 lg:col-span-8 rounded-3xl bg-white p-6 sm:p-8 border border-slate-200/80 shadow-xs">
             
             {/* Tab Headers */}
             <div className="flex border-b border-slate-200 gap-6 overflow-x-auto">
@@ -814,7 +814,7 @@ export default function ProductDetailsPage() {
           </div>
 
           {/* Bottom Right "You may also like" Mini Cards Column (Col 4 matching Image 3) */}
-          <div className="lg:col-span-4 rounded-3xl bg-white p-6 border border-slate-200/80 shadow-xs space-y-4">
+          <div className="min-w-0 lg:col-span-4 rounded-3xl bg-white p-6 border border-slate-200/80 shadow-xs space-y-4">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-extrabold text-[#102A5C] text-sm">

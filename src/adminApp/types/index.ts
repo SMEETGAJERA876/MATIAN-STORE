@@ -80,6 +80,7 @@ export interface Order {
   orderNumber: string; // e.g. "#MTR-8902"
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
   customerAvatar?: string;
   date: string;
   totalAmount: number;

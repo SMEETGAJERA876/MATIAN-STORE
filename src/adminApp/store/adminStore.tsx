@@ -552,6 +552,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 orderNumber: o.invoiceNumber || `#${o.id}`,
                 customerName: o.customer?.fullName || 'Customer',
                 customerEmail: o.customer?.email || 'customer@matrin.com',
+                customerPhone: o.customer?.phone || '',
                 customerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
                 date: o.orderDate || new Date().toISOString().slice(0, 10),
                 totalAmount: Number(o.totalAmount) || 500,
@@ -559,7 +560,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 shippingStatus: o.orderStatus === 'Shipped' ? 'In Transit' : 'Processing',
                 courier: 'FedEx Express',
                 trackingNumber: o.transactionId || 'FDX-994102931',
-                shippingAddress: `${o.customer?.addressLine || ''}, ${o.customer?.city || ''}`,
+                shippingAddress: [
+                  o.customer?.addressLine,
+                  o.customer?.city,
+                  o.customer?.state,
+                  o.customer?.pincode,
+                ].filter(Boolean).join(', '),
                 items: (o.items || []).map((it: any) => ({
                   productId: String(it.product?.id || 1),
                   productName: it.product?.name || 'Cleaning Item',

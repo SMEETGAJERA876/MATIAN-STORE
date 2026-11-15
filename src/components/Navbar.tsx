@@ -118,7 +118,7 @@ export default function Navbar() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 lg:py-5 h-16 sm:h-20 lg:h-[84px]">
 
           {/* Brand Logo & Desktop Navigation Wrapper */}
-          <div className="flex items-center gap-8 lg:gap-14">
+          <div className="flex items-center gap-4 xl:gap-4 2xl:gap-14">
             {/* Large Brand Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0 py-1">
               <img
@@ -129,7 +129,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden items-center gap-6 lg:gap-8 lg:flex">
+            <div className="hidden items-center gap-3 xl:flex 2xl:gap-8">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const isDropdownActive = activeDropdown === link.name;
@@ -142,7 +142,7 @@ export default function Navbar() {
                   >
                     <Link
                       href={link.href}
-                      className={`text-base sm:text-base lg:text-[16px] font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${isActive
+                      className={`text-sm 2xl:text-base font-bold tracking-wide transition-colors flex items-center gap-1.5 py-1 relative ${isActive
                         ? "text-[#0645B5]"
                         : "text-slate-800 hover:text-[#0645B5]"
                         }`}
@@ -237,7 +237,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Action Bar (Tablet & Desktop) */}
-          <div className="hidden items-center gap-4 md:flex ml-6 lg:ml-12">
+          <div className="hidden items-center gap-2 xl:flex xl:ml-4 2xl:ml-12 2xl:gap-4">
 
             {/* Inline Search Bar */}
             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
@@ -300,7 +300,7 @@ export default function Navbar() {
                     <div className="h-8 w-8 rounded-full bg-[#0645B5] text-white flex items-center justify-center text-xs font-extrabold uppercase shrink-0">
                       {user.name?.charAt(0) || "U"}
                     </div>
-                    <span className="hidden lg:inline text-xs font-bold max-w-[100px] truncate">
+                    <span className="hidden 2xl:inline text-xs font-bold max-w-[100px] truncate">
                       {user.name}
                     </span>
                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${isAccountOpen ? "rotate-180" : ""}`} />
@@ -380,8 +380,8 @@ export default function Navbar() {
 
           </div>
 
-          {/* Mobile Action Bar (<640px) */}
-          <div className="flex items-center gap-1 md:hidden">
+          {/* Compact Action Bar (below desktop navigation breakpoint) */}
+          <div className="flex items-center gap-1 xl:hidden">
             {/* Mobile Account/Login Button */}
             <Link
               href={user ? (isAdmin ? "/admin/dashboard" : "/") : "/login"}
@@ -446,7 +446,7 @@ export default function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-t border-slate-100 bg-slate-50/90 px-4 py-3 md:hidden"
+              className="overflow-hidden border-t border-slate-100 bg-slate-50/90 px-4 py-3 xl:hidden"
             >
               <form onSubmit={handleSearchSubmit} className="relative flex items-center">
                 <input
@@ -469,7 +469,7 @@ export default function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-t border-slate-100 bg-white px-4 py-4 md:hidden shadow-xl"
+              className="overflow-hidden border-t border-slate-100 bg-white px-4 py-4 xl:hidden shadow-xl"
             >
               <div className="flex flex-col gap-1.5">
                 {navLinks.map((link) => {

@@ -123,57 +123,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (
     identifier: string,
     pass: string,
-    expectedRole: "ADMIN" | "CUSTOMER"
+    expectedRole: "ADMIN" | "CUSTOMER" | "AUTO"
   ): Promise<boolean> => {
     const cleanEmail = identifier.trim().toLowerCase();
 
     // Built-in admin and demo accounts for instant access
-    const isAdminAccount =
-      (cleanEmail === "admin@matrin.com" ||
-        cleanEmail === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase()) &&
-      pass === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!");
+    const isAdminEmail =
+      cleanEmail === "admin@matrin.com" ||
+      cleanEmail === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase();
 
     const isDemoCustomer = cleanEmail === "user@matrin.com" && pass === "User123!";
 
-    if (isAdminAccount) {
-      if (expectedRole !== "ADMIN") {
-        toast.error("Please use the admin sign-in page.");
-        return false;
-      }
-
+    if (isAdminEmail && expectedRole !== "CUSTOMER") {
       try {
         // Establishes a real server-verifiable session (a JWT cookie) for this
         // mock admin login, since there is no Supabase session behind it.
         // Admin-only API routes (product/category/coupon writes) check for
         // this cookie — without it every admin mutation silently fails.
-        await fetch("/api/auth/admin-session", {
+        const response = await fetch("/api/auth/admin-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: cleanEmail, password: pass }),
         });
-      } catch (e) {
-        console.warn("Could not establish admin session cookie:", e);
-      }
+        if (response.ok) {
+          const adminUser: User = {
+            id: "usr_admin_01",
+            name: "MATRIN Administrator",
+            email: cleanEmail,
+            role: "ADMIN",
+            status: "Active",
+            createdAt: new Date().toISOString().slice(0, 10),
+            totalOrders: 42,
+            totalSpent: 98000,
+          };
+          setUser(adminUser);
+          setToken("admin_mock_token");
+          toast.success("Welcome back, MATRIN Admin!", { icon: "👑" });
+          router.push("/admin/dashboard");
+          return true;
+        }
 
-      const adminUser: User = {
-        id: "usr_admin_01",
-        name: "MATRIN Administrator",
-        email: cleanEmail,
-        role: "ADMIN",
-        status: "Active",
-        createdAt: new Date().toISOString().slice(0, 10),
-        totalOrders: 42,
-        totalSpent: 98000,
-      };
-      setUser(adminUser);
-      setToken("admin_mock_token");
-      toast.success("Welcome back, MATRIN Admin!", { icon: "👑" });
-      router.push("/admin/dashboard");
-      return true;
+        if (response.status !== 401) {
+          const result = await response.json();
+          throw new Error(result.error || "Could not establish your admin session.");
+        }
+        // A configured admin may use Supabase credentials; try Supabase below
+        // when they are not the built-in mock account.
+      } catch (e) {
+        console.error("Could not establish admin session cookie:", e);
+        toast.error(e instanceof Error ? e.message : "Could not establish your admin session.");
+        return false;
+      }
+    }
+
+    if (isAdminEmail && expectedRole === "CUSTOMER") {
+      toast.error("This account does not have customer access.");
+      return false;
     }
 
     if (isDemoCustomer) {
-      if (expectedRole !== "CUSTOMER") {
+      if (expectedRole === "ADMIN") {
         toast.error("Use an admin account to sign in.");
         return false;
       }
@@ -207,7 +216,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const profile = await fetchProfile(data.user.id, data.user.email || "");
-      if (!profile || profile.role?.toString().toUpperCase() !== expectedRole) {
+      const profileRole = profile?.role?.toString().toUpperCase();
+      const roleMatches =
+        expectedRole === "AUTO"
+          ? profileRole === "ADMIN" || profileRole === "CUSTOMER"
+          : profileRole === expectedRole;
+
+      if (!profile || !roleMatches) {
         await supabase.auth.signOut();
         setUser(null);
         setToken(null);
@@ -216,7 +231,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           profile
             ? expectedRole === "ADMIN"
               ? "This account does not have admin access."
-              : "Admin accounts must use the admin sign-in page."
+              : expectedRole === "CUSTOMER"
+                ? "This account does not have customer access."
+                : "This account does not have a supported role."
             : "Could not verify this account. Please try again."
         );
         return false;
@@ -293,7 +310,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== "undefined") {
         const dest =
           redirectTo ||
-          (window.location.pathname.startsWith("/admin") ? "/admin/login" : "/login");
+          "/login";
         window.location.href = dest;
       }
     }

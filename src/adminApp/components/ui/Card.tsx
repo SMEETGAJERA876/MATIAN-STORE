@@ -16,7 +16,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-6 shadow-card transition-all duration-200',
+        'min-w-0 bg-white dark:bg-matrin-darkcard border border-matrin-border dark:border-matrin-darkborder rounded-2xl p-6 shadow-card transition-all duration-200',
         hoverEffect && 'hover:shadow-soft hover:-translate-y-0.5',
         className
       )}
@@ -31,7 +31,7 @@ export const CardHeader: React.FC<{ children: React.ReactNode; className?: strin
   children,
   className,
 }) => (
-  <div className={clsx('flex items-center justify-between pb-4 border-b border-matrin-border dark:border-matrin-darkborder mb-4', className)}>
+  <div className={clsx('flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-matrin-border dark:border-matrin-darkborder mb-4', className)}>
     {children}
   </div>
 );

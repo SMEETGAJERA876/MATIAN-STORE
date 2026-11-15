@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (isLoginRoute) return;
     if (isLoaded) {
       if (!user || user.role?.toUpperCase() !== "ADMIN") {
-        router.push("/admin/login");
+        router.push("/login");
       }
     }
   }, [user, isLoaded, router, isLoginRoute]);

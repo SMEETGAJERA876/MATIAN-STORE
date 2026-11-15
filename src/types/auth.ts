@@ -30,7 +30,7 @@ export interface AuthContextType {
   isAuthModalOpen: boolean;
   openAuthModal: (initialTab?: "login" | "register") => void;
   closeAuthModal: () => void;
-  login: (email: string, password: string, expectedRole: "ADMIN" | "CUSTOMER") => Promise<boolean> | boolean;
+  login: (email: string, password: string, expectedRole: "ADMIN" | "CUSTOMER" | "AUTO") => Promise<boolean> | boolean;
   quickUserLogin: () => void;
   quickAdminLogin?: () => void;
   register: (name: string, email: string, password: string) => Promise<boolean> | boolean;

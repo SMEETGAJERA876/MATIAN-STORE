@@ -136,7 +136,7 @@ export const MainLayout: React.FC<{ initialModule?: string }> = ({ initialModule
       >
         <Navbar />
 
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="min-w-0 flex-1 p-3 sm:p-4 md:p-6 xl:p-8 max-w-7xl w-full mx-auto">
           {renderModuleContent()}
         </main>
       </div>

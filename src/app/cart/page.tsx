@@ -56,17 +56,17 @@ export default function CartPage() {
   // Checkout step state: "cart" | "checkout" | "success"
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "checkout" | "success">("checkout");
 
-  // Shipping details state (Pre-filled with default test data)
+  // Prefill only details belonging to the signed-in customer.
   const [shippingDetails, setShippingDetails] = useState<ShippingAddress>({
-    fullName: user?.name || "Rahul Patel",
-    phone: "9876543210",
-    email: user?.email || "rahul@example.com",
-    houseFlatNo: "Flat 102",
-    streetArea: "Navrangpura",
-    addressLine: "Flat 102, Navrangpura",
-    city: "Ahmedabad",
-    state: "Gujarat",
-    pincode: "380015",
+    fullName: user?.name || "",
+    phone: "",
+    email: user?.email || "",
+    houseFlatNo: "",
+    streetArea: "",
+    addressLine: "",
+    city: "",
+    state: "",
+    pincode: "",
     addressType: "Home",
   });
 
@@ -146,10 +146,6 @@ export default function CartPage() {
   };
 
   const completeOrder = async (paymentId: string, status: "Paid" | "Cash on Delivery" = "Paid") => {
-    if (appliedCoupon) {
-      applyCouponRedemption(appliedCoupon);
-    }
-
     const netSubtotal = Math.max(0, subtotal - discountAmount);
     const tax = Math.round((netSubtotal * 18) / 118);
     const invoiceNum = `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -204,8 +200,18 @@ export default function CartPage() {
       transactionId: paymentId,
     };
 
-    // Save order & trigger server-side Google Sheets sync
-    await addOrder(newInvoice);
+    // Save order before showing checkout success so failed persistence is visible.
+    try {
+      await addOrder(newInvoice);
+    } catch (error) {
+      setIsProcessingPayment(false);
+      toast.error(error instanceof Error ? error.message : "Failed to save your order.");
+      return;
+    }
+
+    if (appliedCoupon) {
+      applyCouponRedemption(appliedCoupon);
+    }
 
     // Client-side backup sync to Google Sheets API
     try {
