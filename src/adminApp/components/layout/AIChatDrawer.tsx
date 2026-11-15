@@ -44,7 +44,7 @@ export const AIChatDrawer: React.FC = () => {
         const lowItems = inventory.filter((i) => i.currentStock <= i.criticalLevel);
         aiText = `Analysis complete: You currently have ${lowItems.length} critical inventory items (e.g. ${lowItems.map((i) => i.name).join(', ')}). I recommend initiating a purchase order to GreenChem Organics immediately to prevent out-of-stock downtime.`;
       } else if (q.includes('forecast') || q.includes('revenue') || q.includes('sales')) {
-        aiText = 'Based on linear regression of Q3-Q4 sales velocity, projected MATRIN Enterprise revenue for next month is $148,200 (+19% YoY). Your top growth drivers are Fabric Care steam units and Eco-Series subscriptions.';
+        aiText = 'Based on linear regression of Q3-Q4 sales velocity, projected MATRIN Enterprise revenue for next month is ₹1,48,200 (+19% YoY). Your top growth drivers are Fabric Care steam units and Eco-Series subscriptions.';
       } else if (q.includes('promo') || q.includes('coupon')) {
         aiText = 'Recommended Campaign Strategy: Creating a 15% discount for recurring subscription cleaning pods could increase customer retention by 22% this quarter while maintaining a 68% gross margin.';
       } else {

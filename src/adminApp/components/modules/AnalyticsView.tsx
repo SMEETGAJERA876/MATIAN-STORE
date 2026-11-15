@@ -256,7 +256,7 @@ export const AnalyticsView: React.FC = () => {
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="label" stroke="#94a3b8" />
-                  <YAxis stroke="#94a3b8" tickFormatter={(val) => `$${val / 1000}k`} />
+                  <YAxis stroke="#94a3b8" tickFormatter={(val) => `₹${val / 1000}k`} />
                   <Tooltip formatter={(value: any) => [formatCurrency(Number(value) || 0), 'Revenue']} />
                   <Area type="monotone" dataKey="revenue" stroke="#1F5EFF" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                 </AreaChart>
@@ -298,7 +298,7 @@ export const AnalyticsView: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryRevenue}>
                 <XAxis dataKey="category" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" tickFormatter={(v) => `$${v / 1000}k`} />
+                <YAxis stroke="#94a3b8" tickFormatter={(v) => `₹${v / 1000}k`} />
                 <Tooltip formatter={(value: any) => [formatCurrency(Number(value) || 0), 'Revenue']} />
                 <Bar dataKey="revenue" fill="#0B3A75" radius={[6, 6, 0, 0]} />
               </BarChart>

@@ -14,7 +14,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, defaultSize }: ProductCardProps) {
-  const { addToCart } = useCart();
+  const { addToCart, getRemainingStock } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
@@ -36,9 +36,10 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
   const currentDiscount = sizePricing.discount;
   const variantProduct = getVariantProduct(product, selectedSize);
 
-  const availableStock = getProductAvailableStock(product);
-  const isOutOfStock = availableStock <= 0 || product.inStock === false;
-  const isLowStock = availableStock > 0 && availableStock <= 10;
+  const totalStock = getProductAvailableStock(product);
+  const remainingStock = getRemainingStock(product);
+  const isOutOfStock = totalStock <= 0 || product.inStock === false || remainingStock <= 0;
+  const isLowStock = remainingStock > 0 && remainingStock <= 10;
 
   return (
     <>
@@ -57,7 +58,7 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
                 {currentDiscount || (product.discountPercentage ? `${product.discountPercentage}% OFF` : "NEW")}
               </span>
               <span className="rounded-md bg-amber-500 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-2xs animate-pulse">
-                Only {availableStock} left
+                Only {remainingStock} left
               </span>
             </div>
           ) : (
@@ -132,7 +133,7 @@ export default function ProductCard({ product, defaultSize }: ProductCardProps) 
                 </span>
               ) : isLowStock ? (
                 <span className="text-[10px] font-extrabold text-amber-600">
-                  {availableStock} left
+                  {remainingStock} left
                 </span>
               ) : (
                 <span className="text-[10px] font-bold text-emerald-600">

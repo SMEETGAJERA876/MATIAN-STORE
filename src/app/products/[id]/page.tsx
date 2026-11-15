@@ -44,7 +44,7 @@ export default function ProductDetailsPage() {
         (p as unknown as { slug?: string }).slug === id
     ) || products[0];
 
-  const { addToCart } = useCart();
+  const { addToCart, getRemainingStock } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [selectedFragrance, setSelectedFragrance] = useState("Lavender Fresh");
@@ -152,9 +152,11 @@ export default function ProductDetailsPage() {
   const baseName = product ? product.name.replace(/\s*\([^)]*\)/g, "").trim() : "Liquid Detergent";
   const currentTitle = `${baseName} (${selectedSize})`;
 
-  const availableStock = product ? getProductAvailableStock(product) : 0;
-  const isOutOfStock = availableStock <= 0 || (product && product.inStock === false);
-  const isLowStock = availableStock > 0 && availableStock <= 10;
+  const totalStock = product ? getProductAvailableStock(product) : 0;
+  const remainingStock = product ? getRemainingStock(product) : 0;
+  const isOutOfStock = totalStock <= 0 || (product && product.inStock === false) || remainingStock <= 0;
+  const isStockLimitReached = totalStock > 0 && remainingStock <= 0;
+  const isLowStock = remainingStock > 0 && remainingStock <= 10;
 
   const customVariantProduct = product ? {
     ...product,
@@ -183,20 +185,22 @@ export default function ProductDetailsPage() {
   };
 
   const handleBuyNow = () => {
-    if (isOutOfStock) {
+    if (isOutOfStock || remainingStock <= 0) {
       toast.error(`"${product.name}" is currently Out of Stock!`, { icon: "⚠️" });
       return;
     }
-    addToCart(customVariantProduct, quantity);
+    const qtyToAdd = Math.min(quantity, remainingStock);
+    addToCart(customVariantProduct, qtyToAdd);
     router.push("/cart");
   };
 
   const handleAddToCart = () => {
-    if (isOutOfStock) {
+    if (isOutOfStock || remainingStock <= 0) {
       toast.error(`"${product.name}" is currently Out of Stock!`, { icon: "⚠️" });
       return;
     }
-    addToCart(customVariantProduct, quantity);
+    const qtyToAdd = Math.min(quantity, remainingStock);
+    addToCart(customVariantProduct, qtyToAdd);
   };
 
   const handlePrevImage = () => {
@@ -355,15 +359,15 @@ export default function ProductDetailsPage() {
                 <span className="text-slate-300">|</span>
                 {isOutOfStock ? (
                   <span className="rounded-full bg-rose-100 text-rose-700 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider">
-                    Out of Stock
+                    {isStockLimitReached ? "Out of Stock (Limit Reached)" : "Out of Stock"}
                   </span>
                 ) : isLowStock ? (
                   <span className="rounded-full bg-amber-100 text-amber-800 px-2.5 py-0.5 text-[11px] font-extrabold animate-pulse">
-                    Only {availableStock} left in stock!
+                    Only {remainingStock} left in stock!
                   </span>
                 ) : (
                   <span className="rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-[11px] font-bold">
-                    In Stock ({availableStock} available)
+                    In Stock ({remainingStock} available)
                   </span>
                 )}
               </div>
@@ -481,11 +485,15 @@ export default function ProductDetailsPage() {
               {isOutOfStock ? (
                 <div className="rounded-2xl bg-rose-50 p-3 border border-rose-200 text-xs font-bold text-rose-700 flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-rose-600 inline-block shrink-0"></span>
-                  <span>Currently Out of Stock. Admin is restocking soon!</span>
+                  <span>
+                    {isStockLimitReached
+                      ? `Out of Stock: All ${totalStock} available bottle${totalStock === 1 ? "" : "s"} are already in your cart!`
+                      : "Currently Out of Stock. Admin is restocking soon!"}
+                  </span>
                 </div>
               ) : isLowStock ? (
                 <div className="rounded-2xl bg-amber-50 p-3 border border-amber-200 text-xs font-bold text-amber-800 flex items-center justify-between">
-                  <span>Hurry! Only {availableStock} bottle{availableStock === 1 ? "" : "s"} left</span>
+                  <span>Hurry! Only {remainingStock} bottle{remainingStock === 1 ? "" : "s"} left</span>
                   <span className="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Limited Stock</span>
                 </div>
               ) : null}
@@ -494,9 +502,9 @@ export default function ProductDetailsPage() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-bold text-slate-700">Quantity</label>
-                  {!isOutOfStock && (
+                  {!isOutOfStock && remainingStock > 0 && (
                     <span className="text-[10px] font-semibold text-slate-500">
-                      Max: {availableStock} {availableStock === 1 ? "bottle" : "bottles"}
+                      Available: {remainingStock} of {totalStock} {totalStock === 1 ? "bottle" : "bottles"}
                     </span>
                   )}
                 </div>
@@ -510,23 +518,33 @@ export default function ProductDetailsPage() {
                     -
                   </button>
                   <span className="font-extrabold text-sm text-[#102A5C]">
-                    {isOutOfStock ? 0 : quantity}
+                    {isOutOfStock ? 0 : Math.min(quantity, remainingStock)}
                   </span>
                   <button
                     type="button"
                     onClick={() => {
-                      if (quantity < availableStock) {
+                      if (quantity < remainingStock) {
                         setQuantity(quantity + 1);
                       } else {
-                        toast.error(`Only ${availableStock} bottle${availableStock === 1 ? "" : "s"} available in stock!`, { icon: "⚠️" });
+                        toast.error(
+                          `Stock limit reached! Only ${totalStock} bottle${totalStock === 1 ? "" : "s"} total in stock. Product is Out of Stock for more.`,
+                          { icon: "⚠️" }
+                        );
                       }
                     }}
-                    disabled={isOutOfStock || quantity >= availableStock}
+                    disabled={isOutOfStock || quantity >= remainingStock}
                     className="h-8 w-8 rounded-lg bg-white shadow-2xs font-extrabold text-slate-700 hover:bg-slate-100 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     +
                   </button>
                 </div>
+                {/* Out of stock limit warning when user reaches max counter */}
+                {!isOutOfStock && quantity >= remainingStock && remainingStock > 0 && (
+                  <div className="mt-2 rounded-xl bg-rose-50 border border-rose-200 p-2 text-[11px] font-extrabold text-rose-700 flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-rose-600 shrink-0"></span>
+                    <span>Out of Stock (Stock limit of {totalStock} reached)</span>
+                  </div>
+                )}
               </div>
 
               {/* Add to Cart Button */}
@@ -556,7 +574,7 @@ export default function ProductDetailsPage() {
                   disabled
                   className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs font-bold text-slate-400 cursor-not-allowed"
                 >
-                  <span>Sold Out</span>
+                  <span>Out of Stock</span>
                 </button>
               ) : (
                 <button

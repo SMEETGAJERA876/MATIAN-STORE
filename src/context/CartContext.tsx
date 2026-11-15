@@ -10,6 +10,7 @@ type CartContextType = {
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
+  getRemainingStock: (product: Product) => number;
   cartCount: number;
   subtotal: number;
   shippingFee: number;
@@ -36,6 +37,21 @@ export function getProductAvailableStock(product: Product): number {
     return Math.max(0, Number(product.stock));
   }
   return 50;
+}
+
+export function getRemainingStockForProduct(product: Product, cart: CartItem[]): number {
+  const totalStock = getProductAvailableStock(product);
+  if (totalStock <= 0) return 0;
+
+  const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
+  const inCart = (cart || [])
+    .filter(
+      (item) =>
+        (item.product.baseProductId || (item.product.id > 1000 ? item.product.id % 10000 : item.product.id)) === baseId
+    )
+    .reduce((sum, item) => sum + item.quantity, 0);
+
+  return Math.max(0, totalStock - inCart);
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -322,6 +338,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        getRemainingStock: (product: Product) => getRemainingStockForProduct(product, cart),
         cartCount,
         subtotal,
         shippingFee,

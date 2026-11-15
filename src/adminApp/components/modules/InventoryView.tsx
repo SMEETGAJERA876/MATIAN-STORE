@@ -158,7 +158,7 @@ export const InventoryView: React.FC = () => {
           <div className="flex justify-between items-start">
             <div>
               <div className="text-[11px] font-bold uppercase tracking-wider text-matrin-gray">Global Value</div>
-              <div className="text-2xl font-extrabold text-matrin-text dark:text-white mt-1">$2,482,900.00</div>
+              <div className="text-2xl font-extrabold text-matrin-text dark:text-white mt-1">{formatCurrency(2482900)}</div>
               <div className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-0.5">
                 <ArrowUpRight className="w-3.5 h-3.5" /> +4.2% from last month
               </div>

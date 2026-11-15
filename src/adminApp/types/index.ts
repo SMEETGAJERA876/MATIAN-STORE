@@ -129,7 +129,7 @@ export interface Promotion {
   id: string;
   code: string;
   incentiveType: 'Percentage' | 'Fixed Amount' | 'Free Shipping';
-  value: string; // e.g. "20%" or "$50.00"
+  value: string; // e.g. "20%" or "₹50.00"
   usageProgress: number; // e.g. 420
   usageLimit: number; // e.g. 500
   expiryDate: string;

@@ -260,7 +260,7 @@ export const PromotionsView: React.FC = () => {
             Revenue Attributed
           </div>
           <div className="text-3xl font-extrabold text-matrin-primary dark:text-blue-400 mt-1">
-            $42,900
+            {formatCurrency(42900)}
           </div>
           <div className="text-xs font-semibold text-matrin-secondary mt-2">
             18% of total sales
@@ -322,7 +322,7 @@ export const PromotionsView: React.FC = () => {
               Bestselling Discount
             </h4>
             <p className="text-xs text-matrin-gray dark:text-slate-400 mt-1">
-              Coupons with "$20 Off" have 40% higher conversion than "15% Off" this week.
+              Coupons with "₹20 Off" have 40% higher conversion than "15% Off" this week.
             </p>
           </div>
 
@@ -383,7 +383,7 @@ export const PromotionsView: React.FC = () => {
                 className="w-full px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
               >
                 <option value="Percentage">Percentage (%)</option>
-                <option value="Fixed Amount">Fixed Amount ($)</option>
+                <option value="Fixed Amount">Fixed Amount (₹)</option>
                 <option value="Free Shipping">Free Shipping</option>
               </select>
             </div>
@@ -396,7 +396,7 @@ export const PromotionsView: React.FC = () => {
                 type="text"
                 value={val}
                 onChange={(e) => setVal(e.target.value)}
-                placeholder="20% or $50"
+                placeholder="20% or ₹50"
                 className="w-full px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
               />
             </div>

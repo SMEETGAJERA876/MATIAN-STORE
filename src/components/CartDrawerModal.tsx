@@ -142,8 +142,17 @@ export default function CartDrawerModal() {
 
                         {/* Quantity Controls & Stock Warning */}
                         {(() => {
-                          const availableStock = getProductAvailableStock(product);
-                          const isMaxReached = quantity >= availableStock;
+                          const totalStock = getProductAvailableStock(product);
+                          const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
+                          const otherItemsQty = cart
+                            .filter(
+                              (item) =>
+                                item.product.id !== product.id &&
+                                (item.product.baseProductId || (item.product.id > 1000 ? item.product.id % 10000 : item.product.id)) === baseId
+                            )
+                            .reduce((sum, item) => sum + item.quantity, 0);
+                          const maxAllowed = Math.max(0, totalStock - otherItemsQty);
+                          const isMaxReached = quantity >= maxAllowed;
                           return (
                             <div className="mt-2">
                               <div className="flex items-center gap-2">
@@ -165,14 +174,14 @@ export default function CartDrawerModal() {
                                         ? "text-slate-300 cursor-not-allowed"
                                         : "text-slate-600 hover:text-slate-900"
                                     }`}
-                                    title={isMaxReached ? `Maximum available stock is ${availableStock}` : "Add one more"}
+                                    title={isMaxReached ? `Out of stock: Limit of ${totalStock} reached` : "Add one more"}
                                   >
                                     <Plus size={12} />
                                   </button>
                                 </div>
                                 {isMaxReached && (
-                                  <span className="text-[10px] font-bold text-amber-600">
-                                    (Max {availableStock} in stock)
+                                  <span className="text-[10px] font-extrabold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                                    Out of Stock (Max {totalStock} reached)
                                   </span>
                                 )}
                               </div>

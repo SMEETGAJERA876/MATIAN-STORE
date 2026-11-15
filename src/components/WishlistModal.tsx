@@ -15,7 +15,7 @@ interface WishlistModalProps {
 
 export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
   const { wishlist, toggleWishlist, wishlistCount } = useWishlist();
-  const { addToCart } = useCart();
+  const { addToCart, getRemainingStock } = useCart();
 
   if (!isOpen) return null;
 
@@ -109,14 +109,25 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleMoveToCart(item)}
-                          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#0645B5] text-white text-xs font-bold shadow-xs hover:bg-[#043694] transition active:scale-95 shrink-0"
-                          title="Move to Cart"
-                        >
-                          <ShoppingBag size={14} />
-                          <span className="hidden sm:inline">Add</span>
-                        </button>
+                        {getRemainingStock(item) <= 0 ? (
+                          <button
+                            type="button"
+                            disabled
+                            className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 text-slate-400 text-xs font-bold shrink-0 cursor-not-allowed"
+                            title="Out of Stock"
+                          >
+                            <span>Out of Stock</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleMoveToCart(item)}
+                            className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#0645B5] text-white text-xs font-bold shadow-xs hover:bg-[#043694] transition active:scale-95 shrink-0"
+                            title="Move to Cart"
+                          >
+                            <ShoppingBag size={14} />
+                            <span className="hidden sm:inline">Add</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => toggleWishlist(item)}
                           className="h-8 w-8 rounded-xl bg-slate-100 text-slate-500 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition shrink-0"

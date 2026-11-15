@@ -178,7 +178,7 @@ export const SalesReportsView: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData}>
                 <XAxis dataKey="category" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" tickFormatter={(v) => `$${v / 1000}k`} />
+                <YAxis stroke="#94a3b8" tickFormatter={(v) => `₹${v / 1000}k`} />
                 <Tooltip formatter={(value: any) => [formatCurrency(Number(value) || 0), 'Revenue']} />
                 <Bar dataKey="revenue" fill="#0B3A75" radius={[6, 6, 0, 0]} />
               </BarChart>

@@ -611,8 +611,17 @@ export default function CartPage() {
 
                       <div className="flex items-center justify-between w-full sm:w-auto gap-6 border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-100">
                         {(() => {
-                          const availableStock = getProductAvailableStock(product);
-                          const isMaxReached = quantity >= availableStock;
+                          const totalStock = getProductAvailableStock(product);
+                          const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
+                          const otherItemsQty = cart
+                            .filter(
+                              (item) =>
+                                item.product.id !== product.id &&
+                                (item.product.baseProductId || (item.product.id > 1000 ? item.product.id % 10000 : item.product.id)) === baseId
+                            )
+                            .reduce((sum, item) => sum + item.quantity, 0);
+                          const maxAllowed = Math.max(0, totalStock - otherItemsQty);
+                          const isMaxReached = quantity >= maxAllowed;
                           return (
                             <div className="flex flex-col items-center">
                               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
@@ -635,14 +644,14 @@ export default function CartPage() {
                                       ? "text-slate-300 cursor-not-allowed hover:bg-transparent"
                                       : "text-slate-600 hover:bg-slate-200"
                                   }`}
-                                  title={isMaxReached ? `Only ${availableStock} in stock` : "Add one"}
+                                  title={isMaxReached ? `Out of stock: Limit of ${totalStock} reached` : "Add one"}
                                 >
                                   +
                                 </button>
                               </div>
                               {isMaxReached && (
-                                <span className="text-[10px] font-bold text-amber-600 mt-1">
-                                  (Max {availableStock} in stock)
+                                <span className="text-[10px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 mt-1">
+                                  Out of Stock (Max {totalStock} reached)
                                 </span>
                               )}
                             </div>

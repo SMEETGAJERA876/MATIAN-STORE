@@ -18,7 +18,7 @@ type QuickViewModalProps = {
 };
 
 export default function QuickViewModal({ product, initialSize, onClose }: QuickViewModalProps) {
-  const { addToCart } = useCart();
+  const { addToCart, getRemainingStock } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
 
@@ -29,9 +29,11 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
 
   if (!product) return null;
 
-  const availableStock = getProductAvailableStock(product);
-  const isOutOfStock = availableStock <= 0 || product.inStock === false;
-  const isLowStock = availableStock > 0 && availableStock <= 10;
+  const totalStock = product ? getProductAvailableStock(product) : 0;
+  const remainingStock = product ? getRemainingStock(product) : 0;
+  const isOutOfStock = totalStock <= 0 || product.inStock === false || remainingStock <= 0;
+  const isStockLimitReached = totalStock > 0 && remainingStock <= 0;
+  const isLowStock = remainingStock > 0 && remainingStock <= 10;
 
   const isFav = isInWishlist(product.id);
   const sizePricing = getProductSizePrice(product.price, selectedSize);
@@ -41,11 +43,12 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
   const variantProduct = getVariantProduct(product, selectedSize);
 
   const handleAddToCart = () => {
-    if (isOutOfStock) {
+    if (isOutOfStock || remainingStock <= 0) {
       toast.error(`"${product.name}" is currently Out of Stock!`);
       return;
     }
-    addToCart(variantProduct, quantity);
+    const qtyToAdd = Math.min(quantity, remainingStock);
+    addToCart(variantProduct, qtyToAdd);
     onClose();
   };
 
@@ -106,15 +109,15 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
                   </span>
                   {isOutOfStock ? (
                     <span className="text-[11px] font-extrabold text-rose-600 uppercase tracking-wider ml-auto">
-                      Out of Stock
+                      {isStockLimitReached ? "Out of Stock (Limit Reached)" : "Out of Stock"}
                     </span>
                   ) : isLowStock ? (
                     <span className="text-[11px] font-extrabold text-amber-600 ml-auto">
-                      Only {availableStock} left in stock!
+                      Only {remainingStock} left in stock!
                     </span>
                   ) : (
                     <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 ml-auto">
-                      <Check size={12} /> In Stock ({availableStock} available)
+                      <Check size={12} /> In Stock ({remainingStock} available)
                     </span>
                   )}
                 </div>
@@ -187,23 +190,29 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
                       -
                     </button>
                     <span className="w-8 text-center font-bold text-slate-800 text-xs">
-                      {isOutOfStock ? 0 : quantity}
+                      {isOutOfStock ? 0 : Math.min(quantity, remainingStock)}
                     </span>
                     <button
                       type="button"
                       onClick={() => {
-                        if (quantity < availableStock) {
+                        if (quantity < remainingStock) {
                           setQuantity(quantity + 1);
                         } else {
-                          toast.error(`Only ${availableStock} bottle${availableStock === 1 ? "" : "s"} available in stock!`);
+                          toast.error(`Stock limit reached! Only ${totalStock} bottle${totalStock === 1 ? "" : "s"} available. Product is Out of Stock for more.`);
                         }
                       }}
-                      disabled={isOutOfStock || quantity >= availableStock}
+                      disabled={isOutOfStock || quantity >= remainingStock}
                       className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 hover:bg-[#EFEAE4] font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       +
                     </button>
                   </div>
+
+                  {(!isOutOfStock && quantity >= remainingStock && remainingStock > 0) && (
+                    <span className="text-[10px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                      Out of Stock (Limit reached)
+                    </span>
+                  )}
 
                   <button
                     onClick={() => toggleWishlist(product)}
