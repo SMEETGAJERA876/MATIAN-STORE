@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
    ========================================================================== */
 export const HERO_BANNER_CONFIG = {
   // Your poster / background image:
-  posterImage: "/images/hero-banner.webp",
+  posterImage: "/images/matrin-hero-banner.png",
 
   // Set to false if your festival poster ALREADY has text designed on it:
   showTextOverlay: true,
