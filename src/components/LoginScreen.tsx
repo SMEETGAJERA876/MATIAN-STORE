@@ -136,13 +136,13 @@ export default function LoginScreen() {
               </p>
             </div>
 
-            <div className="my-8 flex min-h-64 items-center justify-center rounded-xl bg-[#f0efe7] px-6 py-5">
+            <div className="my-8 flex min-h-64 items-center justify-center overflow-hidden rounded-xl bg-[#d2e8ef] p-3">
               <Image
-                src="/images/products/matrin-detergent-real.webp"
-                alt="MATRIN detergent"
-                width={320}
-                height={320}
-                className="max-h-64 w-auto object-contain"
+                src="/images/login-welcome.png"
+                alt="Illustration of a customer holding a MATRIN balloon"
+                width={768}
+                height={768}
+                className="h-auto w-full max-w-[22rem] object-contain"
               />
             </div>
 

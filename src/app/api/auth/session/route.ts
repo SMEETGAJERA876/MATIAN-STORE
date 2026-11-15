@@ -8,9 +8,13 @@ type UserProfile = {
   id: string;
   email: string;
   name: string;
+  authProvider?: string;
+  avatar?: string;
+  phone?: string;
   role: "ADMIN" | "CUSTOMER";
   status: "Active" | "Blocked" | "Inactive";
   createdAt: string;
+  updatedAt: string;
   totalOrders: number;
   totalSpent: number;
 };
@@ -20,15 +24,21 @@ function createProfile(
   email: string,
   name: string,
   emailVerified: boolean,
-  existing?: Partial<UserProfile> | null
+  existing?: Partial<UserProfile> | null,
+  accountMetadata?: Pick<UserProfile, "authProvider" | "avatar" | "phone">
 ): UserProfile {
+  const now = new Date().toISOString();
   return {
     id: uid,
     email,
     name: name || existing?.name || email.split("@")[0],
+    authProvider: accountMetadata?.authProvider || existing?.authProvider || "password",
+    avatar: accountMetadata?.avatar || existing?.avatar,
+    phone: accountMetadata?.phone || existing?.phone,
     role: isAdminEmail(email, emailVerified) ? "ADMIN" : "CUSTOMER",
     status: existing?.status || "Active",
-    createdAt: existing?.createdAt || new Date().toISOString(),
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
     totalOrders: Number(existing?.totalOrders) || 0,
     totalSpent: Number(existing?.totalSpent) || 0,
   };
@@ -99,7 +109,12 @@ export async function POST(req: Request) {
       email,
       name || decoded.name || "",
       decoded.email_verified === true,
-      existing
+      existing,
+      {
+        authProvider: decoded.firebase.sign_in_provider,
+        avatar: decoded.picture,
+        phone: decoded.phone_number,
+      }
     );
     await upsertStoreRecord("Users", profile);
     const sessionCookie = await adminAuth.createSessionCookie(idToken, {

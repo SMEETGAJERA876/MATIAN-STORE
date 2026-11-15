@@ -14,6 +14,7 @@ export interface User {
   role: UserRole;
   phone?: string;
   avatar?: string;
+  authProvider?: string;
   createdAt: string;
   lastLogin?: string;
   totalOrders: number;

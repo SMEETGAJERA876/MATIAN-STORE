@@ -19,11 +19,13 @@ In the Firebase Console:
 6. Under **Authentication > Users**, create the admin account and verify its email address. Set that email as `ADMIN_EMAIL` in Vercel. Admin access requires the verified email to match this server-side value.
 7. In **Project settings > Service accounts**, generate a private key. Keep it private; do not send it in chat or commit it to the repository.
 
-The login page supports Google popup sign-in. If the Google email already belongs to an email/password account, sign in with that password once when prompted to link the methods; later sign-ins can use Google directly.
+The login page supports Google popup sign-in. If the Google email already belongs to an email/password account, sign in with that password once when prompted to link the methods; later sign-ins can use Google directly. Both email registration and Google sign-in create/update a `Users/{uid}` profile in Realtime Database with the user's name, email, role, sign-in provider, and available profile details. Firebase Authentication securely stores the login credentials and password hashes; passwords are never copied into Realtime Database. Shipping/contact details are stored with the order and customer record when the customer checks out.
 
 Existing Supabase accounts and passwords are not automatically transferred. Customers will need to create Firebase accounts. If you have an approved account-migration plan, existing user emails can be migrated separately, but passwords cannot be recovered from Supabase for direct copying.
 
 ## Vercel environment variables
+
+The public Web App settings have the values from the registered `matrin-product` app as code defaults, so missing `NEXT_PUBLIC_FIREBASE_*` variables will not disable the login page. You can still set or override them in Vercel. The server-side service-account JSON and admin email below are required and must be configured in Vercel before sign-in can establish an app session.
 
 Set these variables for the Vercel deployment and redeploy:
 

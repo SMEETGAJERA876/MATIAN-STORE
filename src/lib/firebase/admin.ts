@@ -1,6 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getDatabase } from "firebase-admin/database";
+import { firebaseWebConfig } from "@/lib/firebase/config";
 
 const APP_NAME = "matrin-store";
 
@@ -69,9 +70,7 @@ export function getFirebaseConfigStatus() {
     serviceAccountConfigured: Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_JSON),
     adminEmailConfigured: Boolean(process.env.ADMIN_EMAIL),
     authWebConfigConfigured: Boolean(
-      process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
-        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
-        process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+      firebaseWebConfig.apiKey && firebaseWebConfig.authDomain && firebaseWebConfig.appId
     ),
   };
 }
