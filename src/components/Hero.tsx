@@ -87,7 +87,7 @@ export default function Hero() {
       {/* ========================================================
           FLOATING 4-METRIC TRUST BAR (Matching Reference Mockup)
           ======================================================== */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20 -mt-6 sm:-mt-8 lg:-mt-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20 mt-4">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
