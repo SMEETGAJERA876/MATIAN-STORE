@@ -4,7 +4,7 @@ import { Product } from "@/types/product";
 import { useCart, getProductAvailableStock } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { X, Star, Heart, ShoppingBag, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +26,17 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
   const [selectedSize, setSelectedSize] = useState<string>(
     initialSize || (product ? product.selectedSize || availableSizes[0] : "1 L")
   );
+
+  useEffect(() => {
+    if (!product) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [product, onClose]);
 
   if (!product) return null;
 
@@ -60,7 +71,7 @@ export default function QuickViewModal({ product, initialSize, onClose }: QuickV
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-[#FAF7F2] border border-[#EFEAE4] shadow-2xl"
+          className="relative w-full max-w-3xl max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-3xl bg-[#FAF7F2] border border-[#EFEAE4] shadow-2xl"
         >
           {/* Close button */}
           <button

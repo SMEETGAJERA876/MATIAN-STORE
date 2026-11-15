@@ -41,7 +41,7 @@ interface NavItem {
   badge?: number | string;
 }
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<{ mobileCollapsed?: boolean }> = ({ mobileCollapsed = false }) => {
   const { logout } = useAuth();
   const {
     activeModule,
@@ -54,6 +54,7 @@ export const Sidebar: React.FC = () => {
     addToast,
   } = useAdminStore();
 
+  const isCollapsed = mobileCollapsed || isSidebarCollapsed;
   const lowStockCount = inventory.filter((i) => i.currentStock <= i.criticalLevel).length;
   const pendingReviewsCount = reviews.filter((r) => r.status === 'Pending').length;
   const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
@@ -97,7 +98,7 @@ export const Sidebar: React.FC = () => {
 
   const renderNavGroup = (title: string, items: NavItem[]) => (
     <div className="space-y-1 mb-6">
-      {!isSidebarCollapsed && (
+      {!isCollapsed && (
         <h4 className="px-4 text-[11px] font-bold uppercase tracking-wider text-matrin-gray dark:text-slate-400 mb-2">
           {title}
         </h4>
@@ -108,6 +109,7 @@ export const Sidebar: React.FC = () => {
           <button
             key={item.id}
             onClick={() => setActiveModule(item.id)}
+            aria-label={item.label}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150 group ${
               isActive
                 ? 'bg-matrin-primary/10 dark:bg-blue-600/20 text-matrin-primary dark:text-blue-400 font-semibold shadow-card'
@@ -118,12 +120,12 @@ export const Sidebar: React.FC = () => {
               <span className={`transition-transform duration-150 ${isActive ? 'scale-110 text-matrin-primary dark:text-blue-400' : 'group-hover:scale-105'}`}>
                 {item.icon}
               </span>
-              {!isSidebarCollapsed && (
+              {!isCollapsed && (
                 <span className="truncate">{item.label}</span>
               )}
             </div>
 
-            {!isSidebarCollapsed && item.badge && (
+            {!isCollapsed && item.badge && (
               <span
                 className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                   isActive
@@ -137,7 +139,7 @@ export const Sidebar: React.FC = () => {
           </button>
         );
 
-        return isSidebarCollapsed ? (
+        return isCollapsed ? (
           <Tooltip key={item.id} label={item.label} position="right" className="w-full">
             {navButton}
           </Tooltip>
@@ -151,20 +153,23 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       className={`fixed top-0 left-0 bottom-0 z-40 bg-white dark:bg-matrin-darkcard border-r border-matrin-border dark:border-matrin-darkborder flex flex-col justify-between transition-all duration-300 ${
-        isSidebarCollapsed ? 'w-20' : 'w-64'
+        isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
       {/* Brand Header */}
       <div>
-        {isSidebarCollapsed ? (
+        {isCollapsed ? (
           <div className="h-20 flex flex-col items-center justify-center gap-2 border-b border-matrin-border dark:border-matrin-darkborder">
             <MatrinLogo variant="icon" className="shrink-0" />
-            <button
-              onClick={toggleSidebar}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            {!mobileCollapsed && (
+              <button
+                onClick={toggleSidebar}
+                aria-label="Expand sidebar"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         ) : (
           <div className="h-20 px-5 flex items-center justify-between border-b border-matrin-border dark:border-matrin-darkborder">
@@ -187,7 +192,7 @@ export const Sidebar: React.FC = () => {
         )}
 
         {/* Scrollable Navigation */}
-        <div className="p-3 overflow-y-auto max-h-[calc(100vh-180px)] space-y-1">
+        <div className={`p-3 overflow-y-auto max-h-[calc(100vh-180px)] space-y-1 ${isCollapsed ? 'px-2' : ''}`}>
           {renderNavGroup('Main Menu', mainNavItems)}
           {renderNavGroup('Analytics & AI', analyticsNavItems)}
           {renderNavGroup('Management', operationsNavItems)}
@@ -196,7 +201,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Footer Support & Logout */}
       <div className="p-3 border-t border-matrin-border dark:border-matrin-darkborder space-y-2 bg-matrin-bg/30 dark:bg-slate-900/30">
-        {!isSidebarCollapsed ? (
+        {!isCollapsed ? (
           <button
             onClick={() => setActiveModule('support-tickets')}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-matrin-primary text-white font-semibold text-xs shadow-soft hover:bg-matrin-primary-dark transition-all"
@@ -208,6 +213,7 @@ export const Sidebar: React.FC = () => {
           <Tooltip label="Support Center" position="right" className="w-full">
             <button
               onClick={() => setActiveModule('support-tickets')}
+              aria-label="Support Center"
               className="w-full flex justify-center p-2.5 rounded-xl bg-matrin-primary text-white shadow-soft"
             >
               <Headphones className="w-4 h-4" />
@@ -215,10 +221,11 @@ export const Sidebar: React.FC = () => {
           </Tooltip>
         )}
 
-        {isSidebarCollapsed ? (
+        {isCollapsed ? (
           <Tooltip label="Logout" position="right" className="w-full">
             <button
               onClick={handleLogout}
+              aria-label="Logout"
               className="w-full flex justify-center p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
             >
               <LogOut className="w-4 h-4 shrink-0" />

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateToken, TOKEN_NAME } from "@/lib/auth";
+import { generateToken, getAuthFromReq, TOKEN_NAME } from "@/lib/auth";
 
 // Backs the client-side "Quick Admin Login" demo account, which never creates
 // a Supabase session. Admin-only write routes verify requests via
@@ -8,6 +8,29 @@ import { generateToken, TOKEN_NAME } from "@/lib/auth";
 // silently 403s while the UI still shows a success toast.
 const ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@matrin.com").toLowerCase();
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!";
+
+export async function GET(req: Request) {
+  const auth = await getAuthFromReq(req);
+  if (!auth || auth.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, {
+      status: 401,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  return NextResponse.json({
+    id: auth.userId,
+    name: auth.name,
+    email: auth.email,
+    role: auth.role,
+    status: "Active",
+    createdAt: new Date().toISOString(),
+    totalOrders: 42,
+    totalSpent: 98000,
+  }, {
+    headers: { "Cache-Control": "no-store" },
+  });
+}
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);

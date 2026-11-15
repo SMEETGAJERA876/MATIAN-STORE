@@ -73,6 +73,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           const profile = await fetchProfile(session.user.id, session.user.email || "");
           if (active) setUser(profile);
+        } else {
+          const response = await fetch("/api/auth/admin-session", { cache: "no-store" });
+          if (response.ok) {
+            const adminUser: User = await response.json();
+            if (active && adminUser.role?.toUpperCase() === "ADMIN") {
+              setUser(adminUser);
+              setToken("admin_mock_token");
+            }
+          } else if (response.status !== 401) {
+            console.error("Could not restore admin session:", response.status);
+          }
         }
       } catch (err) {
         console.warn("Could not load initial auth session:", err);

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AdminProvider, useAdminStore } from './store/adminStore';
 import { Sidebar } from './components/layout/Sidebar';
 import { Navbar } from './components/layout/Navbar';
@@ -39,6 +39,15 @@ import { ModuleType } from './types';
 
 export const MainLayout: React.FC<{ initialModule?: string }> = ({ initialModule }) => {
   const { activeModule, setActiveModule, isSidebarCollapsed } = useAdminStore();
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+    updateViewport();
+    mediaQuery.addEventListener('change', updateViewport);
+    return () => mediaQuery.removeEventListener('change', updateViewport);
+  }, []);
 
   useEffect(() => {
     if (initialModule && initialModule !== 'login') {
@@ -117,12 +126,12 @@ export const MainLayout: React.FC<{ initialModule?: string }> = ({ initialModule
   return (
     <div className="min-h-screen bg-matrin-bg dark:bg-matrin-darkbg text-matrin-text dark:text-matrin-darktext flex transition-colors duration-200">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar mobileCollapsed={isMobileViewport} />
 
       {/* Main Content Area */}
       <div
         className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
-          isSidebarCollapsed ? 'ml-20' : 'ml-64'
+          isMobileViewport || isSidebarCollapsed ? 'ml-20' : 'ml-64'
         }`}
       >
         <Navbar />
