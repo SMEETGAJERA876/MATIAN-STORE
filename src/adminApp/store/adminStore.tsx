@@ -279,6 +279,26 @@ const getLocalCustomProducts = (): any[] => {
   }
 };
 
+const getLocalCustomCategories = (): Category[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('matrin_custom_categories');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const getLocalCustomCoupons = (): Promotion[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('matrin_custom_coupons');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -353,11 +373,35 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     return initialProducts;
   });
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const custom = getLocalCustomCategories();
+    if (custom.length > 0) {
+      const merged = [...custom];
+      initialCategories.forEach((ic) => {
+        if (!merged.some((m) => m.id === ic.id || m.name.toLowerCase() === ic.name.toLowerCase())) {
+          merged.push(ic);
+        }
+      });
+      return merged;
+    }
+    return initialCategories;
+  });
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [promotions, setPromotions] = useState<Promotion[]>(initialPromotions);
+  const [promotions, setPromotions] = useState<Promotion[]>(() => {
+    const custom = getLocalCustomCoupons();
+    if (custom.length > 0) {
+      const merged = [...custom];
+      initialPromotions.forEach((ip) => {
+        if (!merged.some((m) => m.id === ip.id || m.code.toLowerCase() === ip.code.toLowerCase())) {
+          merged.push(ip);
+        }
+      });
+      return merged;
+    }
+    return initialPromotions;
+  });
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
@@ -399,11 +443,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     async function syncBackendData() {
       try {
         const apiBase = '/api';
-        const [resProd, resOrd, resCust, resTickets] = await Promise.all([
+        const [resProd, resOrd, resCust, resTickets, resCats, resCoupons] = await Promise.all([
           fetch(`${apiBase}/products`),
           fetch(`${apiBase}/orders`),
           fetch(`${apiBase}/customers`),
           fetch(`${apiBase}/support-tickets`),
+          fetch(`${apiBase}/categories`),
+          fetch(`${apiBase}/coupons`),
         ]);
 
         if (resProd.ok) {
@@ -552,6 +598,54 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 createdAt: t.createdAt?.slice(0, 16).replace('T', ' ') || new Date().toISOString().slice(0, 16).replace('T', ' '),
               }))
             );
+          }
+        }
+        if (resCats.ok) {
+          const apiCats = await resCats.json();
+          if (Array.isArray(apiCats) && apiCats.length > 0) {
+            const mappedCats: Category[] = apiCats.map((c: any) => ({
+              id: String(c.id),
+              name: c.name,
+              image: c.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
+              parentCategory: c.description || 'General',
+              productCount: Number(c.productCount) || 0,
+              revenue: Number(c.revenue) || 0,
+              status: (c.status || (c.isActive ? 'Active' : 'Inactive')) as 'Active' | 'Draft' | 'Inactive',
+              topLevel: Boolean(c.topLevel),
+              subcategories: Array.isArray(c.subcategories) ? c.subcategories : [],
+            }));
+            const customCats = getLocalCustomCategories();
+            const mergedCats = [...customCats];
+            mappedCats.forEach((ac) => {
+              if (!mergedCats.some((m) => m.id === ac.id || m.name.toLowerCase() === ac.name.toLowerCase())) {
+                mergedCats.push(ac);
+              }
+            });
+            setCategories(mergedCats);
+          }
+        }
+        if (resCoupons.ok) {
+          const apiCoupons = await resCoupons.json();
+          if (Array.isArray(apiCoupons) && apiCoupons.length > 0) {
+            const mappedPromos: Promotion[] = apiCoupons.map((c: any) => ({
+              id: String(c.id),
+              code: c.code,
+              incentiveType: (c.discountType === 'percentage' ? 'Percentage' : 'Fixed Amount') as 'Percentage' | 'Fixed Amount',
+              value: c.discountType === 'percentage' ? `${c.discountValue}%` : `₹${c.discountValue}`,
+              usageProgress: Number(c.usageCount) || 0,
+              usageLimit: Number(c.usageLimit) || 500,
+              expiryDate: c.validUntil || 'Dec 31, 2026',
+              status: (c.isActive ? 'Active' : 'Expired') as 'Active' | 'Scheduled' | 'Archived' | 'Expired',
+              revenueAttributed: 0,
+            }));
+            const customCoupons = getLocalCustomCoupons();
+            const mergedPromos = [...customCoupons];
+            mappedPromos.forEach((ap) => {
+              if (!mergedPromos.some((m) => m.id === ap.id || m.code.toLowerCase() === ap.code.toLowerCase())) {
+                mergedPromos.push(ap);
+              }
+            });
+            setPromotions(mergedPromos);
           }
         }
       } catch (err) {
@@ -808,8 +902,30 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setStockLogs((prev) => [newLog, ...prev]);
 
-    // 4. Sync to the backend so the change is reflected on the live storefront,
-    // not just in this admin session's local state.
+    // 4. Sync immediately to localStorage and dispatch event for real-time storefront update
+    try {
+      const localCustom = getLocalCustomProducts();
+      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(targetProd.id));
+      let updatedList: any[];
+      if (existingIndex !== -1) {
+        updatedList = localCustom.map((p: any) =>
+          String(p.id) === String(targetProd.id)
+            ? { ...p, stock: updatedStock, stockCount: updatedStock, inStock: updatedStock > 0 }
+            : p
+        );
+      } else {
+        updatedList = [
+          { ...targetProd, stock: updatedStock, stockCount: updatedStock, inStock: updatedStock > 0 },
+          ...localCustom,
+        ];
+      }
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    // 5. Sync to the backend so the change is reflected on the live storefront API
     fetch('/api/inventory/adjust', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -878,6 +994,28 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
     setStockLogs((prev) => prev.filter((l) => l.id !== logId));
 
+    try {
+      const localCustom = getLocalCustomProducts();
+      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(targetProd.id));
+      let updatedList: any[];
+      if (existingIndex !== -1) {
+        updatedList = localCustom.map((p: any) =>
+          String(p.id) === String(targetProd.id)
+            ? { ...p, stock: reversedStock, stockCount: reversedStock, inStock: reversedStock > 0 }
+            : p
+        );
+      } else {
+        updatedList = [
+          { ...targetProd, stock: reversedStock, stockCount: reversedStock, inStock: reversedStock > 0 },
+          ...localCustom,
+        ];
+      }
+      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
+      window.dispatchEvent(new Event('matrin_products_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
     fetch('/api/inventory/adjust', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -897,31 +1035,90 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addCategory = (catData: Omit<Category, 'id'>) => {
+    const newId = 'cat-' + Date.now();
     const newCat: Category = {
       ...catData,
-      id: 'cat-' + (categories.length + 1),
+      id: newId,
     };
-    setCategories((prev) => [...prev, newCat]);
+    setCategories((prev) => [newCat, ...prev.filter((c) => c.id !== newId)]);
+    try {
+      const localCustom = getLocalCustomCategories();
+      const updated = [newCat, ...localCustom.filter((c) => c.id !== newId)];
+      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_categories_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    fetch('/api/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: newId,
+        name: newCat.name,
+        description: newCat.parentCategory || '',
+        status: newCat.status,
+      }),
+    }).catch(() => addToast('error', 'Saved category locally, but failed to reach the server.'));
+
     addToast('success', `Category "${newCat.name}" added successfully`);
   };
 
   const updateCategory = (id: string, updatedData: Partial<Category>) => {
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updatedData } : c)));
+    try {
+      const localCustom = getLocalCustomCategories();
+      const existing = categories.find((c) => c.id === id);
+      const merged = { ...(existing || {}), ...updatedData, id } as Category;
+      const updated = localCustom.some((c) => c.id === id)
+        ? localCustom.map((c) => (c.id === id ? { ...c, ...updatedData } : c))
+        : [merged, ...localCustom];
+      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_categories_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    fetch(`/api/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData),
+    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
+
     addToast('info', 'Category details updated');
   };
 
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((c) => c.id !== id));
+    try {
+      const localCustom = getLocalCustomCategories();
+      const updated = localCustom.filter((c) => c.id !== id);
+      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
+
+      const rawDeleted = localStorage.getItem('matrin_deleted_categories');
+      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        localStorage.setItem('matrin_deleted_categories', JSON.stringify(deletedIds));
+      }
+
+      window.dispatchEvent(new Event('matrin_categories_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    fetch(`/api/categories/${id}`, { method: 'DELETE' }).catch(() =>
+      addToast('error', 'Deleted locally, but failed to reach the server.')
+    );
+
     addToast('warning', 'Category deleted');
   };
 
   const toggleCategoryStatus = (id: string) => {
-    setCategories((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, status: c.status === 'Active' ? 'Inactive' : 'Active' } : c
-      )
-    );
-    addToast('info', 'Category status updated');
+    const cat = categories.find((c) => c.id === id);
+    if (!cat) return;
+    const newStatus = cat.status === 'Active' ? 'Inactive' : 'Active';
+    updateCategory(id, { status: newStatus });
   };
 
   const updateOrderStatus = (
@@ -932,30 +1129,118 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOrders((prev) =>
       prev.map((o) => (o.id === id ? { ...o, paymentStatus, shippingStatus } : o))
     );
+
+    fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        paymentStatus,
+        orderStatus: shippingStatus === 'In Transit' ? 'Shipped' : shippingStatus === 'Delivered' ? 'Delivered' : shippingStatus === 'Cancelled' ? 'Cancelled' : 'Processing',
+      }),
+    }).catch(() => addToast('error', 'Order updated locally, but failed to reach the server.'));
+
     addToast('success', `Order ${id} status updated`);
   };
 
   const updateReviewStatus = (id: string, status: Review['status']) => {
     setReviews((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+
+    fetch(`/api/reviews/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    }).catch(() => addToast('error', 'Review updated locally, but failed to reach the server.'));
+
     addToast('info', `Review updated to ${status}`);
   };
 
   const addPromotion = (promoData: Omit<Promotion, 'id'>) => {
+    const newId = 'promo-' + Date.now();
     const newPromo: Promotion = {
       ...promoData,
-      id: 'promo-' + (promotions.length + 1),
+      id: newId,
     };
-    setPromotions((prev) => [newPromo, ...prev]);
+    setPromotions((prev) => [newPromo, ...prev.filter((p) => p.id !== newId)]);
+    try {
+      const localCustom = getLocalCustomCoupons();
+      const updated = [newPromo, ...localCustom.filter((p) => p.id !== newId)];
+      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_coupons_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    const discountValue = parseFloat(newPromo.value.replace(/[^0-9.]/g, '')) || 10;
+    fetch('/api/coupons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: newId,
+        code: newPromo.code,
+        discountType: newPromo.incentiveType === 'Fixed Amount' ? 'fixed' : 'percentage',
+        discountValue,
+        usageLimit: newPromo.usageLimit,
+        isActive: newPromo.status === 'Active',
+      }),
+    }).catch(() => addToast('error', 'Saved coupon locally, but failed to reach the server.'));
+
     addToast('success', `Coupon code "${newPromo.code}" generated!`);
   };
 
   const updatePromotion = (id: string, updatedData: Partial<Promotion>) => {
     setPromotions((prev) => prev.map((p) => (p.id === id ? { ...p, ...updatedData } : p)));
+    try {
+      const localCustom = getLocalCustomCoupons();
+      const existing = promotions.find((p) => p.id === id);
+      const merged = { ...(existing || {}), ...updatedData, id } as Promotion;
+      const updated = localCustom.some((p) => p.id === id)
+        ? localCustom.map((p) => (p.id === id ? { ...p, ...updatedData } : p))
+        : [merged, ...localCustom];
+      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
+      window.dispatchEvent(new Event('matrin_coupons_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    const discountValue = updatedData.value ? (parseFloat(updatedData.value.replace(/[^0-9.]/g, '')) || 10) : undefined;
+    fetch(`/api/coupons/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...(updatedData.code ? { code: updatedData.code } : {}),
+        ...(updatedData.incentiveType ? { discountType: updatedData.incentiveType === 'Fixed Amount' ? 'fixed' : 'percentage' } : {}),
+        ...(discountValue !== undefined ? { discountValue } : {}),
+        ...(updatedData.usageLimit !== undefined ? { usageLimit: updatedData.usageLimit } : {}),
+        ...(updatedData.status ? { isActive: updatedData.status === 'Active' } : {}),
+      }),
+    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
+
     addToast('info', 'Coupon details updated');
   };
 
   const deletePromotion = (id: string) => {
     setPromotions((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const localCustom = getLocalCustomCoupons();
+      const updated = localCustom.filter((p) => p.id !== id);
+      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
+
+      const rawDeleted = localStorage.getItem('matrin_deleted_coupons');
+      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        localStorage.setItem('matrin_deleted_coupons', JSON.stringify(deletedIds));
+      }
+
+      window.dispatchEvent(new Event('matrin_coupons_updated'));
+    } catch (e) {
+      console.warn('LocalStorage error:', e);
+    }
+
+    fetch(`/api/coupons/${id}`, { method: 'DELETE' }).catch(() =>
+      addToast('error', 'Deleted locally, but failed to reach the server.')
+    );
+
     addToast('warning', 'Coupon deleted');
   };
 

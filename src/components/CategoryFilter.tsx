@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ProductCategory } from "@/types/product";
 import { SlidersHorizontal, Layers } from "lucide-react";
 
-const categories: ProductCategory[] = [
+const DEFAULT_CATEGORIES: ProductCategory[] = [
   "All",
   "Laundry Care",
   "Dish Care",
@@ -39,13 +40,38 @@ export default function CategoryFilter({
   sortBy,
   onSelectSort,
 }: CategoryFilterProps) {
+  const [categoriesList, setCategoriesList] = useState<ProductCategory[]>(DEFAULT_CATEGORIES);
+
+  useEffect(() => {
+    const loadCategories = () => {
+      try {
+        const raw = localStorage.getItem("matrin_custom_categories");
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            const customNames = list
+              .filter((c: any) => c.status === "Active" || c.status === undefined)
+              .map((c: any) => c.name);
+            const combined = Array.from(new Set([...DEFAULT_CATEGORIES, ...customNames]));
+            setCategoriesList(combined);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load custom categories:", e);
+      }
+    };
+    loadCategories();
+    window.addEventListener("matrin_categories_updated", loadCategories);
+    return () => window.removeEventListener("matrin_categories_updated", loadCategories);
+  }, []);
+
   return (
     <div className="space-y-4 mb-8 border-b border-[#DCE8F5] pb-6">
       {/* Category Pills & Sort Selector Row */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Category Pills */}
         <div className="flex flex-wrap items-center gap-2">
-          {categories.map((category) => {
+          {categoriesList.map((category) => {
             const isActive = selectedCategory === category;
             return (
               <button

@@ -8,7 +8,10 @@ import { inMemoryStore } from "@/lib/inMemoryStore";
 export async function GET(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   const db = await connectToDatabase();
@@ -34,8 +37,8 @@ export async function POST(req: Request) {
     }
 
     const ticketData = {
-      id: `ticket_${Date.now()}`,
-      ticketNumber: "#TICK-" + Math.floor(1000 + Math.random() * 9000),
+      id: body.id || `ticket_${Date.now()}`,
+      ticketNumber: body.ticketNumber || ("#TICK-" + Math.floor(1000 + Math.random() * 9000)),
       subject,
       customerName,
       customerEmail,

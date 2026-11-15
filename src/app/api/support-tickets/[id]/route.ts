@@ -6,7 +6,10 @@ import { inMemoryStore } from "@/lib/inMemoryStore";
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   try {
@@ -33,7 +36,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   try {

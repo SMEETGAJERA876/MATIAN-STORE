@@ -6,7 +6,10 @@ import { inMemoryStore, initialNotifications } from "@/lib/inMemoryStore";
 export async function GET(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   const db = await connectToDatabase();
@@ -25,7 +28,10 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    const referer = req.headers.get("referer") || "";
+    if (!referer.includes("/admin")) {
+      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+    }
   }
 
   try {

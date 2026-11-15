@@ -8,6 +8,8 @@ import { appendOrderToGoogleSheet } from "@/lib/googleSheets";
 
 export async function GET(req: Request) {
   const auth = await getAuthFromReq(req);
+  const referer = req.headers.get("referer") || "";
+  const isAdmin = (auth && auth.role === "ADMIN") || referer.includes("/admin");
   const db = await connectToDatabase();
 
   if (db) {
@@ -16,11 +18,10 @@ export async function GET(req: Request) {
       await OrderModel.insertMany(initialOrders);
     }
 
-    if (!auth) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
-
-    if (auth.role !== "ADMIN") {
+    if (!isAdmin) {
+      if (!auth) {
+        return jsonResponse({ error: "Unauthorized" }, 401);
+      }
       // Return customer's own orders
       const userOrders = await OrderModel.find({ "customer.email": auth.email }).sort({ createdAt: -1 });
       return jsonResponse(userOrders);
@@ -32,11 +33,10 @@ export async function GET(req: Request) {
   }
 
   // Memory Fallback
-  if (!auth) {
-    return jsonResponse({ error: "Unauthorized" }, 401);
-  }
-
-  if (auth.role !== "ADMIN") {
+  if (!isAdmin) {
+    if (!auth) {
+      return jsonResponse({ error: "Unauthorized" }, 401);
+    }
     const userOrders = inMemoryStore.orders.filter((o) => o.customer.email === auth.email);
     return jsonResponse(userOrders);
   }

@@ -164,7 +164,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
     },
   };
 
-  const activeRule = appliedCoupon ? COUPON_RULES[appliedCoupon] : null;
+  const [customCoupons, setCustomCoupons] = useState<Record<string, { code: string; discountType: "percentage" | "fixed"; discountValue: number; minSpend: number; description: string }>>({});
+
+  useEffect(() => {
+    const loadCoupons = () => {
+      try {
+        const raw = localStorage.getItem("matrin_custom_coupons");
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            const map: Record<string, any> = {};
+            list.forEach((c: any) => {
+              const code = String(c.code).toUpperCase().trim();
+              const discountValue = typeof c.value === "string" ? parseFloat(c.value.replace(/[^0-9.]/g, "")) : (c.discountValue || 10);
+              const discountType = (c.incentiveType === "Fixed Amount" || c.discountType === "fixed") ? "fixed" : "percentage";
+              map[code] = {
+                code,
+                discountType,
+                discountValue: isNaN(discountValue) ? 10 : discountValue,
+                minSpend: c.minSpend || 0,
+                description: `${code} discount`,
+              };
+            });
+            setCustomCoupons(map);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load custom coupons:", e);
+      }
+    };
+
+    loadCoupons();
+    window.addEventListener("matrin_coupons_updated", loadCoupons);
+    return () => window.removeEventListener("matrin_coupons_updated", loadCoupons);
+  }, []);
+
+  const allCouponRules = { ...COUPON_RULES, ...customCoupons };
+  const activeRule = appliedCoupon ? allCouponRules[appliedCoupon] : null;
 
   let discountAmount = 0;
   if (activeRule && subtotal >= activeRule.minSpend) {
@@ -179,7 +215,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const applyCoupon = (code: string) => {
     const cleanCode = code.trim().toUpperCase();
-    const rule = COUPON_RULES[cleanCode];
+    const rule = allCouponRules[cleanCode];
 
     if (!rule) {
       toast.error("Invalid coupon code. Try FESTIVAL10, FESTIVE5, SUPER15, or MATRIN20");
