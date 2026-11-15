@@ -1,62 +1,57 @@
-import { connectToDatabase } from "@/lib/db";
-import { CategoryModel } from "@/models/Category";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  deleteStoreRecord,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetCategory = {
+  id: string | number;
+  [key: string]: unknown;
+};
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const body = await req.json();
-
-    const db = await connectToDatabase();
-    if (db) {
-      const updated = await CategoryModel.findOneAndUpdate({ id }, { $set: body }, { new: true });
-      if (updated) return jsonResponse({ success: true, category: updated });
-    }
-
-    const index = inMemoryStore.categories.findIndex((c) => c.id === id);
-    if (index !== -1) {
-      inMemoryStore.categories[index] = { ...inMemoryStore.categories[index], ...body };
-      return jsonResponse({ success: true, category: inMemoryStore.categories[index] });
-    }
-
-    return jsonResponse({ error: "Category not found" }, 404);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update category" }, 500);
+    const updated = await patchStoreRecord<SheetCategory>(
+      "Categories",
+      id,
+      await req.json()
+    );
+    return updated
+      ? jsonResponse({ success: true, category: updated })
+      : jsonResponse({ error: "Category not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update category" },
+      503
+    );
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const db = await connectToDatabase();
-    if (db) {
-      await CategoryModel.deleteOne({ id });
-      return jsonResponse({ success: true, message: "Category deleted" });
-    }
-
-    inMemoryStore.categories = inMemoryStore.categories.filter((c) => c.id !== id);
+    const categories = await listStoreRecords<SheetCategory>("Categories");
+    const category = categories.find((entry) => String(entry.id) === id);
+    if (!category) return jsonResponse({ error: "Category not found" }, 404);
+    await deleteStoreRecord("Categories", category.id);
     return jsonResponse({ success: true, message: "Category deleted" });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to delete category" }, 500);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete category" },
+      503
+    );
   }
 }
 

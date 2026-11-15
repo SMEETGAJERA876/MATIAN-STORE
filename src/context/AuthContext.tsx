@@ -1,323 +1,292 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  linkWithCredential,
+  onIdTokenChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+  type OAuthCredential,
+  type User as FirebaseUser,
+} from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { firebaseAuth, isFirebaseConfigured } from "@/lib/firebase/client";
 import { User, AuthContextType } from "@/types/auth";
-import { supabase } from "@/lib/supabase/client";
-import type { Session } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ACCESS_TOKEN_COOKIE = "sb-access-token";
-
-function setAccessTokenCookie(session: Session | null) {
-  if (typeof document === "undefined") return;
-
-  if (!session) {
-    document.cookie = `${ACCESS_TOKEN_COOKIE}=; path=/; max-age=0`;
-    return;
+async function establishServerSession(firebaseUser: FirebaseUser, name?: string) {
+  const idToken = await firebaseUser.getIdToken();
+  const response = await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken, name }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.error || "Could not establish your Firebase session.");
   }
-
-  const maxAge = Math.max(0, Math.floor((session.expires_at || 0) - Date.now() / 1000));
-  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  document.cookie = `${ACCESS_TOKEN_COOKIE}=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+  return { idToken, user: result.user as User };
 }
 
-async function fetchProfile(userId: string, fallbackEmail: string): Promise<User | null> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, name, email, role, status, createdAt:created_at, totalOrders:total_orders, totalSpent:total_spent")
-    .eq("id", userId)
-    .single();
-
-  if (error || !data) {
-    console.error("Failed to load profile:", error?.message);
-    return null;
-  }
-
-  return {
-    id: data.id,
-    name: data.name,
-    email: data.email || fallbackEmail,
-    role: data.role,
-    status: data.status,
-    createdAt: data.createdAt,
-    totalOrders: data.totalOrders || 0,
-    totalSpent: data.totalSpent || 0,
-  };
+async function restoreServerSession() {
+  const response = await fetch("/api/auth/session", { cache: "no-store" });
+  if (!response.ok) return null;
+  const result = await response.json();
+  return result.user as User;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [googleCredentialToLink, setGoogleCredentialToLink] =
+    useState<OAuthCredential | null>(null);
+  const [isLoaded, setIsLoaded] = useState(!isFirebaseConfigured);
+  const isAuthModalOpen = false;
 
   useEffect(() => {
-    let active = true;
-
-    async function loadInitialSession() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!active) return;
-
-        setAccessTokenCookie(session);
-        setToken(session?.access_token || null);
-
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id, session.user.email || "");
-          if (active) setUser(profile);
-        } else {
-          const response = await fetch("/api/auth/admin-session", { cache: "no-store" });
-          if (response.ok) {
-            const adminUser: User = await response.json();
-            if (active && adminUser.role?.toUpperCase() === "ADMIN") {
-              setUser(adminUser);
-              setToken("admin_mock_token");
-            }
-          } else if (response.status !== 401) {
-            console.error("Could not restore admin session:", response.status);
-          }
-        }
-      } catch (err) {
-        console.warn("Could not load initial auth session:", err);
-      } finally {
-        if (active) setIsLoaded(true);
-      }
+    if (!firebaseAuth) {
+      return;
     }
 
-    loadInitialSession();
-
-    const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setAccessTokenCookie(session);
-      setToken(session?.access_token || null);
-
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id, session.user.email || "");
-        setUser(profile);
-      } else {
-        setUser(null);
+    let active = true;
+    const unsubscribe = onIdTokenChanged(firebaseAuth, async (firebaseUser) => {
+      try {
+        if (firebaseUser) {
+          const session = await establishServerSession(firebaseUser);
+          if (active) {
+            setUser(session.user);
+            setToken(session.idToken);
+          }
+        } else {
+          const restoredUser = await restoreServerSession();
+          if (active) {
+            setUser(restoredUser);
+            setToken(null);
+          }
+        }
+      } catch (error) {
+        if (active) {
+          console.error("Could not restore Firebase auth session:", error);
+          setUser(null);
+          setToken(null);
+        }
+      } finally {
+        if (active) setIsLoaded(true);
       }
     });
 
     return () => {
       active = false;
-      subscription.subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
   const openAuthModal = () => {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
+    if (typeof window !== "undefined") window.location.href = "/login";
   };
 
   const closeAuthModal = () => {};
 
+  const completeSignIn = async (
+    firebaseUser: FirebaseUser,
+    expectedRole: "ADMIN" | "CUSTOMER" | "AUTO"
+  ) => {
+    const session = await establishServerSession(firebaseUser);
+    const role = session.user.role.toUpperCase();
+    if (expectedRole !== "AUTO" && role !== expectedRole) {
+      if (firebaseAuth) await signOut(firebaseAuth);
+      await fetch("/api/auth/session", { method: "DELETE" });
+      setUser(null);
+      setToken(null);
+      toast.error(
+        expectedRole === "ADMIN"
+          ? "This account does not have admin access."
+          : "This account does not have customer access."
+      );
+      return false;
+    }
+
+    setUser(session.user);
+    setToken(session.idToken);
+    toast.success(`Welcome back, ${session.user.name || "there"}!`);
+    router.push(role === "ADMIN" ? "/admin/dashboard" : "/");
+    return true;
+  };
+
   const login = async (
     identifier: string,
-    pass: string,
+    password: string,
     expectedRole: "ADMIN" | "CUSTOMER" | "AUTO"
   ): Promise<boolean> => {
-    const cleanEmail = identifier.trim().toLowerCase();
-
-    // Built-in admin and demo accounts for instant access
-    const isAdminEmail =
-      cleanEmail === "admin@matrin.com" ||
-      cleanEmail === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase();
-
-    const isDemoCustomer = cleanEmail === "user@matrin.com" && pass === "User123!";
-
-    if (isAdminEmail && expectedRole !== "CUSTOMER") {
-      try {
-        // Establishes a real server-verifiable session (a JWT cookie) for this
-        // mock admin login, since there is no Supabase session behind it.
-        // Admin-only API routes (product/category/coupon writes) check for
-        // this cookie — without it every admin mutation silently fails.
-        const response = await fetch("/api/auth/admin-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: cleanEmail, password: pass }),
-        });
-        if (response.ok) {
-          const adminUser: User = {
-            id: "usr_admin_01",
-            name: "MATRIN Administrator",
-            email: cleanEmail,
-            role: "ADMIN",
-            status: "Active",
-            createdAt: new Date().toISOString().slice(0, 10),
-            totalOrders: 42,
-            totalSpent: 98000,
-          };
-          setUser(adminUser);
-          setToken("admin_mock_token");
-          toast.success("Welcome back, MATRIN Admin!", { icon: "👑" });
-          router.push("/admin/dashboard");
-          return true;
-        }
-
-        if (response.status !== 401) {
-          const result = await response.json();
-          throw new Error(result.error || "Could not establish your admin session.");
-        }
-        // A configured admin may use Supabase credentials; try Supabase below
-        // when they are not the built-in mock account.
-      } catch (e) {
-        console.error("Could not establish admin session cookie:", e);
-        toast.error(e instanceof Error ? e.message : "Could not establish your admin session.");
-        return false;
-      }
-    }
-
-    if (isAdminEmail && expectedRole === "CUSTOMER") {
-      toast.error("This account does not have customer access.");
+    if (!firebaseAuth || !isFirebaseConfigured) {
+      toast.error("Firebase Authentication is not configured for this deployment.");
       return false;
     }
 
-    if (isDemoCustomer) {
-      if (expectedRole === "ADMIN") {
-        toast.error("Use an admin account to sign in.");
-        return false;
+    try {
+      const credential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        identifier.trim().toLowerCase(),
+        password
+      );
+      return await completeSignIn(credential.user, expectedRole);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not sign in.");
+      return false;
+    }
+  };
+
+  const loginWithGoogle = async (): Promise<boolean> => {
+    if (!firebaseAuth || !isFirebaseConfigured) {
+      toast.error("Firebase Authentication is not configured for this deployment.");
+      return false;
+    }
+
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const credential = await signInWithPopup(firebaseAuth, provider);
+      return await completeSignIn(credential.user, "AUTO");
+    } catch (error) {
+      if (
+        error instanceof FirebaseError &&
+        error.code === "auth/account-exists-with-different-credential"
+      ) {
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        if (credential) {
+          setGoogleCredentialToLink(credential);
+          toast.error(
+            "This Google email already has a password account. Enter that account’s email and password once to link Google."
+          );
+          return false;
+        }
       }
 
-      const demoUser: User = {
-        id: "usr_cust_01",
-        name: "Demo Customer",
-        email: cleanEmail,
-        role: "CUSTOMER",
-        status: "Active",
-        createdAt: new Date().toISOString().slice(0, 10),
-        totalOrders: 2,
-        totalSpent: 1290,
-      };
-      setUser(demoUser);
-      setToken("user_mock_token");
-      toast.success("Welcome back, Demo Customer!", { icon: "👤" });
+      const code =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        typeof error.code === "string"
+          ? error.code
+          : "";
+      const message =
+        code === "auth/operation-not-allowed"
+          ? "Enable Google sign-in in Firebase Authentication."
+          : code === "auth/unauthorized-domain"
+            ? "Add this website's domain to Firebase Authentication's authorized domains."
+            : code === "auth/account-exists-with-different-credential"
+              ? "This email already uses another sign-in method. Sign in with that method for this account."
+              : code === "auth/popup-closed-by-user"
+                ? "Google sign-in was cancelled."
+                : error instanceof Error
+                  ? error.message
+                  : "Could not sign in with Google.";
+      toast.error(message);
+      return false;
+    }
+  };
+
+  const completeGoogleLink = async (email: string, password: string) => {
+    if (!firebaseAuth || !googleCredentialToLink) {
+      toast.error("Start Google sign-in again to link your account.");
+      return false;
+    }
+
+    try {
+      const credential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        email.trim().toLowerCase(),
+        password
+      );
+      const linked = await linkWithCredential(
+        credential.user,
+        googleCredentialToLink
+      );
+      setGoogleCredentialToLink(null);
+      return await completeSignIn(linked.user, "AUTO");
+    } catch (error) {
+      if (firebaseAuth.currentUser) await signOut(firebaseAuth);
+      await fetch("/api/auth/session", { method: "DELETE" });
+      toast.error(error instanceof Error ? error.message : "Could not link Google to this account.");
+      return false;
+    }
+  };
+
+  const cancelGoogleLink = () => setGoogleCredentialToLink(null);
+
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    if (!firebaseAuth || !isFirebaseConfigured) {
+      toast.error("Firebase Authentication is not configured for this deployment.");
+      return false;
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const configuredAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase();
+    if (configuredAdminEmail && cleanEmail === configuredAdminEmail) {
+      toast.error("The admin account must be created by an administrator.");
+      return false;
+    }
+
+    try {
+      const credential = await createUserWithEmailAndPassword(
+        firebaseAuth,
+        cleanEmail,
+        password
+      );
+      await updateProfile(credential.user, { displayName: name.trim() });
+      const session = await establishServerSession(credential.user, name.trim());
+      setUser(session.user);
+      setToken(session.idToken);
+      toast.success(`Account created! Welcome, ${session.user.name || name}!`);
       router.push("/");
       return true;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: pass,
-      });
-
-      if (error || !data.session || !data.user) {
-        toast.error(error?.message || "Invalid credentials. Please try again.");
-        return false;
-      }
-
-      const profile = await fetchProfile(data.user.id, data.user.email || "");
-      const profileRole = profile?.role?.toString().toUpperCase();
-      const roleMatches =
-        expectedRole === "AUTO"
-          ? profileRole === "ADMIN" || profileRole === "CUSTOMER"
-          : profileRole === expectedRole;
-
-      if (!profile || !roleMatches) {
-        await supabase.auth.signOut();
-        setUser(null);
-        setToken(null);
-        setAccessTokenCookie(null);
-        toast.error(
-          profile
-            ? expectedRole === "ADMIN"
-              ? "This account does not have admin access."
-              : expectedRole === "CUSTOMER"
-                ? "This account does not have customer access."
-                : "This account does not have a supported role."
-            : "Could not verify this account. Please try again."
-        );
-        return false;
-      }
-
-      setUser(profile);
-
-      toast.success(`Welcome back, ${profile?.name || "there"}!`, { icon: "👤" });
-
-      if (profile?.role?.toString().toUpperCase() === "ADMIN") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/");
-      }
-
-      return true;
-    } catch (e: unknown) {
-      const error = e as Error;
-      toast.error(error.message || "An unexpected error occurred during login.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Registration failed.");
       return false;
     }
   };
 
-  const quickUserLogin = () => {
-    login("user@matrin.com", "User123!", "CUSTOMER");
-  };
-
-  const register = async (name: string, email: string, pass: string): Promise<boolean> => {
+  const resetPassword = async (email: string): Promise<boolean> => {
+    if (!firebaseAuth || !isFirebaseConfigured) {
+      toast.error("Firebase Authentication is not configured for this deployment.");
+      return false;
+    }
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password: pass,
-        options: { data: { name: name.trim() } },
-      });
-
-      if (error) {
-        toast.error(error.message || "Registration failed.");
-        return false;
-      }
-
-      if (!data.session) {
-        toast.success("Account created! Please check your email to confirm before logging in.", { icon: "📧" });
-        return true;
-      }
-
-      const profile = await fetchProfile(data.user!.id, data.user!.email || "");
-      setUser(profile);
-
-      toast.success(`Account created! Welcome, ${profile?.name || name}!`, { icon: "🚀" });
-
-      if (typeof window !== "undefined") {
-        window.location.href = "/";
-      }
-
+      await sendPasswordResetEmail(firebaseAuth, email.trim().toLowerCase());
+      toast.success("Password reset email sent.");
       return true;
-    } catch (e: unknown) {
-      const error = e as Error;
-      toast.error(error.message || "Registration failed.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not send password reset email.");
       return false;
     }
   };
 
   const logout = async (redirectTo?: string) => {
     try {
-      await supabase.auth.signOut();
-      await fetch("/api/auth/admin-session", { method: "DELETE" });
-    } catch (e) {
-      console.error("Logout error:", e);
+      if (firebaseAuth) await signOut(firebaseAuth);
+    } catch (error) {
+      console.error("Firebase sign-out failed:", error);
     } finally {
+      try {
+        await fetch("/api/auth/session", { method: "DELETE" });
+      } catch (error) {
+        console.error("Could not clear Firebase server session:", error);
+      }
       setUser(null);
       setToken(null);
-      setAccessTokenCookie(null);
       toast.success("Signed out successfully");
       if (typeof window !== "undefined") {
-        const dest =
-          redirectTo ||
-          "/login";
-        window.location.href = dest;
+        window.location.href = redirectTo || "/login";
       }
     }
-  };
-
-  const quickAdminLogin = () => {
-    login("admin@matrin.com", process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123!", "ADMIN");
   };
 
   return (
@@ -329,12 +298,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoaded,
         isAuthModalOpen,
+        googleLinkPending: googleCredentialToLink !== null,
         openAuthModal,
         closeAuthModal,
         login,
-        quickUserLogin,
-        quickAdminLogin,
+        loginWithGoogle,
+        completeGoogleLink,
+        cancelGoogleLink,
         register,
+        resetPassword,
         logout,
       }}
     >

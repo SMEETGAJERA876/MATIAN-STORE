@@ -213,73 +213,6 @@ export default function CartPage() {
       applyCouponRedemption(appliedCoupon);
     }
 
-    // Client-side backup sync to Google Sheets API
-    try {
-      fetch("/api/google-sheets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "submit_lead", data: newInvoice }),
-      }).catch(() => {});
-    } catch {
-      // ignore backup error
-    }
-
-    // Immediately decrement product stock across all purchased items
-    try {
-      const rawCustom = localStorage.getItem("matrin_custom_products");
-      let customList: any[] = rawCustom ? JSON.parse(rawCustom) : [];
-
-      cart.forEach(({ product, quantity: purchasedQty }) => {
-        const baseId = product.baseProductId || (product.id > 1000 ? product.id % 10000 : product.id);
-        const existingIdx = customList.findIndex(
-          (p: any) =>
-            String(p.id) === String(baseId) ||
-            p.name.toLowerCase().trim() === product.name.replace(/\s*\([^)]*\)/g, "").trim().toLowerCase()
-        );
-
-        const currentStock = getProductAvailableStock(product);
-        const remainingStock = Math.max(0, currentStock - purchasedQty);
-        const inStock = remainingStock > 0;
-        const status = remainingStock > 10 ? "In Stock" : remainingStock > 0 ? "Low Stock" : "Out of Stock";
-
-        if (existingIdx !== -1) {
-          customList[existingIdx] = {
-            ...customList[existingIdx],
-            stock: remainingStock,
-            stockCount: remainingStock,
-            inStock,
-            status,
-          };
-        } else {
-          customList.push({
-            ...product,
-            id: baseId,
-            stock: remainingStock,
-            stockCount: remainingStock,
-            inStock,
-            status,
-          });
-        }
-
-        // Also sync stock change to the backend inventory endpoint
-        fetch("/api/inventory/adjust", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            productId: String(baseId),
-            quantityToAdd: -purchasedQty,
-            reason: `Order #${newInvoice.invoiceNumber} purchase`,
-            performedBy: "Storefront Checkout",
-          }),
-        }).catch(() => {});
-      });
-
-      localStorage.setItem("matrin_custom_products", JSON.stringify(customList));
-      window.dispatchEvent(new Event("matrin_products_updated"));
-    } catch (e) {
-      console.warn("Stock decrement error:", e);
-    }
-
     setGeneratedInvoice(newInvoice);
     setCheckoutStep("success");
     setIsProcessingPayment(false);
@@ -928,7 +861,7 @@ export default function CartPage() {
                           <span className="px-2 py-0.5 text-[9px] bg-emerald-600 text-white rounded-full font-extrabold">TEST CHECKOUT</span>
                         </h4>
                         <p className="text-[10px] text-emerald-700 font-medium">
-                          Simulate successful payment instantly & verify Google Sheets data sync!
+                          Simulate successful payment instantly & verify Firebase data sync!
                         </p>
                       </div>
                     </div>

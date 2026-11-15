@@ -1,62 +1,53 @@
-import { connectToDatabase } from "@/lib/db";
-import { CouponModel } from "@/models/Coupon";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  deleteStoreRecord,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetCoupon = {
+  id: string | number;
+  [key: string]: unknown;
+};
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const body = await req.json();
-
-    const db = await connectToDatabase();
-    if (db) {
-      const updated = await CouponModel.findOneAndUpdate({ id }, { $set: body }, { new: true });
-      if (updated) return jsonResponse({ success: true, coupon: updated });
-    }
-
-    const index = inMemoryStore.coupons.findIndex((c) => c.id === id);
-    if (index !== -1) {
-      inMemoryStore.coupons[index] = { ...inMemoryStore.coupons[index], ...body };
-      return jsonResponse({ success: true, coupon: inMemoryStore.coupons[index] });
-    }
-
-    return jsonResponse({ error: "Coupon not found" }, 404);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update coupon" }, 500);
+    const updated = await patchStoreRecord<SheetCoupon>("Coupons", id, await req.json());
+    return updated
+      ? jsonResponse({ success: true, coupon: updated })
+      : jsonResponse({ error: "Coupon not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update coupon" },
+      503
+    );
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const db = await connectToDatabase();
-    if (db) {
-      await CouponModel.deleteOne({ id });
-      return jsonResponse({ success: true, message: "Coupon deleted" });
-    }
-
-    inMemoryStore.coupons = inMemoryStore.coupons.filter((c) => c.id !== id);
+    const coupons = await listStoreRecords<SheetCoupon>("Coupons");
+    const coupon = coupons.find((entry) => String(entry.id) === id);
+    if (!coupon) return jsonResponse({ error: "Coupon not found" }, 404);
+    await deleteStoreRecord("Coupons", coupon.id);
     return jsonResponse({ success: true, message: "Coupon deleted" });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to delete coupon" }, 500);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete coupon" },
+      503
+    );
   }
 }
 

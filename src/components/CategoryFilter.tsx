@@ -44,21 +44,18 @@ export default function CategoryFilter({
 
   useEffect(() => {
     const loadCategories = () => {
-      try {
-        const raw = localStorage.getItem("matrin_custom_categories");
-        if (raw) {
-          const list = JSON.parse(raw);
-          if (Array.isArray(list)) {
-            const customNames = list
-              .filter((c: any) => c.status === "Active" || c.status === undefined)
-              .map((c: any) => c.name);
-            const combined = Array.from(new Set([...DEFAULT_CATEGORIES, ...customNames]));
-            setCategoriesList(combined);
-          }
-        }
-      } catch (e) {
-        console.warn("Could not load custom categories:", e);
-      }
+      fetch("/api/categories")
+        .then(async (response) => {
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Failed to load categories.");
+          if (!Array.isArray(result)) throw new Error("Invalid category data from the store.");
+          const names = result
+            .filter((category) => category.isActive !== false && category.status !== "Inactive")
+            .map((category) => category.name)
+            .filter((name): name is string => typeof name === "string" && name.length > 0);
+          setCategoriesList(Array.from(new Set(["All", ...names])) as ProductCategory[]);
+        })
+        .catch((error) => console.error("Could not load categories:", error));
     };
     loadCategories();
     window.addEventListener("matrin_categories_updated", loadCategories);

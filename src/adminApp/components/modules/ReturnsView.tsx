@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { RotateCcw, CheckCircle2, IndianRupee } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { DataTable, Column } from '../ui/DataTable';
+import { Column } from '../ui/DataTable';
 import { EmptyState } from '../ui/EmptyState';
 import { useAdminStore } from '../../store/adminStore';
 import { Order } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 
 export const ReturnsView: React.FC = () => {
-  const { orders, updateShippingInfo, processRefund, addToast } = useAdminStore();
+  const { orders, updateShippingInfo, markRefunded, addToast } = useAdminStore();
 
   // Returns/RMA workflow is driven directly off order shipping & payment status
   const returnableOrders = orders.filter(
@@ -95,8 +95,8 @@ export const ReturnsView: React.FC = () => {
             <CheckCircle2 className="w-4 h-4" /> Refund Complete
           </span>
         ) : (
-          <Button variant="secondary" size="sm" icon={<IndianRupee className="w-3.5 h-3.5" />} onClick={() => processRefund(row.id)}>
-            Process Refund
+          <Button variant="secondary" size="sm" icon={<IndianRupee className="w-3.5 h-3.5" />} onClick={() => markRefunded(row.id)}>
+            Mark Refunded
           </Button>
         ),
     },
@@ -109,7 +109,7 @@ export const ReturnsView: React.FC = () => {
           Returns & RMA Management
         </h2>
         <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-          Initiate customer returns, inspect RMA workflows, and issue refunds.
+          Track customer returns. Issue refunds in Razorpay first, then mark the order refunded here.
         </p>
       </div>
 
@@ -181,7 +181,11 @@ function SimpleTable<T extends { id: string }>({ columns, data }: { columns: Col
           <tr key={row.id} className="hover:bg-matrin-bg/60 dark:hover:bg-slate-800/50 transition-colors">
             {columns.map((col, cIdx) => (
               <td key={cIdx} className="p-4 text-matrin-text dark:text-matrin-darktext font-medium">
-                {col.cell ? col.cell(row) : col.accessorKey ? (row as any)[col.accessorKey] : null}
+                {col.cell
+                  ? col.cell(row)
+                  : typeof col.accessorKey === 'string' && col.accessorKey in row
+                    ? String(row[col.accessorKey as keyof T] ?? '')
+                    : null}
               </td>
             ))}
           </tr>

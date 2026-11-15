@@ -160,13 +160,9 @@ interface AdminContextType {
     orderId: string,
     updates: Partial<Pick<Order, 'courier' | 'trackingNumber' | 'shippingStatus'>>
   ) => void;
-  processRefund: (orderId: string) => void;
+  markRefunded: (orderId: string) => void;
 
   // Security
-  toggleTwoFactor: () => void;
-  addIpToWhitelist: (ip: string) => void;
-  removeIpFromWhitelist: (ip: string) => void;
-  revokeSession: (sessionId: string) => void;
 
   // Toasts
   toasts: ToastMessage[];
@@ -213,91 +209,37 @@ const initialCategories: Category[] = [
   { id: 'cat-6', name: 'Fragrance', image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop&q=80', parentCategory: 'Aromatherapy', productCount: 54, revenue: 31500, status: 'Active', topLevel: false, subcategories: ['Nebulizing Oils', 'Room Sprays', 'Reed Diffusers'] },
 ];
 
-const initialOrders: Order[] = [
-  { id: 'ord-1', orderNumber: '#MTR-8902', customerName: 'Jane Doe', customerEmail: 'jane.doe@example.com', customerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', date: '2023-10-24', totalAmount: 425.00, paymentStatus: 'Paid', shippingStatus: 'Delivered', courier: 'FedEx Express', trackingNumber: 'FDX-994102931', shippingAddress: '742 Evergreen Terrace, Springfield, OR 97477', items: [{ productId: 'prod-4', productName: 'MATRIN Pro Dishwashing Hub', sku: 'MTR-DISH-01', quantity: 1, unitPrice: 349.00, totalPrice: 349.00 }] },
-  { id: 'ord-2', orderNumber: '#MTR-8901', customerName: 'Bill Sanders', customerEmail: 'bill.sanders@techsolutions.io', customerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', date: '2023-10-25', totalAmount: 1120.00, paymentStatus: 'Pending', shippingStatus: 'Processing', courier: 'UPS Ground', trackingNumber: '1Z9999999999999999', shippingAddress: '100 Silicon Way, Suite 400, Austin, TX 78701', items: [{ productId: 'prod-1', productName: 'MATRIN X1 Robotic Vacuum & Mop', sku: 'MTR-X1-ROBOT', quantity: 1, unitPrice: 899.00, totalPrice: 899.00 }] },
-];
+const initialOrders: Order[] = [];
 
-const initialCustomers: Customer[] = [
-  { id: 'cust-1', name: 'Sarah Jenkins', email: 'sarah.j@enterprise.com', phone: '+1 (555) 234-5678', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', location: 'San Francisco, CA', totalOrders: 42, totalSpent: 4280.00, segment: 'VIP', status: 'Active', joinDate: '2022-01-15', lifetimeValue: 6500.00, recentPurchases: [{ id: 'p1', productName: 'MATRIN Ultra Vacuum', amount: 899.00, date: 'Oct 12, 2023' }] },
-  { id: 'cust-2', name: 'Marcus Chen', email: 'm.chen@techglobal.net', phone: '+1 (555) 876-5432', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', location: 'Austin, TX', totalOrders: 12, totalSpent: 1150.45, segment: 'Returning', status: 'Active', joinDate: '2022-06-20', lifetimeValue: 2400.00, recentPurchases: [{ id: 'p4', productName: 'MATRIN Pro Robot', amount: 899.00, date: 'Oct 25, 2023' }] },
-];
+const initialCustomers: Customer[] = [];
 
-const initialReviews: Review[] = [
-  { id: 'rev-1', customerName: 'Elena Rostova', customerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', productName: 'Luxe Purifier v4', rating: 5, reviewText: 'The air quality sensor is incredibly responsive!', date: 'Oct 24, 2023', status: 'Published', sentiment: 'Positive' },
-];
+const initialReviews: Review[] = [];
 
-const initialPromotions: Promotion[] = [
-  { id: 'promo-1', code: 'SUMMER2024', incentiveType: 'Percentage', value: '20%', usageProgress: 420, usageLimit: 500, expiryDate: 'Oct 30, 2024', status: 'Active', revenueAttributed: 28400 },
-];
+const initialPromotions: Promotion[] = [];
 
-const initialInventory: InventoryItem[] = [
-  { id: 'inv-1', sku: 'MTR-X1-ROBOT', name: 'MATRIN X1 Robotic Vacuum', category: 'Floor Care', warehouse: 'San Jose Hub', currentStock: 14, reserved: 2, criticalLevel: 5, incoming: 50, outgoing: 12, status: 'Healthy', lastRestocked: '2023-10-15' },
-  { id: 'inv-2', sku: 'MTR-ECO-99', name: 'MATRIN Eco-Clean Refill Bundle', category: 'Eco-Series', warehouse: 'Austin Facility', currentStock: 3, reserved: 1, criticalLevel: 10, incoming: 200, outgoing: 45, status: 'Critical', lastRestocked: '2023-09-20' },
-  { id: 'inv-3', sku: 'MTR-FAB-88', name: 'MATRIN Fabric Care Sanitizer', category: 'Fabric Care', warehouse: 'San Jose Hub', currentStock: 342, reserved: 15, criticalLevel: 30, incoming: 100, outgoing: 80, status: 'Healthy', lastRestocked: '2023-10-01' },
-];
+const initialInventory: InventoryItem[] = [];
 
-const initialSuppliers: Supplier[] = [
-  { id: 'sup-1', name: 'MATRIN Robotics Division', contactPerson: 'Chen Wei', email: 'c.wei@robotics.matrin.com', phone: '+86 21 8892 1029', category: 'Automation & Hardware', leadTimeDays: 14, status: 'Active' },
-];
+const initialSuppliers: Supplier[] = [];
 
-const initialEmployees: Employee[] = [
-  { id: 'emp-1', name: 'Alex Thompson', email: 'alex.t@matrin.com', role: 'Super Admin', department: 'Executive', status: 'Active', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', lastActive: 'Online now' },
-];
+const initialEmployees: Employee[] = [];
 
 // Starts empty; real tickets load from the backend (including ones customers
 // submit through the storefront Contact Us form) via the sync effect below.
 const initialSupportTickets: SupportTicket[] = [];
 
-const initialNotifications: NotificationItem[] = [
-  { id: 'n-1', title: 'Low Stock Alert', description: 'MATRIN Eco-Clean Refill Bundle has dropped to 3 units.', timestamp: '10 minutes ago', type: 'inventory', read: false, priority: 'high' },
-];
+const initialNotifications: NotificationItem[] = [];
 
 const initialSecuritySettings: SecuritySettings = {
-  twoFactorEnabled: true,
-  ipWhitelist: ['203.0.113.42', '198.51.100.17'],
+  twoFactorEnabled: false,
+  ipWhitelist: [],
 };
 
-const initialActiveSessions: SecuritySession[] = [
-  { id: 'sess-1', device: 'Chrome on Windows 11', location: 'San Jose, CA', ipAddress: '203.0.113.42', lastActive: 'Active now', current: true },
-  { id: 'sess-2', device: 'Safari on iPhone 15', location: 'Austin, TX', ipAddress: '198.51.100.17', lastActive: '2 hours ago' },
-  { id: 'sess-3', device: 'Firefox on macOS', location: 'Chicago, IL', ipAddress: '192.0.2.88', lastActive: '1 day ago' },
-];
+const initialActiveSessions: SecuritySession[] = [];
 
 // Starts empty rather than seeded with demo entries: those referenced the
 // placeholder catalog's fictional products, which don't exist once the real
 // product sync replaces it, so their "Cancel" action could never resolve.
 const initialStockLogs: StockMovementLog[] = [];
-
-const getLocalCustomProducts = (): any[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem('matrin_custom_products');
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
-
-const getLocalCustomCategories = (): Category[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem('matrin_custom_categories');
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
-
-const getLocalCustomCoupons = (): Promotion[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem('matrin_custom_coupons');
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
@@ -332,83 +274,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isAIChatOpen, setAIChatOpen] = useState<boolean>(false);
   const [isStockAdjustmentModalOpen, setStockAdjustmentModalOpen] = useState<boolean>(false);
 
-  const [products, setProducts] = useState<Product[]>(() => {
-    const custom = getLocalCustomProducts();
-    if (custom.length > 0) {
-      const mapped: Product[] = custom.map((p: any) => ({
-        id: String(p.id),
-        name: p.name,
-        sku: p.sku || `MTR-${p.id}`,
-        barcode: p.barcode || `890123456789${p.id}`,
-        category: p.category || 'General',
-        brand: p.brand || 'MATRIN Enterprise',
-        price: Number(p.price) || 299,
-        discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
-        gst: 18,
-        stock: (() => {
-          const raw = p.stock ?? p.stockCount;
-          return raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Math.max(0, Number(raw)) : 100;
-        })(),
-        reservedStock: 0,
-        warehouse: p.warehouse || 'Central Logistics Hub',
-        vendor: p.vendor || 'MATRIN Systems',
-        weight: p.weight || '1.2 kg',
-        dimensions: p.dimensions || '20x15x30 cm',
-        visibility: (p.visibility || 'Published') as 'Published',
-        status: (() => {
-          const raw = p.stock ?? p.stockCount;
-          const s = raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Number(raw) : 100;
-          return (s > 10 ? 'In Stock' : s > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock';
-        })(),
-        rating: Number(p.rating) || 5.0,
-        reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
-        createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
-        updatedAt: p.updatedAt || new Date().toISOString().slice(0, 10),
-        image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
-        galleryImages: p.galleryImages || p.images || [p.image],
-        description: p.description || '',
-        features: p.features || [],
-        specifications: p.specifications || {},
-      }));
-      const merged: Product[] = [...mapped];
-      initialProducts.forEach((ip) => {
-        if (!merged.some((m) => m.id === ip.id || m.name.toLowerCase() === ip.name.toLowerCase())) {
-          merged.push(ip);
-        }
-      });
-      return merged;
-    }
-    return initialProducts;
-  });
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const custom = getLocalCustomCategories();
-    if (custom.length > 0) {
-      const merged = [...custom];
-      initialCategories.forEach((ic) => {
-        if (!merged.some((m) => m.id === ic.id || m.name.toLowerCase() === ic.name.toLowerCase())) {
-          merged.push(ic);
-        }
-      });
-      return merged;
-    }
-    return initialCategories;
-  });
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [promotions, setPromotions] = useState<Promotion[]>(() => {
-    const custom = getLocalCustomCoupons();
-    if (custom.length > 0) {
-      const merged = [...custom];
-      initialPromotions.forEach((ip) => {
-        if (!merged.some((m) => m.id === ip.id || m.code.toLowerCase() === ip.code.toLowerCase())) {
-          merged.push(ip);
-        }
-      });
-      return merged;
-    }
-    return initialPromotions;
-  });
+  const [promotions, setPromotions] = useState<Promotion[]>(initialPromotions);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
@@ -416,7 +287,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
   const [stockLogs, setStockLogs] = useState<StockMovementLog[]>(initialStockLogs);
   const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(initialSecuritySettings);
-  const [activeSessions, setActiveSessions] = useState<SecuritySession[]>(initialActiveSessions);
+  const activeSessions = initialActiveSessions;
   const [warehouses, setWarehouses] = useState<string[]>([]);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -445,24 +316,31 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [isDarkMode]);
 
-  // Sync with shared backend database API
+  // Load shared store records from Firebase-backed APIs.
   useEffect(() => {
     async function syncBackendData() {
       try {
         const apiBase = '/api';
-        const [resProd, resOrd, resCust, resTickets, resCats, resCoupons] = await Promise.all([
+        const [resProd, resOrd, resCust, resTickets, resCats, resCoupons, resReviews, resInventory, resNotifications, resSuppliers, resEmployees, resWarehouses, resSettings] = await Promise.all([
           fetch(`${apiBase}/products`),
           fetch(`${apiBase}/orders`),
           fetch(`${apiBase}/customers`),
           fetch(`${apiBase}/support-tickets`),
           fetch(`${apiBase}/categories`),
           fetch(`${apiBase}/coupons`),
+          fetch(`${apiBase}/reviews`),
+          fetch(`${apiBase}/inventory`),
+          fetch(`${apiBase}/notifications`),
+          fetch(`${apiBase}/admin-data/suppliers`),
+          fetch(`${apiBase}/admin-data/employees`),
+          fetch(`${apiBase}/admin-data/warehouses`),
+          fetch(`${apiBase}/settings`),
         ]);
 
         if (resProd.ok) {
           const apiProducts = await resProd.json();
-          if (Array.isArray(apiProducts) && apiProducts.length > 0) {
-            const mappedApi: Product[] = apiProducts.map((p: any) => ({
+          if (Array.isArray(apiProducts)) {
+            setProducts(apiProducts.map((p: any) => ({
               id: String(p.id),
               name: p.name,
               sku: p.sku || `MTR-${p.id}`,
@@ -470,6 +348,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               category: p.category || 'General',
               brand: 'MATRIN Enterprise',
               price: Number(p.price) || 299,
+              discountPrice: p.originalPrice,
               gst: 18,
               stock: p.stock !== undefined && p.stock !== null && !isNaN(Number(p.stock)) ? Math.max(0, Number(p.stock)) : 100,
               reservedStock: 2,
@@ -489,63 +368,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               createdAt: p.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
               updatedAt: p.updatedAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
               image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
+              galleryImages: p.images || [p.image],
               description: p.description || '',
-            }));
-
-            const custom = getLocalCustomProducts();
-            if (custom.length > 0) {
-              const mappedCustom: Product[] = custom.map((p: any) => ({
-                id: String(p.id),
-                name: p.name,
-                sku: p.sku || `MTR-${p.id}`,
-                barcode: p.barcode || `890123456789${p.id}`,
-                category: p.category || 'General',
-                brand: p.brand || 'MATRIN Enterprise',
-                price: Number(p.price) || 299,
-                discountPrice: p.discountPrice || p.oldPrice || p.originalPrice,
-                gst: 18,
-                stock: (() => {
-                  const raw = p.stock ?? p.stockCount;
-                  return raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Math.max(0, Number(raw)) : 100;
-                })(),
-                reservedStock: 0,
-                warehouse: p.warehouse || 'Central Logistics Hub',
-                vendor: p.vendor || 'MATRIN Systems',
-                weight: p.weight || '1.2 kg',
-                dimensions: p.dimensions || '20x15x30 cm',
-                visibility: (p.visibility || 'Published') as 'Published',
-                status: (() => {
-                  const raw = p.stock ?? p.stockCount;
-                  const s = raw !== undefined && raw !== null && !isNaN(Number(raw)) ? Number(raw) : 100;
-                  return (s > 10 ? 'In Stock' : s > 0 ? 'Low Stock' : 'Out of Stock') as 'In Stock';
-                })(),
-                rating: Number(p.rating) || 5.0,
-                reviewsCount: Number(p.reviewsCount ?? p.reviewCount) || 0,
-                createdAt: p.createdAt || new Date().toISOString().slice(0, 10),
-                updatedAt: p.updatedAt || new Date().toISOString().slice(0, 10),
-                image: p.image || 'https://images.unsplash.com/photo-1585837575652-267c041d77d4?w=600&auto=format&fit=crop&q=80',
-                galleryImages: p.galleryImages || p.images || [p.image],
-                description: p.description || '',
-                features: p.features || [],
-                specifications: p.specifications || {},
-              }));
-
-              const merged = [...mappedCustom];
-              mappedApi.forEach((apiP) => {
-                if (!merged.some((m) => m.id === apiP.id || m.name.toLowerCase() === apiP.name.toLowerCase())) {
-                  merged.push(apiP);
-                }
-              });
-              setProducts(merged);
-            } else {
-              setProducts(mappedApi);
-            }
+              features: p.features || [],
+              specifications: p.specifications || {},
+            })));
           }
         }
 
         if (resOrd.ok) {
           const apiOrders = await resOrd.json();
-          if (Array.isArray(apiOrders) && apiOrders.length > 0) {
+          if (Array.isArray(apiOrders)) {
             setOrders(
               apiOrders.map((o: any) => ({
                 id: o.id,
@@ -555,7 +388,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 customerPhone: o.customer?.phone || '',
                 customerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
                 date: o.orderDate || new Date().toISOString().slice(0, 10),
-                totalAmount: Number(o.totalAmount) || 500,
+                totalAmount: Number(o.totalAmount) || 0,
                 paymentStatus: o.paymentStatus === 'Paid' ? 'Paid' : 'Pending',
                 shippingStatus: o.orderStatus === 'Shipped' ? 'In Transit' : 'Processing',
                 courier: 'FedEx Express',
@@ -580,7 +413,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
         if (resCust.ok) {
           const apiCustomers = await resCust.json();
-          if (Array.isArray(apiCustomers) && apiCustomers.length > 0) {
+          if (Array.isArray(apiCustomers)) {
             setCustomers(
               apiCustomers.map((c: any) => ({
                 id: String(c.id),
@@ -622,7 +455,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
         if (resCats.ok) {
           const apiCats = await resCats.json();
-          if (Array.isArray(apiCats) && apiCats.length > 0) {
+          if (Array.isArray(apiCats)) {
             const mappedCats: Category[] = apiCats.map((c: any) => ({
               id: String(c.id),
               name: c.name,
@@ -634,19 +467,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               topLevel: Boolean(c.topLevel),
               subcategories: Array.isArray(c.subcategories) ? c.subcategories : [],
             }));
-            const customCats = getLocalCustomCategories();
-            const mergedCats = [...customCats];
-            mappedCats.forEach((ac) => {
-              if (!mergedCats.some((m) => m.id === ac.id || m.name.toLowerCase() === ac.name.toLowerCase())) {
-                mergedCats.push(ac);
-              }
-            });
-            setCategories(mergedCats);
+            setCategories(mappedCats);
           }
         }
         if (resCoupons.ok) {
           const apiCoupons = await resCoupons.json();
-          if (Array.isArray(apiCoupons) && apiCoupons.length > 0) {
+          if (Array.isArray(apiCoupons)) {
             const mappedPromos: Promotion[] = apiCoupons.map((c: any) => ({
               id: String(c.id),
               code: c.code,
@@ -658,18 +484,94 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               status: (c.isActive ? 'Active' : 'Expired') as 'Active' | 'Scheduled' | 'Archived' | 'Expired',
               revenueAttributed: 0,
             }));
-            const customCoupons = getLocalCustomCoupons();
-            const mergedPromos = [...customCoupons];
-            mappedPromos.forEach((ap) => {
-              if (!mergedPromos.some((m) => m.id === ap.id || m.code.toLowerCase() === ap.code.toLowerCase())) {
-                mergedPromos.push(ap);
-              }
+            setPromotions(mappedPromos);
+          }
+        }
+        if (resReviews.ok) {
+          const apiReviews = await resReviews.json();
+          if (Array.isArray(apiReviews)) {
+            setReviews(apiReviews.map((review: any) => ({
+              id: String(review.id),
+              customerName: review.customerName || 'Customer',
+              customerAvatar: '',
+              productName: review.productName || 'Product',
+              rating: Number(review.rating) || 0,
+              reviewText: review.comment || '',
+              date: review.date || '',
+              status: review.status === 'Approved' ? 'Published' : review.status || 'Pending',
+              sentiment: 'Neutral',
+            })));
+          }
+        }
+        if (resInventory.ok) {
+          const inventoryData = await resInventory.json();
+          if (Array.isArray(inventoryData.items)) {
+            setInventory(inventoryData.items.map((item: any) => ({
+              id: String(item.id),
+              sku: item.sku || '',
+              name: item.name || '',
+              category: item.category || '',
+              warehouse: item.warehouse || 'Main Central Hub',
+              currentStock: Number(item.stock) || 0,
+              reserved: 0,
+              criticalLevel: Number(item.minStockLevel) || 5,
+              incoming: 0,
+              outgoing: 0,
+              status: Number(item.stock) <= 0 ? 'Critical' : Number(item.stock) <= Number(item.minStockLevel || 5) ? 'Low Stock' : 'Healthy',
+              lastRestocked: '',
+            })));
+            setStockLogs((inventoryData.logs || []).map((log: any) => ({
+              id: String(log.id),
+              productId: String(log.productId || ''),
+              productName: log.productName || '',
+              sku: log.sku || '',
+              quantityChange: Number(log.changeAmount) || 0,
+              warehouse: log.warehouse || '',
+              reason: log.reason || '',
+              timestamp: log.timestamp || '',
+              performedBy: log.adjustedBy || '',
+            })));
+          }
+        }
+        if (resNotifications.ok) {
+          const apiNotifications = await resNotifications.json();
+          if (Array.isArray(apiNotifications)) {
+            setNotifications(apiNotifications.map((notification: any) => ({
+              id: String(notification.id),
+              title: notification.title || '',
+              description: notification.message || '',
+              timestamp: notification.timestamp || '',
+              type: notification.type || 'system',
+              read: Boolean(notification.isRead),
+              priority: 'normal',
+            })));
+          }
+        }
+        if (resSuppliers.ok) {
+          const apiSuppliers = await resSuppliers.json();
+          if (Array.isArray(apiSuppliers)) setSuppliers(apiSuppliers);
+        }
+        if (resEmployees.ok) {
+          const apiEmployees = await resEmployees.json();
+          if (Array.isArray(apiEmployees)) setEmployees(apiEmployees);
+        }
+        if (resWarehouses.ok) {
+          const apiWarehouses = await resWarehouses.json();
+          if (Array.isArray(apiWarehouses)) {
+            setWarehouses(apiWarehouses.map((warehouse: { name: string }) => warehouse.name));
+          }
+        }
+        if (resSettings.ok) {
+          const apiSettings = await resSettings.json();
+          if (Array.isArray(apiSettings.securitySettings?.ipWhitelist)) {
+            setSecuritySettings({
+              twoFactorEnabled: Boolean(apiSettings.securitySettings.twoFactorEnabled),
+              ipWhitelist: apiSettings.securitySettings.ipWhitelist,
             });
-            setPromotions(mergedPromos);
           }
         }
       } catch (err) {
-        console.log('Using local fallback state for Admin Panel');
+        console.error('Could not load Firebase store data:', err);
       }
     }
 
@@ -699,116 +601,81 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       createdAt: new Date().toISOString().slice(0, 10),
       updatedAt: new Date().toISOString().slice(0, 10),
     };
-    setProducts((prev) => [newProduct, ...prev.filter((p) => p.id !== newProduct.id)]);
-    try {
-      const localCustom = getLocalCustomProducts();
-      const updated = [newProduct, ...localCustom.filter((p: any) => String(p.id) !== newId)];
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-    addToast('success', `Product "${newProduct.name}" created successfully!`);
+    fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...newProduct,
+        originalPrice: newProduct.discountPrice,
+        images: newProduct.galleryImages || [newProduct.image],
+      }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to create product.');
+        setProducts((prev) => [newProduct, ...prev.filter((p) => p.id !== newProduct.id)]);
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('success', `Product "${newProduct.name}" created successfully!`);
+      })
+      .catch((error) => {
+        addToast('error', error instanceof Error ? error.message : 'Failed to create product.');
+      });
   };
 
   const updateProduct = (id: string, updatedData: Partial<Product>) => {
-    let fullUpdatedProd: Product | null = null;
-
-    setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          fullUpdatedProd = {
-            ...p,
-            ...updatedData,
-            updatedAt: new Date().toISOString().slice(0, 10),
-          };
-          return fullUpdatedProd;
-        }
-        return p;
-      })
-    );
-
-    try {
-      const localCustom = getLocalCustomProducts();
-      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(id));
-
-      const currentProd = products.find((p) => String(p.id) === String(id));
-      const targetProd: Product = fullUpdatedProd || ({
-        ...(currentProd || {}),
-        ...updatedData,
-        id: String(id),
-        updatedAt: new Date().toISOString().slice(0, 10),
-      } as Product);
-
-      let updatedList: any[];
-      if (existingIndex !== -1) {
-        updatedList = localCustom.map((p: any) =>
-          String(p.id) === String(id) ? { ...p, ...targetProd } : p
+    const updatedAt = new Date().toISOString().slice(0, 10);
+    fetch(`/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...updatedData, updatedAt }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update product.');
+        setProducts((prev) =>
+          prev.map((product) =>
+            product.id === id ? { ...product, ...updatedData, updatedAt } : product
+          )
         );
-      } else {
-        updatedList = [targetProd, ...localCustom];
-      }
-
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-    addToast('info', 'Product details updated');
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('info', 'Product details updated');
+      })
+      .catch((error) => {
+        addToast('error', error instanceof Error ? error.message : 'Failed to update product.');
+      });
   };
 
   const deleteProduct = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-    try {
-      const localCustom = getLocalCustomProducts();
-      const updated = localCustom.filter((p: any) => String(p.id) !== String(id));
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
-
-      const rawDeleted = localStorage.getItem('matrin_deleted_products');
-      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-      if (!deletedIds.includes(String(id))) {
-        deletedIds.push(String(id));
-        localStorage.setItem('matrin_deleted_products', JSON.stringify(deletedIds));
-      }
-
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
     fetch(`/api/products/${id}`, { method: 'DELETE' })
-      .then((res) => {
-        if (!res.ok) addToast('error', 'Deleted locally, but the server did not confirm the deletion.');
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to delete product.');
+        setProducts((prev) => prev.filter((product) => product.id !== id));
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('warning', 'Product deleted from catalog');
       })
-      .catch(() => addToast('error', 'Deleted locally, but failed to reach the server.'));
-    addToast('warning', 'Product deleted from catalog');
+      .catch((error) => addToast('error', error instanceof Error ? error.message : 'Failed to delete product.'));
   };
 
   const bulkDeleteProducts = (ids: string[]) => {
-    setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
-    try {
-      const localCustom = getLocalCustomProducts();
-      const updated = localCustom.filter((p: any) => !ids.includes(String(p.id)));
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updated));
-
-      const rawDeleted = localStorage.getItem('matrin_deleted_products');
-      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-      ids.forEach((id) => {
-        if (!deletedIds.includes(String(id))) deletedIds.push(String(id));
-      });
-      localStorage.setItem('matrin_deleted_products', JSON.stringify(deletedIds));
-
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-    Promise.all(ids.map((id) => fetch(`/api/products/${id}`, { method: 'DELETE' })))
-      .catch(() => addToast('error', 'Deleted locally, but failed to sync some deletions to the server.'));
-    addToast('warning', `${ids.length} products deleted`);
+    Promise.all(
+      ids.map(async (id) => {
+        const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || `Failed to delete product ${id}.`);
+      })
+    )
+      .then(() => {
+        setProducts((prev) => prev.filter((product) => !ids.includes(product.id)));
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('warning', `${ids.length} products deleted`);
+      })
+      .catch((error) => addToast('error', error instanceof Error ? error.message : 'Failed to delete products.'));
   };
 
   const importProducts = (newProds: Partial<Product>[]) => {
     const formatted: Product[] = newProds.map((p, idx) => ({
-      id: 'prod-imp-' + Date.now() + '-' + idx,
+      id: String(Date.now() + idx),
       name: p.name || 'Imported MATRIN Product',
       sku: p.sku || `MTR-IMP-${Math.floor(1000 + Math.random() * 9000)}`,
       barcode: p.barcode || '8909998887771',
@@ -830,8 +697,27 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updatedAt: new Date().toISOString().slice(0, 10),
       image: p.image || 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=600&auto=format&fit=crop&q=80',
     }));
-    setProducts((prev) => [...formatted, ...prev]);
-    addToast('success', `Successfully imported ${formatted.length} products into MATRIN catalog!`);
+    Promise.all(
+      formatted.map(async (product) => {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...product,
+            originalPrice: product.discountPrice,
+            images: product.galleryImages || [product.image],
+          }),
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || `Failed to import ${product.name}.`);
+      })
+    )
+      .then(() => {
+        setProducts((prev) => [...formatted, ...prev]);
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('success', `Successfully imported ${formatted.length} products into MATRIN catalog!`);
+      })
+      .catch((error) => addToast('error', error instanceof Error ? error.message : 'Failed to import products.'));
   };
 
   // Stock Management Action: Adjust stock by product name/SKU
@@ -922,30 +808,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setStockLogs((prev) => [newLog, ...prev]);
 
-    // 4. Sync immediately to localStorage and dispatch event for real-time storefront update
-    try {
-      const localCustom = getLocalCustomProducts();
-      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(targetProd.id));
-      let updatedList: any[];
-      if (existingIndex !== -1) {
-        updatedList = localCustom.map((p: any) =>
-          String(p.id) === String(targetProd.id)
-            ? { ...p, stock: updatedStock, stockCount: updatedStock, inStock: updatedStock > 0 }
-            : p
-        );
-      } else {
-        updatedList = [
-          { ...targetProd, stock: updatedStock, stockCount: updatedStock, inStock: updatedStock > 0 },
-          ...localCustom,
-        ];
-      }
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
-    // 5. Sync to the backend so the change is reflected on the live storefront API
+    // Persist the adjustment in Firebase so the storefront reads the same stock.
     fetch('/api/inventory/adjust', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -956,15 +819,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         performedBy: user.name + ' (' + user.role + ')',
       }),
     })
-      .then((res) => {
-        if (!res.ok) addToast('error', 'Stock updated locally, but the server did not confirm it.');
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Stock update was not saved.');
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast(
+          'success',
+          `Stock updated for "${targetProd.name}": ${quantityToAdd >= 0 ? '+' : ''}${quantityToAdd} units (New Total: ${updatedStock})`
+        );
       })
-      .catch(() => addToast('error', 'Stock updated locally, but failed to reach the server.'));
-
-    addToast(
-      'success',
-      `Stock updated for "${targetProd.name}": ${quantityToAdd >= 0 ? '+' : ''}${quantityToAdd} units (New Total: ${updatedStock})`
-    );
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Stock update failed.')
+      );
   };
 
   // Warehouses
@@ -978,8 +844,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addToast('error', `Warehouse "${trimmed}" already exists.`);
       return;
     }
-    setWarehouses((prev) => [...prev, trimmed]);
-    addToast('success', `Warehouse "${trimmed}" added.`);
+    fetch('/api/admin-data/warehouses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: trimmed, name: trimmed }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to save warehouse.');
+        setWarehouses((prev) =>
+          prev.some((warehouse) => warehouse.toLowerCase() === trimmed.toLowerCase())
+            ? prev
+            : [...prev, trimmed]
+        );
+        addToast('success', `Warehouse "${trimmed}" added.`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to save warehouse.')
+      );
   };
 
   const deleteWarehouse = (name: string) => {
@@ -988,8 +870,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addToast('error', `Cannot delete "${name}" — it still has products assigned. Restock them to another warehouse first.`);
       return;
     }
-    setWarehouses((prev) => prev.filter((w) => w !== name));
-    addToast('warning', `Warehouse "${name}" removed.`);
+    fetch(`/api/admin-data/warehouses/${encodeURIComponent(name)}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to delete warehouse.');
+        setWarehouses((prev) => prev.filter((warehouse) => warehouse !== name));
+        addToast('warning', `Warehouse "${name}" removed.`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to delete warehouse.')
+      );
   };
 
   // Reverses a single stock movement: restores the product's prior stock and
@@ -1014,28 +904,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
     setStockLogs((prev) => prev.filter((l) => l.id !== logId));
 
-    try {
-      const localCustom = getLocalCustomProducts();
-      const existingIndex = localCustom.findIndex((p: any) => String(p.id) === String(targetProd.id));
-      let updatedList: any[];
-      if (existingIndex !== -1) {
-        updatedList = localCustom.map((p: any) =>
-          String(p.id) === String(targetProd.id)
-            ? { ...p, stock: reversedStock, stockCount: reversedStock, inStock: reversedStock > 0 }
-            : p
-        );
-      } else {
-        updatedList = [
-          { ...targetProd, stock: reversedStock, stockCount: reversedStock, inStock: reversedStock > 0 },
-          ...localCustom,
-        ];
-      }
-      localStorage.setItem('matrin_custom_products', JSON.stringify(updatedList));
-      window.dispatchEvent(new Event('matrin_products_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
     fetch('/api/inventory/adjust', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1046,12 +914,15 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         performedBy: user.name + ' (' + user.role + ')',
       }),
     })
-      .then((res) => {
-        if (!res.ok) addToast('error', 'Reversed locally, but the server did not confirm it.');
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Stock reversal was not saved.');
+        window.dispatchEvent(new Event('matrin_products_updated'));
+        addToast('success', `Cancelled stock change for "${targetProd.name}" (New Total: ${reversedStock})`);
       })
-      .catch(() => addToast('error', 'Reversed locally, but failed to reach the server.'));
-
-    addToast('success', `Cancelled stock change for "${targetProd.name}" (New Total: ${reversedStock})`);
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Stock reversal failed.')
+      );
   };
 
   const addCategory = (catData: Omit<Category, 'id'>) => {
@@ -1060,78 +931,58 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ...catData,
       id: newId,
     };
-    setCategories((prev) => [newCat, ...prev.filter((c) => c.id !== newId)]);
-    try {
-      const localCustom = getLocalCustomCategories();
-      const updated = [newCat, ...localCustom.filter((c) => c.id !== newId)];
-      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
-      window.dispatchEvent(new Event('matrin_categories_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
     fetch('/api/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: newId,
-        name: newCat.name,
-        description: newCat.parentCategory || '',
-        status: newCat.status,
-      }),
-    }).catch(() => addToast('error', 'Saved category locally, but failed to reach the server.'));
-
-    addToast('success', `Category "${newCat.name}" added successfully`);
+      body: JSON.stringify({ ...newCat, description: newCat.parentCategory || '' }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to save category.');
+        setCategories((prev) => [newCat, ...prev.filter((category) => category.id !== newId)]);
+        window.dispatchEvent(new Event('matrin_categories_updated'));
+        addToast('success', `Category "${newCat.name}" added successfully`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to save category.')
+      );
   };
 
   const updateCategory = (id: string, updatedData: Partial<Category>) => {
-    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updatedData } : c)));
-    try {
-      const localCustom = getLocalCustomCategories();
-      const existing = categories.find((c) => c.id === id);
-      const merged = { ...(existing || {}), ...updatedData, id } as Category;
-      const updated = localCustom.some((c) => c.id === id)
-        ? localCustom.map((c) => (c.id === id ? { ...c, ...updatedData } : c))
-        : [merged, ...localCustom];
-      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
-      window.dispatchEvent(new Event('matrin_categories_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
     fetch(`/api/categories/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedData),
-    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
-
-    addToast('info', 'Category details updated');
+      body: JSON.stringify({
+        ...updatedData,
+        ...(updatedData.parentCategory !== undefined ? { description: updatedData.parentCategory } : {}),
+      }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update category.');
+        setCategories((prev) => prev.map((category) =>
+          category.id === id ? { ...category, ...updatedData } : category
+        ));
+        window.dispatchEvent(new Event('matrin_categories_updated'));
+        addToast('info', 'Category details updated');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update category.')
+      );
   };
 
   const deleteCategory = (id: string) => {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    try {
-      const localCustom = getLocalCustomCategories();
-      const updated = localCustom.filter((c) => c.id !== id);
-      localStorage.setItem('matrin_custom_categories', JSON.stringify(updated));
-
-      const rawDeleted = localStorage.getItem('matrin_deleted_categories');
-      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-      if (!deletedIds.includes(id)) {
-        deletedIds.push(id);
-        localStorage.setItem('matrin_deleted_categories', JSON.stringify(deletedIds));
-      }
-
-      window.dispatchEvent(new Event('matrin_categories_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
-    fetch(`/api/categories/${id}`, { method: 'DELETE' }).catch(() =>
-      addToast('error', 'Deleted locally, but failed to reach the server.')
-    );
-
-    addToast('warning', 'Category deleted');
+    fetch(`/api/categories/${id}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to delete category.');
+        setCategories((prev) => prev.filter((category) => category.id !== id));
+        window.dispatchEvent(new Event('matrin_categories_updated'));
+        addToast('warning', 'Category deleted');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to delete category.')
+      );
   };
 
   const toggleCategoryStatus = (id: string) => {
@@ -1146,32 +997,45 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     paymentStatus: Order['paymentStatus'],
     shippingStatus: Order['shippingStatus']
   ) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, paymentStatus, shippingStatus } : o))
-    );
-
-    fetch(`/api/orders/${id}`, {
+    fetch(`/api/orders/${encodeURIComponent(id)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         paymentStatus,
+        shippingStatus,
         orderStatus: shippingStatus === 'In Transit' ? 'Shipped' : shippingStatus === 'Delivered' ? 'Delivered' : shippingStatus === 'Cancelled' ? 'Cancelled' : 'Processing',
       }),
-    }).catch(() => addToast('error', 'Order updated locally, but failed to reach the server.'));
-
-    addToast('success', `Order ${id} status updated`);
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update order.');
+        setOrders((prev) => prev.map((order) =>
+          order.id === id ? { ...order, paymentStatus, shippingStatus } : order
+        ));
+        addToast('success', `Order ${id} status updated`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update order.')
+      );
   };
 
   const updateReviewStatus = (id: string, status: Review['status']) => {
-    setReviews((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
-
-    fetch(`/api/reviews/${id}`, {
+    fetch(`/api/reviews/${encodeURIComponent(id)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
-    }).catch(() => addToast('error', 'Review updated locally, but failed to reach the server.'));
-
-    addToast('info', `Review updated to ${status}`);
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update review.');
+        setReviews((prev) => prev.map((review) =>
+          review.id === id ? { ...review, status } : review
+        ));
+        addToast('info', `Review updated to ${status}`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update review.')
+      );
   };
 
   const addPromotion = (promoData: Omit<Promotion, 'id'>) => {
@@ -1180,16 +1044,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ...promoData,
       id: newId,
     };
-    setPromotions((prev) => [newPromo, ...prev.filter((p) => p.id !== newId)]);
-    try {
-      const localCustom = getLocalCustomCoupons();
-      const updated = [newPromo, ...localCustom.filter((p) => p.id !== newId)];
-      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
-      window.dispatchEvent(new Event('matrin_coupons_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
     const discountValue = parseFloat(newPromo.value.replace(/[^0-9.]/g, '')) || 10;
     fetch('/api/coupons', {
       method: 'POST',
@@ -1200,28 +1054,23 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         discountType: newPromo.incentiveType === 'Fixed Amount' ? 'fixed' : 'percentage',
         discountValue,
         usageLimit: newPromo.usageLimit,
+        validUntil: newPromo.expiryDate,
         isActive: newPromo.status === 'Active',
       }),
-    }).catch(() => addToast('error', 'Saved coupon locally, but failed to reach the server.'));
-
-    addToast('success', `Coupon code "${newPromo.code}" generated!`);
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to create coupon.');
+        setPromotions((prev) => [newPromo, ...prev.filter((promo) => promo.id !== newId)]);
+        window.dispatchEvent(new Event('matrin_coupons_updated'));
+        addToast('success', `Coupon code "${newPromo.code}" generated!`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to create coupon.')
+      );
   };
 
   const updatePromotion = (id: string, updatedData: Partial<Promotion>) => {
-    setPromotions((prev) => prev.map((p) => (p.id === id ? { ...p, ...updatedData } : p)));
-    try {
-      const localCustom = getLocalCustomCoupons();
-      const existing = promotions.find((p) => p.id === id);
-      const merged = { ...(existing || {}), ...updatedData, id } as Promotion;
-      const updated = localCustom.some((p) => p.id === id)
-        ? localCustom.map((p) => (p.id === id ? { ...p, ...updatedData } : p))
-        : [merged, ...localCustom];
-      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
-      window.dispatchEvent(new Event('matrin_coupons_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
     const discountValue = updatedData.value ? (parseFloat(updatedData.value.replace(/[^0-9.]/g, '')) || 10) : undefined;
     fetch(`/api/coupons/${id}`, {
       method: 'PUT',
@@ -1232,86 +1081,175 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ...(discountValue !== undefined ? { discountValue } : {}),
         ...(updatedData.usageLimit !== undefined ? { usageLimit: updatedData.usageLimit } : {}),
         ...(updatedData.status ? { isActive: updatedData.status === 'Active' } : {}),
+        ...(updatedData.expiryDate ? { validUntil: updatedData.expiryDate } : {}),
       }),
-    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
-
-    addToast('info', 'Coupon details updated');
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update coupon.');
+        setPromotions((prev) => prev.map((promo) =>
+          promo.id === id ? { ...promo, ...updatedData } : promo
+        ));
+        window.dispatchEvent(new Event('matrin_coupons_updated'));
+        addToast('info', 'Coupon details updated');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update coupon.')
+      );
   };
 
   const deletePromotion = (id: string) => {
-    setPromotions((prev) => prev.filter((p) => p.id !== id));
-    try {
-      const localCustom = getLocalCustomCoupons();
-      const updated = localCustom.filter((p) => p.id !== id);
-      localStorage.setItem('matrin_custom_coupons', JSON.stringify(updated));
-
-      const rawDeleted = localStorage.getItem('matrin_deleted_coupons');
-      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-      if (!deletedIds.includes(id)) {
-        deletedIds.push(id);
-        localStorage.setItem('matrin_deleted_coupons', JSON.stringify(deletedIds));
-      }
-
-      window.dispatchEvent(new Event('matrin_coupons_updated'));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-
-    fetch(`/api/coupons/${id}`, { method: 'DELETE' }).catch(() =>
-      addToast('error', 'Deleted locally, but failed to reach the server.')
-    );
-
-    addToast('warning', 'Coupon deleted');
+    fetch(`/api/coupons/${id}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to delete coupon.');
+        setPromotions((prev) => prev.filter((promo) => promo.id !== id));
+        window.dispatchEvent(new Event('matrin_coupons_updated'));
+        addToast('warning', 'Coupon deleted');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to delete coupon.')
+      );
   };
 
   const markNotificationRead = (id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    fetch('/api/notifications', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, isRead: true }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update notification.');
+        setNotifications((prev) => prev.map((notification) =>
+          notification.id === id ? { ...notification, read: true } : notification
+        ));
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update notification.')
+      );
   };
 
   const clearNotifications = () => {
-    setNotifications([]);
-    addToast('info', 'All notifications cleared');
+    fetch('/api/notifications', { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to clear notifications.');
+        setNotifications([]);
+        addToast('info', 'All notifications cleared');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to clear notifications.')
+      );
   };
 
   // Suppliers
   const addSupplier = (supplierData: Omit<Supplier, 'id'>) => {
     const newSupplier: Supplier = { ...supplierData, id: 'sup-' + Date.now() };
-    setSuppliers((prev) => [newSupplier, ...prev]);
-    addToast('success', `Supplier "${newSupplier.name}" added`);
+    fetch('/api/admin-data/suppliers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSupplier),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to add supplier.');
+        setSuppliers((prev) => [newSupplier, ...prev]);
+        addToast('success', `Supplier "${newSupplier.name}" added`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to add supplier.')
+      );
   };
 
   const updateSupplier = (id: string, updatedData: Partial<Supplier>) => {
-    setSuppliers((prev) => prev.map((s) => (s.id === id ? { ...s, ...updatedData } : s)));
-    addToast('info', 'Supplier details updated');
+    fetch(`/api/admin-data/suppliers/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update supplier.');
+        setSuppliers((prev) => prev.map((supplier) =>
+          supplier.id === id ? { ...supplier, ...updatedData } : supplier
+        ));
+        addToast('info', 'Supplier details updated');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update supplier.')
+      );
   };
 
   const deleteSupplier = (id: string) => {
-    setSuppliers((prev) => prev.filter((s) => s.id !== id));
-    addToast('warning', 'Supplier removed');
+    fetch(`/api/admin-data/suppliers/${encodeURIComponent(id)}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to remove supplier.');
+        setSuppliers((prev) => prev.filter((supplier) => supplier.id !== id));
+        addToast('warning', 'Supplier removed');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to remove supplier.')
+      );
   };
 
   // Employees
   const addEmployee = (employeeData: Omit<Employee, 'id'>) => {
     const newEmployee: Employee = { ...employeeData, id: 'emp-' + Date.now() };
-    setEmployees((prev) => [newEmployee, ...prev]);
-    addToast('success', `Employee "${newEmployee.name}" added`);
+    fetch('/api/admin-data/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEmployee),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to add employee.');
+        setEmployees((prev) => [newEmployee, ...prev]);
+        addToast('success', `Employee "${newEmployee.name}" added`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to add employee.')
+      );
   };
 
   const updateEmployee = (id: string, updatedData: Partial<Employee>) => {
-    setEmployees((prev) => prev.map((e) => (e.id === id ? { ...e, ...updatedData } : e)));
-    addToast('info', 'Employee details updated');
+    fetch(`/api/admin-data/employees/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update employee.');
+        setEmployees((prev) => prev.map((employee) =>
+          employee.id === id ? { ...employee, ...updatedData } : employee
+        ));
+        addToast('info', 'Employee details updated');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update employee.')
+      );
   };
 
   const deleteEmployee = (id: string) => {
-    setEmployees((prev) => prev.filter((e) => e.id !== id));
-    addToast('warning', 'Employee removed');
+    fetch(`/api/admin-data/employees/${encodeURIComponent(id)}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to remove employee.');
+        setEmployees((prev) => prev.filter((employee) => employee.id !== id));
+        addToast('warning', 'Employee removed');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to remove employee.')
+      );
   };
 
   const toggleEmployeeStatus = (id: string) => {
-    setEmployees((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, status: e.status === 'Active' ? 'Inactive' : 'Active' } : e))
-    );
-    addToast('info', 'Employee status updated');
+    const employee = employees.find((entry) => entry.id === id);
+    if (!employee) return;
+    const updatedStatus = employee.status === 'Active' ? 'Inactive' : 'Active';
+    updateEmployee(id, { status: updatedStatus });
   };
 
   // Support Tickets
@@ -1322,37 +1260,53 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ticketNumber: '#TICK-' + Math.floor(1000 + Math.random() * 9000),
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
     };
-    setSupportTickets((prev) => [newTicket, ...prev]);
-
     fetch('/api/support-tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTicket),
-    }).catch(() => addToast('error', 'Ticket saved locally, but failed to reach the server.'));
-
-    addToast('success', `Ticket ${newTicket.ticketNumber} created`);
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to create support ticket.');
+        const savedTicket = result.ticket as SupportTicket;
+        setSupportTickets((prev) => [savedTicket, ...prev]);
+        addToast('success', `Ticket ${savedTicket.ticketNumber} created`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to create support ticket.')
+      );
   };
 
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
-    setSupportTickets((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
-
-    fetch(`/api/support-tickets/${id}`, {
+    fetch(`/api/support-tickets/${encodeURIComponent(id)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
-    }).catch(() => addToast('error', 'Updated locally, but failed to reach the server.'));
-
-    addToast('info', `Ticket updated to ${status}`);
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update support ticket.');
+        setSupportTickets((prev) => prev.map((ticket) =>
+          ticket.id === id ? { ...ticket, status } : ticket
+        ));
+        addToast('info', `Ticket updated to ${status}`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update support ticket.')
+      );
   };
 
   const deleteSupportTicket = (id: string) => {
-    setSupportTickets((prev) => prev.filter((t) => t.id !== id));
-
-    fetch(`/api/support-tickets/${id}`, { method: 'DELETE' }).catch(() =>
-      addToast('error', 'Deleted locally, but failed to reach the server.')
-    );
-
-    addToast('warning', 'Ticket deleted');
+    fetch(`/api/support-tickets/${encodeURIComponent(id)}`, { method: 'DELETE' })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to delete support ticket.');
+        setSupportTickets((prev) => prev.filter((ticket) => ticket.id !== id));
+        addToast('warning', 'Ticket deleted');
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to delete support ticket.')
+      );
   };
 
   // Shipping & Returns
@@ -1360,41 +1314,52 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     orderId: string,
     updates: Partial<Pick<Order, 'courier' | 'trackingNumber' | 'shippingStatus'>>
   ) => {
-    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...updates } : o)));
-    addToast('success', `Shipment for order ${orderId} updated`);
+    fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update shipment.');
+        setOrders((prev) => prev.map((order) =>
+          order.id === orderId ? { ...order, ...updates } : order
+        ));
+        addToast('success', `Shipment for order ${orderId} updated`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update shipment.')
+      );
   };
 
-  const processRefund = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId ? { ...o, paymentStatus: 'Refunded', shippingStatus: 'Returned' } : o
-      )
-    );
-    addToast('success', `Refund processed for order ${orderId}`);
-  };
+  const markRefunded = (orderId: string) => {
+    const order = orders.find((entry) => entry.id === orderId);
+    if (!order) {
+      addToast('error', 'Order not found.');
+      return;
+    }
+    if (!window.confirm(`Have you already issued the refund in Razorpay? This only updates order ${order.orderNumber}; no payment will be sent.`)) {
+      return;
+    }
 
-  // Security
-  const toggleTwoFactor = () => {
-    setSecuritySettings((prev) => ({ ...prev, twoFactorEnabled: !prev.twoFactorEnabled }));
-    addToast('info', 'Two-factor authentication setting updated');
-  };
-
-  const addIpToWhitelist = (ip: string) => {
-    if (!ip.trim()) return;
-    setSecuritySettings((prev) =>
-      prev.ipWhitelist.includes(ip) ? prev : { ...prev, ipWhitelist: [...prev.ipWhitelist, ip] }
-    );
-    addToast('success', `IP ${ip} added to whitelist`);
-  };
-
-  const removeIpFromWhitelist = (ip: string) => {
-    setSecuritySettings((prev) => ({ ...prev, ipWhitelist: prev.ipWhitelist.filter((i) => i !== ip) }));
-    addToast('warning', `IP ${ip} removed from whitelist`);
-  };
-
-  const revokeSession = (sessionId: string) => {
-    setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
-    addToast('warning', 'Session revoked');
+    fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus: 'Refunded', shippingStatus: 'Returned' }),
+    })
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Failed to update refund status.');
+        setOrders((prev) => prev.map((entry) =>
+          entry.id === orderId
+            ? { ...entry, paymentStatus: 'Refunded', shippingStatus: 'Returned' }
+            : entry
+        ));
+        addToast('success', `Order ${order.orderNumber} marked refunded. No payment was sent by this app.`);
+      })
+      .catch((error) =>
+        addToast('error', error instanceof Error ? error.message : 'Failed to update refund status.')
+      );
   };
 
   return (
@@ -1482,11 +1447,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateTicketStatus,
         deleteSupportTicket,
         updateShippingInfo,
-        processRefund,
-        toggleTwoFactor,
-        addIpToWhitelist,
-        removeIpFromWhitelist,
-        revokeSession,
+        markRefunded,
         toasts,
         addToast,
         removeToast,

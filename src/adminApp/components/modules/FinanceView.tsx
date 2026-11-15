@@ -8,7 +8,7 @@ import { Order } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 
 export const FinanceView: React.FC = () => {
-  const { orders, processRefund } = useAdminStore();
+  const { orders, markRefunded } = useAdminStore();
   const [activeTab, setActiveTab] = useState('all');
 
   const paidAmount = orders.filter((o) => o.paymentStatus === 'Paid').reduce((sum, o) => sum + o.totalAmount, 0);
@@ -54,7 +54,12 @@ export const FinanceView: React.FC = () => {
       accessorKey: 'paymentStatus',
       sortable: true,
       cell: (row) => {
-        const variants: Record<string, any> = { Paid: 'success', Pending: 'warning', Failed: 'danger', Refunded: 'neutral' };
+        const variants: Record<string, 'success' | 'warning' | 'danger' | 'neutral'> = {
+          Paid: 'success',
+          Pending: 'warning',
+          Failed: 'danger',
+          Refunded: 'neutral',
+        };
         return <Badge variant={variants[row.paymentStatus] || 'neutral'} dot>{row.paymentStatus}</Badge>;
       },
     },
@@ -62,8 +67,8 @@ export const FinanceView: React.FC = () => {
       header: 'ACTION',
       cell: (row) =>
         row.paymentStatus === 'Paid' ? (
-          <Button variant="outline" size="sm" icon={<RotateCcw className="w-3.5 h-3.5" />} onClick={() => processRefund(row.id)}>
-            Issue Refund
+          <Button variant="outline" size="sm" icon={<RotateCcw className="w-3.5 h-3.5" />} onClick={() => markRefunded(row.id)}>
+            Mark Refunded
           </Button>
         ) : (
           <span className="text-xs text-matrin-gray">—</span>
@@ -78,7 +83,7 @@ export const FinanceView: React.FC = () => {
           Finance & Payouts
         </h2>
         <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-          Track gross revenue, pending settlements, and refund liabilities across all orders.
+          Track revenue and refund status. Issue payments separately in Razorpay; this panel only records the status.
         </p>
       </div>
 

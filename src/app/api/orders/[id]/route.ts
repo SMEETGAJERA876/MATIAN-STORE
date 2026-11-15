@@ -1,52 +1,44 @@
-import { connectToDatabase } from "@/lib/db";
-import { OrderModel } from "@/models/Order";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const db = await connectToDatabase();
+type SheetOrder = { id: string | number; [key: string]: unknown };
 
-  if (db) {
-    const order = await OrderModel.findOne({ id });
-    if (order) return jsonResponse(order);
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const orders = await listStoreRecords<SheetOrder>("Orders");
+    const order = orders.find((entry) => String(entry.id) === id);
+    return order
+      ? jsonResponse(order)
+      : jsonResponse({ error: "Order not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load order" },
+      503
+    );
   }
-
-  const memOrder = inMemoryStore.orders.find((o) => o.id === id);
-  if (memOrder) return jsonResponse(memOrder);
-
-  return jsonResponse({ error: "Order not found" }, 404);
 }
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const body = await req.json();
-
-    const db = await connectToDatabase();
-    if (db) {
-      const updated = await OrderModel.findOneAndUpdate({ id }, { $set: body }, { new: true });
-      if (updated) return jsonResponse({ success: true, order: updated });
-    }
-
-    const index = inMemoryStore.orders.findIndex((o) => o.id === id);
-    if (index !== -1) {
-      inMemoryStore.orders[index] = { ...inMemoryStore.orders[index], ...body };
-      return jsonResponse({ success: true, order: inMemoryStore.orders[index] });
-    }
-
-    return jsonResponse({ error: "Order not found" }, 404);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update order" }, 500);
+    const updated = await patchStoreRecord<SheetOrder>("Orders", id, await req.json());
+    return updated
+      ? jsonResponse({ success: true, order: updated })
+      : jsonResponse({ error: "Order not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update order" },
+      503
+    );
   }
 }
 

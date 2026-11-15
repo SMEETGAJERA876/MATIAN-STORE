@@ -9,15 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/server": "^1.5.3",
-    "@supabase/supabase-js": "^2.115.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "bcryptjs": "^3.0.3",
+    "firebase": "^13.3.0",
+    "firebase-admin": "^14.5.1",
     "framer-motion": "^12.42.2",
-    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.27.0",
-    "mongoose": "^9.9.1",
     "next": "16.2.12",
     "razorpay": "^2.9.8",
     "react": "19.2.4",

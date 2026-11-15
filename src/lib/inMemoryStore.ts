@@ -1,45 +1,4 @@
 import { products as defaultProducts } from "@/data/products";
-import { hashPassword } from "./auth";
-
-export interface MemoryUser {
-  id: string;
-  name: string;
-  email: string;
-  password?: string;
-  role: "ADMIN" | "CUSTOMER";
-  avatar?: string;
-  createdAt: string;
-  totalOrders: number;
-  totalSpent: number;
-  status: "Active" | "Blocked";
-}
-
-export const initialUsers: MemoryUser[] = [
-  {
-    id: "usr_admin_01",
-    name: "MATRIN Administrator",
-    email: "admin@matrin.com",
-    password: hashPassword("Admin123!"),
-    role: "ADMIN" as const,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-    createdAt: "2025-01-01",
-    totalOrders: 0,
-    totalSpent: 0,
-    status: "Active" as "Active" | "Blocked",
-  },
-  {
-    id: "usr_cust_01",
-    name: "Standard Customer",
-    email: "user@matrin.com",
-    password: hashPassword("User123!"),
-    role: "CUSTOMER" as const,
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
-    createdAt: "2025-05-01",
-    totalOrders: 2,
-    totalSpent: 1290,
-    status: "Active" as "Active" | "Blocked",
-  },
-];
 
 export const initialCategories = [
   { id: "cat_1", name: "Laundry Care", slug: "laundry-care", description: "Detergents & Fabric Softeners", iconName: "Shirt", productCount: 1, isActive: true, status: "Active" as const },
@@ -237,9 +196,8 @@ export const initialSettings = {
   ],
 };
 
-// Global Memory Store Fallback
+// Seed data used only when a Firebase collection is empty.
 class MemoryStore {
-  users: MemoryUser[] = [...initialUsers];
   categories = [...initialCategories];
   coupons = [...initialCoupons];
   reviews = [...initialReviews];

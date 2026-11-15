@@ -1,32 +1,18 @@
-import React, { useState } from 'react';
-import { Shield, ShieldCheck, Monitor, X, Plus, Trash2, Clock } from 'lucide-react';
+import React from 'react';
+import { Shield, ShieldCheck, Monitor, Clock } from 'lucide-react';
 import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useAdminStore } from '../../store/adminStore';
 
 export const SecurityView: React.FC = () => {
   const {
     securitySettings,
-    toggleTwoFactor,
-    addIpToWhitelist,
-    removeIpFromWhitelist,
     activeSessions,
-    revokeSession,
     stockLogs,
     notifications,
   } = useAdminStore();
 
-  const [newIp, setNewIp] = useState('');
-
   const securityAlerts = notifications.filter((n) => n.type === 'security');
-
-  const handleAddIp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newIp.trim()) return;
-    addIpToWhitelist(newIp.trim());
-    setNewIp('');
-  };
 
   return (
     <div className="space-y-6 pb-12">
@@ -35,8 +21,12 @@ export const SecurityView: React.FC = () => {
           Security & Audit Logs
         </h2>
         <p className="text-sm text-matrin-gray dark:text-slate-400 mt-0.5">
-          Manage authentication policy, IP access rules, active sessions, and the system audit trail.
+          Review the system audit trail. Authentication and network access controls are managed by Firebase.
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+        Two-factor authentication, IP allowlisting, and session revocation are not enforced by this panel. Configure authentication directly in Firebase; the values below are informational only.
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -51,7 +41,7 @@ export const SecurityView: React.FC = () => {
                 <div>
                   <h3 className="text-sm font-bold text-matrin-text dark:text-white">Two-Factor Authentication</h3>
                   <p className="text-xs text-matrin-gray dark:text-slate-400 mt-0.5">
-                    Require an authenticator code for every admin sign-in.
+                    Firebase-managed setting; this panel cannot enable or enforce it.
                   </p>
                 </div>
               </div>
@@ -59,7 +49,7 @@ export const SecurityView: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={securitySettings.twoFactorEnabled}
-                  onChange={toggleTwoFactor}
+                  disabled
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrin-secondary relative" />
@@ -70,21 +60,8 @@ export const SecurityView: React.FC = () => {
           <Card>
             <h3 className="text-sm font-bold text-matrin-text dark:text-white mb-1">IP Access Whitelist</h3>
             <p className="text-xs text-matrin-gray dark:text-slate-400 mb-4">
-              Only these IP addresses may access the Enterprise Admin panel.
+              These saved addresses are not used to restrict access.
             </p>
-
-            <form onSubmit={handleAddIp} className="flex items-center gap-2 mb-4">
-              <input
-                type="text"
-                value={newIp}
-                onChange={(e) => setNewIp(e.target.value)}
-                placeholder="e.g. 203.0.113.10"
-                className="flex-1 px-4 py-2 text-sm bg-matrin-bg dark:bg-slate-900 border border-matrin-border dark:border-matrin-darkborder rounded-xl focus:outline-none focus:ring-2 focus:ring-matrin-primary"
-              />
-              <Button type="submit" variant="primary" size="sm" icon={<Plus className="w-3.5 h-3.5" />}>
-                Add IP
-              </Button>
-            </form>
 
             <div className="space-y-2">
               {securitySettings.ipWhitelist.length === 0 ? (
@@ -93,12 +70,6 @@ export const SecurityView: React.FC = () => {
                 securitySettings.ipWhitelist.map((ip) => (
                   <div key={ip} className="flex items-center justify-between px-4 py-2 bg-matrin-bg/60 dark:bg-slate-900/60 rounded-xl border border-matrin-border dark:border-matrin-darkborder">
                     <span className="font-mono text-xs font-bold text-matrin-text dark:text-white">{ip}</span>
-                    <button
-                      onClick={() => removeIpFromWhitelist(ip)}
-                      className="p-1 text-matrin-gray hover:text-rose-600 rounded-lg transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
                   </div>
                 ))
               )}
@@ -141,19 +112,11 @@ export const SecurityView: React.FC = () => {
                       <div className="text-[10px] text-matrin-gray mt-1">{s.location} • {s.ipAddress}</div>
                       <div className="text-[10px] text-matrin-gray mt-0.5">{s.lastActive}</div>
                     </div>
-                    {!s.current && (
-                      <button
-                        onClick={() => revokeSession(s.id)}
-                        className="p-1.5 text-matrin-gray hover:text-rose-600 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors shrink-0"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
               {activeSessions.length === 0 && (
-                <p className="text-xs text-matrin-gray italic">No other active sessions.</p>
+                <p className="text-xs text-matrin-gray italic">Active sessions are not tracked by this panel.</p>
               )}
             </div>
           </Card>
@@ -165,7 +128,7 @@ export const SecurityView: React.FC = () => {
             <div>
               <h4 className="text-sm font-extrabold text-rose-600 dark:text-rose-400">Security Reminder</h4>
               <p className="text-xs text-slate-700 dark:text-slate-300 mt-1 leading-relaxed">
-                Revoke sessions from devices you no longer use and keep the IP whitelist limited to trusted networks.
+                Use Firebase Authentication to manage account access and sign-in security.
               </p>
             </div>
           </div>

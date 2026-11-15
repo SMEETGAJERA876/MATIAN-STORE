@@ -191,111 +191,8 @@ interface ProductStoreContextType {
 
 const ProductStoreContext = createContext<ProductStoreContextType | undefined>(undefined);
 
-const getStoredCustomProducts = (): Product[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem("matrin_custom_products");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((p: any) => ({
-      id: Number(p.id) || Date.now(),
-      name: p.name,
-      category: (p.category || "General") as ProductCategory,
-      price: Number(p.price) || 0,
-      oldPrice: Number(p.oldPrice || p.originalPrice || p.discountPrice) || Math.round(Number(p.price) * 1.25),
-      discountPercentage:
-        p.oldPrice || p.originalPrice || p.discountPrice
-          ? Math.round((((Number(p.oldPrice || p.originalPrice || p.discountPrice)) - Number(p.price)) / Number(p.oldPrice || p.originalPrice || p.discountPrice)) * 100)
-          : 20,
-      rating: Number(p.rating) || 5.0,
-      reviewCount: Number(p.reviewCount ?? p.reviewsCount) || 12,
-      image: p.image || "/images/products/detergent.webp",
-      galleryImages: Array.isArray(p.galleryImages) && p.galleryImages.length > 0
-        ? p.galleryImages
-        : Array.isArray(p.images) && p.images.length > 0
-        ? p.images
-        : [p.image || "/images/products/detergent.webp"],
-      description: p.description || "",
-      features: Array.isArray(p.features) ? p.features : [],
-      specifications: p.specifications || {},
-      inStock: (() => {
-        const rawStock = p.stockCount ?? p.stock;
-        const count = rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Number(rawStock) : 50;
-        return p.inStock !== false && count > 0;
-      })(),
-      stockCount: (() => {
-        const rawStock = p.stockCount ?? p.stock;
-        return rawStock !== undefined && rawStock !== null && !isNaN(Number(rawStock)) ? Math.max(0, Number(rawStock)) : 50;
-      })(),
-      isFeatured: true,
-      isBestSeller: p.isBestSeller ?? p.badge === "Bestseller",
-      isNewArrival: p.isNewArrival ?? p.badge === "New",
-      tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : ["Cleaning", p.category || "General"],
-    }));
-  } catch {
-    return [];
-  }
-};
-
-function mergeWithCustom(baseProducts: Product[], customProducts: Product[]): Product[] {
-  let deletedIds = new Set<string>();
-  if (typeof window !== "undefined") {
-    try {
-      const rawDeleted = localStorage.getItem("matrin_deleted_products");
-      if (rawDeleted) {
-        const parsed = JSON.parse(rawDeleted);
-        if (Array.isArray(parsed)) {
-          deletedIds = new Set(parsed.map((id) => String(id)));
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
-
-  // Filter out any explicitly deleted products
-  const activeBaseProducts = baseProducts.filter(
-    (bp) => !deletedIds.has(String(bp.id)) && !deletedIds.has(bp.name.toLowerCase().trim())
-  );
-
-  if (!customProducts.length) return activeBaseProducts;
-
-  const customById = new Map<number, Product>();
-  const customByName = new Map<string, Product>();
-
-  customProducts.forEach((cp) => {
-    if (!deletedIds.has(String(cp.id))) {
-      customById.set(cp.id, cp);
-      customByName.set(cp.name.toLowerCase().trim(), cp);
-    }
-  });
-
-  const usedCustomIds = new Set<number>();
-
-  // Replace matched baseProducts in-place with the updated custom product (photo, price, title, etc.)
-  const result: Product[] = activeBaseProducts.map((bp) => {
-    const updated = customById.get(bp.id) || customByName.get(bp.name.toLowerCase().trim());
-    if (updated) {
-      usedCustomIds.add(updated.id);
-      return { ...bp, ...updated };
-    }
-    return bp;
-  });
-
-  // Any custom products that are brand new (not replacing an existing product) are prepended
-  const brandNew = customProducts.filter(
-    (cp) => !deletedIds.has(String(cp.id)) && !usedCustomIds.has(cp.id)
-  );
-
-  return [...brandNew, ...result];
-}
-
 export function ProductStoreProvider({ children }: { children: React.ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(() => {
-    const custom = getStoredCustomProducts();
-    return mergeWithCustom(defaultProducts, custom);
-  });
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
   const [categories, setCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES);
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [orders, setOrders] = useState<OrderInvoice[]>([]);
@@ -354,7 +251,6 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
   // Fetch storefront data from APIs on load
   const refreshStoreData = async () => {
     try {
-      const storedCustom = getStoredCustomProducts();
       const results = await Promise.allSettled([
         fetch("/api/products"),
         fetch("/api/categories"),
@@ -395,12 +291,13 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
             isNewArrival: p.badge === "New",
             tags: ["Cleaning", p.category],
           }));
-          setProducts(mergeWithCustom(apiMapped, storedCustom));
+          setProducts(apiMapped);
         } else {
-          setProducts(mergeWithCustom(defaultProducts, storedCustom));
+          setProducts([]);
         }
       } else {
-        setProducts(mergeWithCustom(defaultProducts, storedCustom));
+        setProducts(defaultProducts);
+        console.error("Could not load products from Firebase-backed API.");
       }
 
       if (resCat.status === "fulfilled" && resCat.value.ok) {
@@ -418,9 +315,8 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
         if (Array.isArray(revData)) setReviews(revData);
       }
     } catch (err) {
-      console.warn("Using offline catalog fallback:", err);
-      const storedCustom = getStoredCustomProducts();
-      setProducts(mergeWithCustom(defaultProducts, storedCustom));
+      console.error("Could not refresh store data:", err);
+      setProducts(defaultProducts);
     }
   };
 
@@ -443,82 +339,50 @@ export function ProductStoreProvider({ children }: { children: React.ReactNode }
   // Products CRUD
   const addProduct = async (prod: Omit<Product, "id">) => {
     const newId = Date.now();
-    const newProduct: Product = { ...prod, id: newId };
     try {
-      if (typeof window !== "undefined") {
-        const custom = getStoredCustomProducts();
-        const updated = [newProduct, ...custom.filter((p) => p.id !== newId)];
-        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
-        window.dispatchEvent(new Event("matrin_products_updated"));
-      }
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...prod, id: newId }),
       });
-      if (res.ok) {
-        toast.success("Product added successfully!");
-      }
-    } catch (e) {
-      console.error(e);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to add product.");
+      toast.success("Product added successfully!");
+      await refreshStoreData();
+    } catch (error) {
+      console.error("Product creation failed:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to add product.");
     }
-    refreshStoreData();
   };
 
   const updateProduct = async (id: number, prod: Partial<Product>) => {
     try {
-      if (typeof window !== "undefined") {
-        const custom = getStoredCustomProducts();
-        const existingIndex = custom.findIndex((p) => p.id === id);
-        let updatedList: Product[];
-        if (existingIndex !== -1) {
-          updatedList = custom.map((p) => (p.id === id ? { ...p, ...prod } : p));
-        } else {
-          const currentProd = products.find((p) => p.id === id);
-          const full = { ...(currentProd || {}), ...prod, id } as Product;
-          updatedList = [full, ...custom];
-        }
-        localStorage.setItem("matrin_custom_products", JSON.stringify(updatedList));
-        window.dispatchEvent(new Event("matrin_products_updated"));
-      }
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(prod),
       });
-      if (res.ok) {
-        toast.success("Product updated!");
-      }
-    } catch (e) {
-      console.error(e);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to update product.");
+      toast.success("Product updated!");
+      await refreshStoreData();
+    } catch (error) {
+      console.error("Product update failed:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update product.");
     }
-    refreshStoreData();
   };
 
   const deleteProduct = async (id: number) => {
     try {
-      if (typeof window !== "undefined") {
-        const custom = getStoredCustomProducts();
-        const updated = custom.filter((p) => p.id !== id);
-        localStorage.setItem("matrin_custom_products", JSON.stringify(updated));
-
-        const rawDeleted = localStorage.getItem("matrin_deleted_products");
-        const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-        if (!deletedIds.includes(String(id))) {
-          deletedIds.push(String(id));
-          localStorage.setItem("matrin_deleted_products", JSON.stringify(deletedIds));
-        }
-
-        window.dispatchEvent(new Event("matrin_products_updated"));
-      }
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        toast.success("Product deleted");
-      }
-    } catch (e) {
-      console.error(e);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to delete product.");
+      toast.success("Product deleted");
+      await refreshStoreData();
+    } catch (error) {
+      console.error("Product deletion failed:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to delete product.");
     }
-    refreshStoreData();
   };
 
   const toggleStock = (id: number) => {

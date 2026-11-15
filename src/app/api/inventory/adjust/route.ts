@@ -1,90 +1,72 @@
-import { connectToDatabase } from "@/lib/db";
-import { ProductModel } from "@/models/Product";
-import { InventoryLogModel } from "@/models/InventoryLog";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  listOrSeedStoreRecords,
+  upsertStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetProduct = {
+  id: string | number;
+  name: string;
+  stock?: number;
+  inStock?: boolean;
+  [key: string]: unknown;
+};
 
 export async function POST(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const body = await req.json();
     const { productId, productIdentifier, quantityToAdd, reason, performedBy } = body;
-
-    const qty = Number(quantityToAdd);
-    if (!qty) {
-      return jsonResponse({ error: "Quantity is required" }, 400);
+    const quantity = Number(quantityToAdd);
+    if (!Number.isFinite(quantity) || quantity === 0) {
+      return jsonResponse({ error: "Quantity must be a non-zero number" }, 400);
     }
 
-    const db = await connectToDatabase();
-
-    if (db) {
-      const query = productId ? { id: Number(productId) } : { name: { $regex: new RegExp(productIdentifier, "i") } };
-      const product = await ProductModel.findOne(query);
-
-      if (!product) {
-        return jsonResponse({ error: "Product not found" }, 404);
-      }
-
-      const previousStock = product.stock || 0;
-      const newStock = Math.max(0, previousStock + qty);
-      product.stock = newStock;
-      product.inStock = newStock > 0;
-      await product.save();
-
-      const log = await InventoryLogModel.create({
-        id: `inv_log_${Date.now()}`,
-        productId: product.id,
-        productName: product.name,
-        previousStock,
-        newStock,
-        changeAmount: qty,
-        reason: reason || "Manual Adjustment",
-        adjustedBy: performedBy || auth?.name || "Admin",
-        timestamp: new Date().toISOString(),
-      });
-
-      return jsonResponse({ success: true, product, log });
-    }
-
-    // Fallback Memory Store
-    const memProduct = inMemoryStore.products.find(
-      (p) => p.id === Number(productId) || (productIdentifier && p.name.toLowerCase().includes(productIdentifier.toLowerCase()))
+    const products = await listOrSeedStoreRecords<SheetProduct>(
+      "Products",
+      inMemoryStore.products
     );
+    const product = products.find(
+      (entry) =>
+        (productId !== undefined && String(entry.id) === String(productId)) ||
+        (productIdentifier &&
+          entry.name.toLowerCase().includes(String(productIdentifier).toLowerCase()))
+    );
+    if (!product) return jsonResponse({ error: "Product not found" }, 404);
 
-    if (!memProduct) {
-      return jsonResponse({ error: "Product not found" }, 404);
-    }
+    const previousStock = Number(product.stock) || 0;
+    const newStock = Math.max(0, previousStock + quantity);
+    const updatedProduct = {
+      ...product,
+      stock: newStock,
+      inStock: newStock > 0,
+    };
+    await upsertStoreRecord("Products", updatedProduct);
 
-    const previousStock = memProduct.stock;
-    const newStock = Math.max(0, previousStock + qty);
-    memProduct.stock = newStock;
-    memProduct.inStock = newStock > 0;
-
-    const memLog = {
+    const log = {
       id: `inv_log_${Date.now()}`,
-      productId: memProduct.id,
-      productName: memProduct.name,
+      productId: product.id,
+      productName: product.name,
       previousStock,
       newStock,
-      changeAmount: qty,
+      changeAmount: quantity,
       reason: reason || "Manual Adjustment",
       adjustedBy: performedBy || auth?.name || "Admin",
       timestamp: new Date().toISOString(),
     };
+    await upsertStoreRecord("InventoryLogs", log);
 
-    inMemoryStore.inventoryLogs.unshift(memLog);
-
-    return jsonResponse({ success: true, product: memProduct, log: memLog });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Stock adjustment failed" }, 500);
+    return jsonResponse({ success: true, product: updatedProduct, log });
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Stock adjustment failed" },
+      503
+    );
   }
 }
 

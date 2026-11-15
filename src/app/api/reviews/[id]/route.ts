@@ -1,62 +1,50 @@
-import { connectToDatabase } from "@/lib/db";
-import { ReviewModel } from "@/models/Review";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  deleteStoreRecord,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetReview = { id: string | number; [key: string]: unknown };
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const body = await req.json();
-
-    const db = await connectToDatabase();
-    if (db) {
-      const updated = await ReviewModel.findOneAndUpdate({ id }, { $set: body }, { new: true });
-      if (updated) return jsonResponse({ success: true, review: updated });
-    }
-
-    const index = inMemoryStore.reviews.findIndex((r) => r.id === id);
-    if (index !== -1) {
-      inMemoryStore.reviews[index] = { ...inMemoryStore.reviews[index], ...body };
-      return jsonResponse({ success: true, review: inMemoryStore.reviews[index] });
-    }
-
-    return jsonResponse({ error: "Review not found" }, 404);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update review" }, 500);
+    const updated = await patchStoreRecord<SheetReview>("Reviews", id, await req.json());
+    return updated
+      ? jsonResponse({ success: true, review: updated })
+      : jsonResponse({ error: "Review not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update review" },
+      503
+    );
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const db = await connectToDatabase();
-    if (db) {
-      await ReviewModel.deleteOne({ id });
-      return jsonResponse({ success: true, message: "Review deleted" });
-    }
-
-    inMemoryStore.reviews = inMemoryStore.reviews.filter((r) => r.id !== id);
+    const reviews = await listStoreRecords<SheetReview>("Reviews");
+    const review = reviews.find((entry) => String(entry.id) === id);
+    if (!review) return jsonResponse({ error: "Review not found" }, 404);
+    await deleteStoreRecord("Reviews", review.id);
     return jsonResponse({ success: true, message: "Review deleted" });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to delete review" }, 500);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete review" },
+      503
+    );
   }
 }
 

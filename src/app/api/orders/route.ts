@@ -1,56 +1,65 @@
-import { connectToDatabase } from "@/lib/db";
-import { OrderModel } from "@/models/Order";
-import { ProductModel } from "@/models/Product";
-import { NotificationModel } from "@/models/Notification";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore, initialOrders } from "@/lib/inMemoryStore";
-import { appendOrderToGoogleSheet } from "@/lib/googleSheets";
+import { initialOrders } from "@/lib/inMemoryStore";
+import {
+  listOrSeedStoreRecords,
+  listStoreRecords,
+  patchStoreRecord,
+  upsertStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetOrder = {
+  id: string | number;
+  customer: { email: string; fullName?: string; phone?: string; [key: string]: unknown };
+  items: Array<{ product?: { id?: string | number; [key: string]: unknown }; quantity?: number }>;
+  totalAmount?: number;
+  orderDate?: string;
+  [key: string]: unknown;
+};
+
+type SheetProduct = {
+  id: string | number;
+  stock?: number;
+  salesCount?: number;
+  inStock?: boolean;
+  [key: string]: unknown;
+};
+
+type SheetCustomer = {
+  id: string | number;
+  email: string;
+  totalOrders?: number;
+  totalSpent?: number;
+  [key: string]: unknown;
+};
 
 export async function GET(req: Request) {
   const auth = await getAuthFromReq(req);
-  const referer = req.headers.get("referer") || "";
-  const isAdmin = (auth && auth.role === "ADMIN") || referer.includes("/admin");
-  const db = await connectToDatabase();
+  const isAdmin = auth?.role === "ADMIN";
+  const customerEmail = auth?.email?.toLowerCase();
+  if (!isAdmin && !customerEmail) return jsonResponse({ error: "Unauthorized" }, 401);
 
-  if (db) {
-    const count = await OrderModel.countDocuments();
-    if (count === 0) {
-      await OrderModel.insertMany(initialOrders);
-    }
-
+  try {
+    let orders = await listOrSeedStoreRecords<SheetOrder>("Orders", initialOrders);
+    orders.sort((a, b) => String(b.orderDate || "").localeCompare(String(a.orderDate || "")));
     if (!isAdmin) {
-      if (!auth) {
-        return jsonResponse({ error: "Unauthorized" }, 401);
-      }
-      // Return customer's own orders
-      const userOrders = await OrderModel.find({ "customer.email": auth.email }).sort({ createdAt: -1 });
-      return jsonResponse(userOrders);
+      orders = orders.filter(
+        (order) => order.customer?.email?.toLowerCase() === customerEmail
+      );
     }
-
-    // Admin receives all orders
-    const allOrders = await OrderModel.find().sort({ createdAt: -1 });
-    return jsonResponse(allOrders);
+    return jsonResponse(orders);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load orders" },
+      503
+    );
   }
-
-  // Memory Fallback
-  if (!isAdmin) {
-    if (!auth) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    const userOrders = inMemoryStore.orders.filter((o) => o.customer.email === auth.email);
-    return jsonResponse(userOrders);
-  }
-
-  return jsonResponse(inMemoryStore.orders);
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const db = await connectToDatabase();
-
     const orderId = body.id || `ord_${Date.now()}`;
-    const invoiceNumber = body.invoiceNumber || `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const invoiceNumber = body.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const rawCustomer = body.customer || {};
     const houseFlatNo = (rawCustomer.houseFlatNo || "").toString().trim();
@@ -58,7 +67,6 @@ export async function POST(req: Request) {
     const city = (rawCustomer.city || "").toString().trim();
     const state = (rawCustomer.state || "").toString().trim();
     const pincode = (rawCustomer.pincode || "").toString().trim();
-
     const fullAddress =
       [houseFlatNo, streetArea, city, state, pincode].filter(Boolean).join(", ") ||
       (rawCustomer.addressLine || "").toString().trim() ||
@@ -84,7 +92,7 @@ export async function POST(req: Request) {
     const netSubtotal = Math.max(0, subtotal - discountAmount);
     const taxAmount = Number(body.taxAmount) || Math.round((netSubtotal * 18) / 118);
 
-    const orderData = {
+    const orderData: SheetOrder = {
       id: orderId,
       invoiceNumber,
       orderDate: body.orderDate || new Date().toISOString().split("T")[0],
@@ -103,84 +111,58 @@ export async function POST(req: Request) {
       transactionId: body.transactionId || `TXN-${Math.floor(10000000 + Math.random() * 90000000)}`,
     };
 
-    if (db) {
-      const createdOrder = await OrderModel.create(orderData);
+    const existingOrders = await listStoreRecords<SheetOrder>("Orders");
+    const isNewOrder = !existingOrders.some((order) => String(order.id) === String(orderId));
+    const savedOrder = await upsertStoreRecord("Orders", orderData);
 
-      // Decrement inventory stock automatically in Database
-      if (body.items && Array.isArray(body.items)) {
-        for (const item of body.items) {
-          const prodId = item.product?.id;
-          const qty = item.quantity || 1;
-          if (prodId) {
-            await ProductModel.updateOne(
-              { id: prodId },
-              { $inc: { stock: -qty, salesCount: qty } }
-            );
-          }
-        }
+    if (isNewOrder) {
+      const products = await listStoreRecords<SheetProduct>("Products");
+      for (const item of orderData.items) {
+        const productId = item.product?.id;
+        const product = products.find((entry) => String(entry.id) === String(productId));
+        if (!product) continue;
+        const quantity = Number(item.quantity) || 1;
+        const stock = Math.max(0, Number(product.stock) - quantity);
+        await patchStoreRecord<SheetProduct>("Products", product.id, {
+          stock,
+          inStock: stock > 0,
+          salesCount: (Number(product.salesCount) || 0) + quantity,
+        });
       }
 
-      // Create Admin Notification
-      await NotificationModel.create({
+      const customers = await listStoreRecords<SheetCustomer>("Customers");
+      const existingCustomer = customers.find(
+        (entry) => entry.email?.toLowerCase() === customer.email
+      );
+      const customerRecord: SheetCustomer = {
+        ...(existingCustomer || {}),
+        id: existingCustomer?.id || customer.email,
+        ...customer,
+        name: customer.fullName,
+        email: customer.email,
+        totalOrders: (Number(existingCustomer?.totalOrders) || 0) + 1,
+        totalSpent: (Number(existingCustomer?.totalSpent) || 0) + totalAmount,
+        updatedAt: new Date().toISOString(),
+      };
+      await upsertStoreRecord("Customers", customerRecord);
+
+      await upsertStoreRecord("Notifications", {
         id: `notif_${Date.now()}`,
         title: "New Customer Order",
-        message: `Order #${invoiceNumber} placed by ${body.customer?.fullName || "Customer"} (₹${body.totalAmount})`,
+        message: `Order #${invoiceNumber} placed by ${customer.fullName} (₹${totalAmount})`,
+        timestamp: new Date().toISOString(),
         type: "order",
         isRead: false,
         link: "/admin/orders",
       });
-
-      // Trigger Google Sheets data collection sync
-      try {
-        const sheetsResult = await appendOrderToGoogleSheet(createdOrder);
-        if (!sheetsResult.success) {
-          console.error("Google Sheets sync error:", sheetsResult.error);
-        }
-      } catch (sheetsErr) {
-        console.error("Google Sheets sync exception:", sheetsErr);
-      }
-
-      return jsonResponse({ success: true, order: createdOrder }, 201);
     }
 
-    // Memory Store update
-    inMemoryStore.orders.unshift(orderData as unknown as (typeof inMemoryStore.orders)[0]);
-    if (body.items && Array.isArray(body.items)) {
-      for (const item of body.items) {
-        const prodId = item.product?.id;
-        const qty = item.quantity || 1;
-        const target = inMemoryStore.products.find((p) => p.id === prodId);
-        if (target) {
-          target.stock = Math.max(0, target.stock - qty);
-          target.salesCount = (target.salesCount || 0) + qty;
-        }
-      }
-    }
-
-    inMemoryStore.notifications.unshift({
-      id: `notif_${Date.now()}`,
-      title: "New Customer Order",
-      message: `Order #${invoiceNumber} placed by ${body.customer?.fullName || "Customer"} (₹${body.totalAmount})`,
-      timestamp: new Date().toISOString(),
-      type: "order" as const,
-      isRead: false,
-      link: "/admin/orders",
-    });
-
-    // Trigger Google Sheets data collection sync
-    try {
-      const sheetsResult = await appendOrderToGoogleSheet(orderData);
-      if (!sheetsResult.success) {
-        console.error("Google Sheets sync error:", sheetsResult.error);
-      }
-    } catch (sheetsErr) {
-      console.error("Google Sheets sync exception:", sheetsErr);
-    }
-
-    return jsonResponse({ success: true, order: orderData }, 201);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to create order" }, 500);
+    return jsonResponse({ success: true, order: savedOrder }, 201);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to create order" },
+      503
+    );
   }
 }
 

@@ -1,69 +1,72 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import {
-  Lock,
-  Mail,
-  User,
-  ShieldCheck,
+  ArrowLeft,
   Eye,
   EyeOff,
-  ArrowRight,
-  ArrowLeft,
-  Sparkles,
-  Droplet,
-  Leaf,
-  CheckCircle2,
-  KeyRound,
-  Shield,
-  Truck,
-  Headphones,
+  LockKeyhole,
+  Mail,
+  UserRound,
 } from "lucide-react";
-import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
-export default function LoginScreen() {
-  const { login, register } = useAuth();
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 48 48" className="h-5 w-5">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.27 5.48-4.77 7.18l7.73 6C44.4 37.99 46.98 31.85 46.98 24.55Z" />
+      <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.45-4.88 2.3-8.17 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z" />
+    </svg>
+  );
+}
 
-  // Form states
+export default function LoginScreen() {
+  const {
+    login,
+    loginWithGoogle,
+    googleLinkPending,
+    completeGoogleLink,
+    cancelGoogleLink,
+    register,
+    resetPassword,
+  } = useAuth();
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Password validation for registration
-  const hasMinLength = password.length >= 8;
-  const hasLetter = /[a-zA-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const isPasswordValid = hasMinLength && hasLetter && hasNumber;
+  const passwordIsValid =
+    password.length >= 8 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      toast.error("Please fill in both email and password.");
-      return;
-    }
-
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsSubmitting(true);
     try {
-      await login(email.trim(), password, "AUTO");
+      if (googleLinkPending) {
+        await completeGoogleLink(email, password);
+      } else {
+        await login(email.trim(), password, "AUTO");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      toast.error("Please complete all registration fields.");
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!name.trim()) {
+      toast.error("Enter your name to create an account.");
       return;
     }
-
-    if (!isPasswordValid) {
-      toast.error("Password must be at least 8 characters with at least 1 letter and 1 number.");
+    if (!passwordIsValid) {
+      toast.error("Use at least 8 characters, including a letter and a number.");
       return;
     }
 
@@ -75,421 +78,318 @@ export default function LoginScreen() {
     }
   };
 
-  const handleDemoCustomerLogin = async () => {
-    setEmail("user@matrin.com");
-    setPassword("User123!");
+  const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     try {
-      await login("user@matrin.com", "User123!", "CUSTOMER");
+      await loginWithGoogle();
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!email.trim()) {
+      toast.error("Enter your email address first.");
+      return;
+    }
+    await resetPassword(email);
+  };
+
+  const inputClass =
+    "w-full rounded-lg border border-[#d9ddd9] bg-white px-3.5 py-3 text-sm text-[#202820] outline-none transition placeholder:text-[#929991] focus:border-[#315b3d] focus:ring-2 focus:ring-[#315b3d]/10";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#EDF5FD] via-[#F6FAFF] to-[#E5F0FC] flex flex-col py-8 px-4 sm:px-6 lg:px-8 font-sans">
-      
-      {/* Centered Auth Card Container */}
-      <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-blue-900/10 border border-slate-100 grid lg:grid-cols-12 min-h-[640px]">
-        
-        {/* Left Column: Brand & Trust Showcase (5 cols on Desktop) */}
-        <div className="relative hidden lg:flex lg:col-span-5 flex-col justify-between bg-gradient-to-br from-[#102A5C] via-[#0645B5] to-[#04286B] p-10 text-white overflow-hidden">
-          
-          {/* Subtle Decorative Ambient Lighting */}
-          <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#f4f3ee] px-4 py-5 sm:px-6 sm:py-8">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between">
+        <Link href="/" aria-label="MATRIN home" className="inline-flex items-center">
+          <Image
+            src="/images/matrin-logo-sticker.png"
+            alt="MATRIN"
+            width={180}
+            height={48}
+            className="h-9 w-auto object-contain"
+          />
+        </Link>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#526056] transition hover:text-[#203d29]"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Back to shop</span>
+        </Link>
+      </header>
 
-          {/* Top Logo & Slogan */}
-          <div className="relative z-10 space-y-6">
-            <Link href="/" className="inline-block group">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/15 transition-all group-hover:bg-white/20">
-                <img
-                  src="/images/matrin-logo-sticker.png"
-                  alt="MATRIN"
-                  className="h-9 w-auto object-contain"
-                />
-              </div>
-            </Link>
-
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-cyan-200 backdrop-blur-md uppercase tracking-wider">
-                <Sparkles size={12} />
-                Premium Cleaning Solutions
-              </span>
-              <h1 className="text-3xl lg:text-4xl font-black tracking-tight leading-tight">
-                Pure Cleaning.<br />
-                <span className="text-cyan-300">Naturally Powerful.</span>
+      <main className="mx-auto flex w-full max-w-6xl items-center justify-center py-6 sm:py-10">
+        <div className="grid w-full overflow-hidden rounded-2xl border border-[#e4e3dc] bg-white shadow-[0_12px_42px_rgba(31,43,33,0.07)] lg:min-h-[650px] lg:grid-cols-[0.92fr_1.08fr]">
+          <section className="relative hidden flex-col justify-between bg-[#203d29] p-10 text-white lg:flex xl:p-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
+                MATRIN · HOME CARE
+              </p>
+              <h1 className="mt-8 max-w-sm text-4xl font-semibold leading-[1.14] tracking-tight">
+                A cleaner home,
+                <br />
+                one simple step at a time.
               </h1>
-              <p className="text-xs text-blue-100/80 leading-relaxed font-normal">
-                Eco-friendly formulas that tackle tough stains while staying gentle on fabrics, skin, and the planet.
+              <p className="mt-4 max-w-sm text-sm leading-6 text-white/75">
+                Sign in to pick up where you left off and keep your everyday essentials close.
               </p>
             </div>
-          </div>
 
-          {/* Center Product Graphic */}
-          <div className="relative z-10 my-6 flex justify-center items-center">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-cyan-300/10 blur-2xl transform scale-125" />
-              <img
+            <div className="my-8 flex min-h-64 items-center justify-center rounded-xl bg-[#f0efe7] px-6 py-5">
+              <Image
                 src="/images/products/matrin-detergent-real.webp"
-                alt="Matrin Ultra Detergent"
-                className="relative z-10 h-52 w-auto object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-300"
+                alt="MATRIN detergent"
+                width={320}
+                height={320}
+                className="max-h-64 w-auto object-contain"
               />
             </div>
-          </div>
 
-          {/* Bottom 4 Highlights */}
-          <div className="relative z-10 space-y-4">
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-md p-2 border border-white/10">
-                <Droplet size={14} className="text-cyan-300 shrink-0" />
-                <span className="font-semibold text-white">3X Power Clean</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-md p-2 border border-white/10">
-                <Leaf size={14} className="text-emerald-300 shrink-0" />
-                <span className="font-semibold text-white">Plant-Based</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-md p-2 border border-white/10">
-                <ShieldCheck size={14} className="text-amber-300 shrink-0" />
-                <span className="font-semibold text-white">Pet & Child Safe</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-white/10 backdrop-blur-md p-2 border border-white/10">
-                <Sparkles size={14} className="text-purple-300 shrink-0" />
-                <span className="font-semibold text-white">Fabric Care</span>
-              </div>
-            </div>
-
-            <p className="text-[10px] text-blue-200/60 text-center font-medium">
-              © 2026 MATRIN Clean Technologies. All rights reserved.
+            <p className="text-xs text-white/60">
+              Thoughtful essentials for the everyday.
             </p>
-          </div>
-        </div>
+          </section>
 
-        {/* Right Column: Authentication Card (7 cols on Desktop) */}
-        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col bg-white">
-          
-          {/* Top Bar: Back to Home Link */}
-          <div className="flex items-center justify-between">
-            <div className="lg:hidden">
-              <Link href="/">
-                <img
-                  src="/images/matrin-logo-sticker.png"
-                  alt="MATRIN"
-                  className="h-8 w-auto object-contain"
-                />
-              </Link>
-            </div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#0645B5] transition ml-auto"
-            >
-              <ArrowLeft size={14} />
-              <span>Back to Store</span>
-            </Link>
-          </div>
-
-          {/* Form Content Area */}
-          <div className="max-w-md w-full mx-auto py-4 mt-6 lg:mt-8">
-            
-            {/* Title Section */}
-            <div className="text-center space-y-1.5 mb-6">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#102A5C] tracking-tight">
-                {mode === "login" ? "Welcome Back!" : "Join MATRIN"}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                {mode === "login"
-                  ? "Sign in to track orders, manage wishlist & claim coupons"
-                  : "Create an account to unlock fast checkout and member perks"}
+          <section className="flex items-center px-6 py-8 sm:px-10 sm:py-12 lg:px-14">
+            <div className="mx-auto w-full max-w-md">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#647168]">
+                Your MATRIN account
               </p>
-            </div>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#202820]">
+                {mode === "login" ? "Welcome back" : "Create your account"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#687169]">
+                {mode === "login"
+                  ? "Sign in to view your orders and saved items."
+                  : "A few details and you’re ready to shop."}
+              </p>
 
-            {/* Segmented Switcher Tabs */}
-            <div className="flex rounded-2xl bg-slate-100 p-1 mb-6 border border-slate-200/60">
-              <button
-                type="button"
-                onClick={() => setMode("login")}
-                className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${
-                  mode === "login"
-                    ? "bg-[#0645B5] text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("register")}
-                className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${
-                  mode === "register"
-                    ? "bg-[#0645B5] text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                Create Account
-              </button>
-            </div>
-
-            {/* Demo Quick-Login Presets (Visible on Sign In) */}
-            {mode === "login" && (
-              <div className="mb-6 rounded-2xl bg-blue-50/70 p-3 border border-blue-100/80 space-y-2">
-                <div className="flex items-center justify-between text-[11px] font-bold text-[#0645B5]">
-                  <span className="flex items-center gap-1">
-                    <KeyRound size={13} />
-                    Quick Demo Customer Login
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">Pre-filled access</span>
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleDemoCustomerLogin}
-                    disabled={isSubmitting}
-                    className="p-2 rounded-xl bg-white border border-blue-200/80 hover:bg-blue-50 text-left transition flex items-center justify-between text-[11px] font-bold text-slate-800 shadow-2xs group disabled:opacity-50"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <User size={13} className="text-[#0645B5]" />
-                      Customer
-                    </span>
-                    <ArrowRight size={12} className="text-[#0645B5] group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </div>
+              <div className="mt-7 flex border-b border-[#e7e8e2]">
+                <button
+                  type="button"
+                  onClick={() => setMode("login")}
+                  className={`-mb-px px-1 pb-3.5 pr-5 text-sm font-semibold transition ${
+                    mode === "login"
+                      ? "border-b-2 border-[#315b3d] text-[#203d29]"
+                      : "text-[#7b827b] hover:text-[#344a39]"
+                  }`}
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("register")}
+                  className={`-mb-px px-1 pb-3.5 text-sm font-semibold transition ${
+                    mode === "register"
+                      ? "border-b-2 border-[#315b3d] text-[#203d29]"
+                      : "text-[#7b827b] hover:text-[#344a39]"
+                  }`}
+                >
+                  Create account
+                </button>
               </div>
-            )}
 
-            {/* Login Form */}
-            {mode === "login" ? (
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Email Address
-                  </label>
-                  <div className="relative flex items-center">
-                    <Mail size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. user@matrin.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden transition"
-                    />
+              {mode === "login" && (
+                <>
+                  {!googleLinkPending ? (
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={isSubmitting}
+                      className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg border border-[#d9ddd9] bg-white px-4 py-3 text-sm font-semibold text-[#303730] transition hover:bg-[#f8f9f7] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? (
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#315b3d] border-t-transparent" />
+                      ) : (
+                        <GoogleMark />
+                      )}
+                      Continue with Google
+                    </button>
+                  ) : (
+                    <div className="mt-6 rounded-lg border border-[#d9ddd9] bg-[#f7f8f5] p-4 text-sm leading-6 text-[#526056]">
+                      This Google address already has an email-and-password account. Enter those credentials below once to link Google for future sign-ins.
+                      <button
+                        type="button"
+                        onClick={cancelGoogleLink}
+                        className="mt-2 block text-xs font-semibold text-[#315b3d] hover:underline"
+                      >
+                        Cancel Google linking
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="my-5 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-[#e7e8e2]" />
+                    <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#929991]">
+                      or use email
+                    </span>
+                    <div className="h-px flex-1 bg-[#e7e8e2]" />
                   </div>
-                </div>
+                </>
+              )}
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold text-slate-700">
+              {mode === "login" ? (
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div>
+                    <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-[#374239]">
+                      Email address
+                    </label>
+                    <div className="relative">
+                      <Mail size={17} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#899189]" />
+                      <input
+                        id="login-email"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="you@example.com"
+                        className={`${inputClass} pl-10`}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between gap-3">
+                      <label htmlFor="login-password" className="text-sm font-medium text-[#374239]">
+                        Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handlePasswordReset}
+                        className="text-xs font-semibold text-[#315b3d] hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <LockKeyhole size={17} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#899189]" />
+                      <input
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        required
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        placeholder="Enter your password"
+                        className={`${inputClass} pl-10 pr-11`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((visible) => !visible)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#899189] hover:text-[#374239]"
+                      >
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-2 w-full rounded-lg bg-[#315b3d] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264a31] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSubmitting
+                      ? googleLinkPending
+                        ? "Linking Google…"
+                        : "Signing in…"
+                      : googleLinkPending
+                        ? "Link Google and sign in"
+                        : "Sign in"}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div>
+                    <label htmlFor="register-name" className="mb-1.5 block text-sm font-medium text-[#374239]">
+                      Full name
+                    </label>
+                    <div className="relative">
+                      <UserRound size={17} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#899189]" />
+                      <input
+                        id="register-name"
+                        type="text"
+                        autoComplete="name"
+                        required
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        placeholder="Your name"
+                        className={`${inputClass} pl-10`}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-[#374239]">
+                      Email address
+                    </label>
+                    <div className="relative">
+                      <Mail size={17} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#899189]" />
+                      <input
+                        id="register-email"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="you@example.com"
+                        className={`${inputClass} pl-10`}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-[#374239]">
                       Password
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => toast("Password reset link will be sent to your email.", { icon: "📧" })}
-                      className="text-[11px] font-semibold text-[#0645B5] hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative flex items-center">
-                    <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-10 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden transition"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#043694] active:scale-[0.99] transition disabled:opacity-60 cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Signing In...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Sign In to Your Account</span>
-                      <ArrowRight size={15} />
-                    </>
-                  )}
-                </button>
-              </form>
-            ) : (
-              /* Register Form */
-              <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Full Name
-                  </label>
-                  <div className="relative flex items-center">
-                    <User size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden transition"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Email Address
-                  </label>
-                  <div className="relative flex items-center">
-                    <Mail size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden transition"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Create Password
-                  </label>
-                  <div className="relative flex items-center">
-                    <Lock size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="At least 8 characters"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-10 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0645B5] focus:ring-1 focus:ring-[#0645B5] focus:outline-hidden transition"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-
-                  {/* Password Strength Badges */}
-                  <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                      <span>Password requirements:</span>
-                      {password && (
-                        <span className={isPasswordValid ? "text-emerald-600 font-bold" : "text-amber-600 font-bold"}>
-                          {isPasswordValid ? "✓ Strong Password" : "Requirements incomplete"}
-                        </span>
-                      )}
+                    <div className="relative">
+                      <LockKeyhole size={17} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#899189]" />
+                      <input
+                        id="register-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        required
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        placeholder="At least 8 characters"
+                        className={`${inputClass} pl-10 pr-11`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((visible) => !visible)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#899189] hover:text-[#374239]"
+                      >
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
                     </div>
-                    <div className="grid grid-cols-3 gap-1 pt-1 text-[10px]">
-                      <div className={`flex items-center gap-1 transition ${hasMinLength ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
-                        {hasMinLength ? <CheckCircle2 size={12} className="text-emerald-600 shrink-0" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
-                        <span>8+ Chars</span>
-                      </div>
-                      <div className={`flex items-center gap-1 transition ${hasLetter ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
-                        {hasLetter ? <CheckCircle2 size={12} className="text-emerald-600 shrink-0" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
-                        <span>Letters</span>
-                      </div>
-                      <div className={`flex items-center gap-1 transition ${hasNumber ? "text-emerald-600 font-bold" : "text-slate-400"}`}>
-                        {hasNumber ? <CheckCircle2 size={12} className="text-emerald-600 shrink-0" /> : <div className="h-1.5 w-1.5 rounded-full bg-slate-300 ml-1 mr-0.5" />}
-                        <span>Numbers</span>
-                      </div>
-                    </div>
+                    <p className="mt-1.5 text-xs text-[#7b827b]">
+                      Use at least 8 characters, including a letter and a number.
+                    </p>
                   </div>
-                </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[#0645B5] py-3.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-[#043694] active:scale-[0.99] transition disabled:opacity-60 cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Creating Account...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Complete Registration</span>
-                      <ArrowRight size={15} />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* Bottom Toggle */}
-            <div className="mt-5 text-center text-xs text-slate-500 font-medium">
-              {mode === "login" ? (
-                <span>
-                  New to MATRIN?{" "}
                   <button
-                    type="button"
-                    onClick={() => setMode("register")}
-                    className="font-bold text-[#0645B5] hover:underline"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-2 w-full rounded-lg bg-[#315b3d] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#264a31] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Create an account
+                    {isSubmitting ? "Creating account…" : "Create account"}
                   </button>
-                </span>
-              ) : (
-                <span>
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => setMode("login")}
-                    className="font-bold text-[#0645B5] hover:underline"
-                  >
-                    Sign in here
-                  </button>
-                </span>
+                </form>
               )}
-            </div>
 
-          </div>
-
-          {/* Bottom Security Footer */}
-          <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
-            <div className="flex items-center gap-2 rounded-xl p-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
-                <Shield size={14} className="text-[#0645B5]" />
-              </div>
-              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">100% Secure</span>
+              <p className="mt-6 text-center text-xs leading-5 text-[#7b827b]">
+                Need a hand?{" "}
+                <Link href="/contact" className="font-semibold text-[#315b3d] hover:underline">
+                  Contact us
+                </Link>
+              </p>
             </div>
-            <div className="flex items-center gap-2 rounded-xl p-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
-                <Truck size={14} className="text-[#0645B5]" />
-              </div>
-              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">Free Delivery ₹499+</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-xl p-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF5FF] border border-[#DCE8F5]">
-                <Headphones size={14} className="text-[#0645B5]" />
-              </div>
-              <span className="text-[11px] font-bold text-[#102A5C] leading-tight">24/7 Support</span>
-            </div>
-          </div>
-
+          </section>
         </div>
-
-      </div>
+      </main>
     </div>
   );
 }

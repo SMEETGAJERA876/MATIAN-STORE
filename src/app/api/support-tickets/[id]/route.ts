@@ -1,61 +1,56 @@
-import { connectToDatabase } from "@/lib/db";
-import { SupportTicketModel } from "@/models/SupportTicket";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import {
+  deleteStoreRecord,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetTicket = { id: string | number; [key: string]: unknown };
+
+function isAdmin(auth: Awaited<ReturnType<typeof getAuthFromReq>>) {
+  return auth?.role === "ADMIN";
+}
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+  if (!isAdmin(await getAuthFromReq(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    const body = await req.json();
-
-    const db = await connectToDatabase();
-    if (db) {
-      const updated = await SupportTicketModel.findOneAndUpdate({ id }, { $set: body }, { new: true });
-      if (updated) return jsonResponse({ success: true, ticket: updated });
-      return jsonResponse({ error: "Ticket not found" }, 404);
-    }
-
-    const index = inMemoryStore.supportTickets.findIndex((t) => t.id === id);
-    if (index === -1) return jsonResponse({ error: "Ticket not found" }, 404);
-    inMemoryStore.supportTickets[index] = { ...inMemoryStore.supportTickets[index], ...body };
-    return jsonResponse({ success: true, ticket: inMemoryStore.supportTickets[index] });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update ticket" }, 500);
+    const updated = await patchStoreRecord<SheetTicket>(
+      "SupportTickets",
+      id,
+      await req.json()
+    );
+    return updated
+      ? jsonResponse({ success: true, ticket: updated })
+      : jsonResponse({ error: "Ticket not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update ticket" },
+      503
+    );
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+  if (!isAdmin(await getAuthFromReq(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-
-    const db = await connectToDatabase();
-    if (db) {
-      await SupportTicketModel.deleteOne({ id });
-      return jsonResponse({ success: true });
-    }
-
-    inMemoryStore.supportTickets = inMemoryStore.supportTickets.filter((t) => t.id !== id);
+    const tickets = await listStoreRecords<SheetTicket>("SupportTickets");
+    const ticket = tickets.find((entry) => String(entry.id) === id);
+    if (!ticket) return jsonResponse({ error: "Ticket not found" }, 404);
+    await deleteStoreRecord("SupportTickets", ticket.id);
     return jsonResponse({ success: true });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to delete ticket" }, 500);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete ticket" },
+      503
+    );
   }
 }
 

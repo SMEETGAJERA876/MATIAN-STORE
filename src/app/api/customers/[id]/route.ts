@@ -1,94 +1,75 @@
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { inMemoryStore } from "@/lib/inMemoryStore";
-import type { Database } from "@/lib/supabase/types";
+import {
+  deleteStoreRecord,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
 
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+type SheetCustomer = { id: string | number; [key: string]: unknown };
+
+async function requireAdmin(req: Request) {
+  const auth = await getAuthFromReq(req);
+  return auth?.role === "ADMIN";
+}
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+  if (!(await requireAdmin(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
     const body = await req.json();
-
-    // Only allow known, safe fields through to the profiles table.
-    const update: ProfileUpdate = {};
-    if (body.name !== undefined) update.name = body.name;
-    if (body.status !== undefined) update.status = body.status;
-    if (body.role !== undefined) update.role = body.role;
-
-    try {
-      const supabaseAdmin = getSupabaseAdmin();
-      const { data, error } = await supabaseAdmin
-        .from("profiles")
-        .update(update)
-        .eq("id", id)
-        .select("id, name, email, role, status, createdAt:created_at, totalOrders:total_orders, totalSpent:total_spent")
-        .single();
-
-      if (!error && data) {
-        return jsonResponse({ success: true, customer: data });
-      }
-    } catch {
-      // Fall through to in-memory store
+    const update: Record<string, unknown> = {};
+    for (const key of ["name", "status", "role"] as const) {
+      if (body[key] !== undefined) update[key] = body[key];
     }
 
-    const idx = inMemoryStore.users.findIndex((u) => u.id === id);
-    if (idx !== -1) {
-      inMemoryStore.users[idx] = {
-        ...inMemoryStore.users[idx],
-        ...(body.name !== undefined ? { name: body.name } : {}),
-        ...(body.status !== undefined ? { status: body.status } : {}),
-      };
-      return jsonResponse({ success: true, customer: inMemoryStore.users[idx] });
-    }
-
-    return jsonResponse({ error: "Customer not found" }, 404);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update customer" }, 500);
+    const customers = await listStoreRecords<SheetCustomer>("Customers");
+    const users = await listStoreRecords<SheetCustomer>("Users");
+    const customer = customers.find((entry) => String(entry.id) === id || entry.email === id);
+    const user = users.find((entry) => String(entry.id) === id || entry.email === customer?.email);
+    const updatedCustomer = customer
+      ? await patchStoreRecord<SheetCustomer>("Customers", customer.id, update)
+      : null;
+    const updatedUser = user
+      ? await patchStoreRecord<SheetCustomer>("Users", user.id, update)
+      : null;
+    const updated = updatedCustomer || updatedUser;
+    return updated ? jsonResponse({ success: true, customer: updated }) : jsonResponse({ error: "Customer not found" }, 404);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update customer" },
+      503
+    );
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+  if (!(await requireAdmin(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
     const { id } = await params;
-    try {
-      const supabaseAdmin = getSupabaseAdmin();
-      // Deleting the auth user cascades to the profiles row (see the SQL schema).
-      const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
-      if (!error) {
-        return jsonResponse({ success: true, message: "Customer deleted" });
-      }
-    } catch {
-      // Fall through to in-memory store
-    }
-
-    const idx = inMemoryStore.users.findIndex((u) => u.id === id);
-    if (idx !== -1) {
-      inMemoryStore.users.splice(idx, 1);
-      return jsonResponse({ success: true, message: "Customer deleted" });
-    }
-
-    return jsonResponse({ success: true, message: "Customer deleted" });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to delete customer" }, 500);
+    const [customers, users] = await Promise.all([
+      listStoreRecords<SheetCustomer>("Customers"),
+      listStoreRecords<SheetCustomer>("Users"),
+    ]);
+    const customer = customers.find((entry) => String(entry.id) === id || entry.email === id);
+    if (!customer) return jsonResponse({ error: "Customer not found" }, 404);
+    await deleteStoreRecord("Customers", customer.id);
+    const user = users.find((entry) => String(entry.id) === id || entry.email === customer.email);
+    if (user) await deleteStoreRecord("Users", user.id);
+    return jsonResponse({
+      success: true,
+      message: "Customer profile removed from the database. Their Firebase Authentication account remains active.",
+    });
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete customer" },
+      503
+    );
   }
 }
 

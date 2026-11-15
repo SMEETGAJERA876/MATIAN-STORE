@@ -1,29 +1,33 @@
-import { connectToDatabase } from "@/lib/db";
-import { ReviewModel } from "@/models/Review";
 import { jsonResponse } from "@/lib/auth";
 import { inMemoryStore, initialReviews } from "@/lib/inMemoryStore";
+import {
+  listOrSeedStoreRecords,
+  upsertStoreRecord,
+} from "@/lib/firebaseStore";
+
+type SheetReview = {
+  id: string | number;
+  productId: number;
+  [key: string]: unknown;
+};
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const productId = searchParams.get("productId");
-
-  const db = await connectToDatabase();
-  if (db) {
-    const count = await ReviewModel.countDocuments();
-    if (count === 0) {
-      await ReviewModel.insertMany(initialReviews);
+  try {
+    const productId = new URL(req.url).searchParams.get("productId");
+    let reviews = await listOrSeedStoreRecords<SheetReview>(
+      "Reviews",
+      [...inMemoryStore.reviews, ...initialReviews]
+    );
+    if (productId) {
+      reviews = reviews.filter((review) => Number(review.productId) === Number(productId));
     }
-
-    const query = productId ? { productId: Number(productId) } : {};
-    const reviews = await ReviewModel.find(query).sort({ createdAt: -1 });
-    return jsonResponse(reviews);
+    return jsonResponse(reviews.sort((a, b) => String(b.date || "").localeCompare(String(a.date || ""))));
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load reviews" },
+      503
+    );
   }
-
-  let list = [...inMemoryStore.reviews];
-  if (productId) {
-    list = list.filter((r) => r.productId === Number(productId));
-  }
-  return jsonResponse(list);
 }
 
 export async function POST(req: Request) {
@@ -40,18 +44,13 @@ export async function POST(req: Request) {
       date: body.date || new Date().toISOString().split("T")[0],
       status: body.status || "Pending",
     };
-
-    const db = await connectToDatabase();
-    if (db) {
-      const created = await ReviewModel.create(reviewData);
-      return jsonResponse({ success: true, review: created }, 201);
-    }
-
-    inMemoryStore.reviews.unshift(reviewData as unknown as (typeof inMemoryStore.reviews)[0]);
-    return jsonResponse({ success: true, review: reviewData }, 201);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to submit review" }, 500);
+    const created = await upsertStoreRecord("Reviews", reviewData);
+    return jsonResponse({ success: true, review: created }, 201);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to submit review" },
+      503
+    );
   }
 }
 

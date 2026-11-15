@@ -211,87 +211,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const shippingFee = subtotal === 0 ? 0 : subtotal >= 499 ? 0 : 50;
 
-  const COUPON_RULES: Record<string, { code: string; discountType: "percentage" | "fixed"; discountValue: number; minSpend: number; description: string }> = {
-    FESTIVAL10: {
-      code: "FESTIVAL10",
-      discountType: "percentage",
-      discountValue: 10,
-      minSpend: 1500,
-      description: "10% Festival Discount on orders above ₹1,500",
-    },
-    FESTIVE5: {
-      code: "FESTIVE5",
-      discountType: "percentage",
-      discountValue: 5,
-      minSpend: 800,
-      description: "5% Festive Savings on orders above ₹800",
-    },
-    SUPER15: {
-      code: "SUPER15",
-      discountType: "percentage",
-      discountValue: 15,
-      minSpend: 2500,
-      description: "15% Mega Household Saver on orders above ₹2,500",
-    },
-    MATRIN20: {
-      code: "MATRIN20",
-      discountType: "percentage",
-      discountValue: 20,
-      minSpend: 499,
-      description: "20% Welcome Discount on orders above ₹499",
-    },
-    MATRIN10: {
-      code: "MATRIN10",
-      discountType: "percentage",
-      discountValue: 10,
-      minSpend: 299,
-      description: "10% Discount on orders above ₹299",
-    },
-    CLEAN50: {
-      code: "CLEAN50",
-      discountType: "fixed",
-      discountValue: 50,
-      minSpend: 199,
-      description: "Flat ₹50 OFF on all orders",
-    },
-  };
-
-  const [customCoupons, setCustomCoupons] = useState<Record<string, { code: string; discountType: "percentage" | "fixed"; discountValue: number; minSpend: number; description: string }>>({});
+  const [couponRules, setCouponRules] = useState<Record<string, {
+    code: string;
+    discountType: "percentage" | "fixed";
+    discountValue: number;
+    minSpend: number;
+    description: string;
+  }>>({});
 
   useEffect(() => {
     const loadCoupons = () => {
-      try {
-        const raw = localStorage.getItem("matrin_custom_coupons");
-        if (raw) {
-          const list = JSON.parse(raw);
-          if (Array.isArray(list)) {
-            const map: Record<string, any> = {};
-            list.forEach((c: any) => {
-              const code = String(c.code).toUpperCase().trim();
-              const discountValue = typeof c.value === "string" ? parseFloat(c.value.replace(/[^0-9.]/g, "")) : (c.discountValue || 10);
-              const discountType = (c.incentiveType === "Fixed Amount" || c.discountType === "fixed") ? "fixed" : "percentage";
-              map[code] = {
-                code,
-                discountType,
-                discountValue: isNaN(discountValue) ? 10 : discountValue,
-                minSpend: c.minSpend || 0,
-                description: `${code} discount`,
-              };
-            });
-            setCustomCoupons(map);
+      fetch("/api/coupons")
+        .then(async (response) => {
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Failed to load coupons.");
+          if (!Array.isArray(result)) throw new Error("Invalid coupon data from the store.");
+          const map: Record<string, {
+            code: string;
+            discountType: "percentage" | "fixed";
+            discountValue: number;
+            minSpend: number;
+            description: string;
+          }> = {};
+          for (const coupon of result) {
+            if (coupon.isActive === false) continue;
+            const code = String(coupon.code || "").toUpperCase().trim();
+            if (!code) continue;
+            map[code] = {
+              code,
+              discountType: coupon.discountType === "fixed" ? "fixed" : "percentage",
+              discountValue: Number(coupon.discountValue) || 0,
+              minSpend: Number(coupon.minSpend ?? coupon.minOrderAmount) || 0,
+              description: coupon.description || `${code} discount`,
+            };
           }
-        }
-      } catch (e) {
-        console.warn("Could not load custom coupons:", e);
-      }
+          setCouponRules(map);
+        })
+        .catch((error) => console.error("Could not load coupon rules:", error));
     };
-
     loadCoupons();
     window.addEventListener("matrin_coupons_updated", loadCoupons);
     return () => window.removeEventListener("matrin_coupons_updated", loadCoupons);
   }, []);
 
-  const allCouponRules = { ...COUPON_RULES, ...customCoupons };
+  const allCouponRules = couponRules;
   const activeRule = appliedCoupon ? allCouponRules[appliedCoupon] : null;
 
   let discountAmount = 0;

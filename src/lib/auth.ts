@@ -1,12 +1,8 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
-import { extractCredentials, verifyCredentials, createAdminClient } from "@supabase/server/core";
-import { resolveSupabaseEnv, getSupabaseJwks } from "./supabase/env";
-import type { Database } from "./supabase/types";
+import { getFirebaseAdminAuth } from "@/lib/firebase/admin";
+import { getStoreRecord } from "@/lib/firebaseStore";
+import { jsonResponse } from "@/lib/authResponse";
 
-const JWT_SECRET = process.env.JWT_SECRET || "matrin_enterprise_secret_jwt_key_2026_x9823";
-const TOKEN_NAME = "matrin_token";
+const SESSION_COOKIE_NAME = "firebase_session";
 
 export interface TokenPayload {
   userId: string;
@@ -15,113 +11,64 @@ export interface TokenPayload {
   name: string;
 }
 
-export function hashPassword(password: string): string {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
-}
-
-export function comparePassword(password: string, hash: string): boolean {
-  return bcrypt.compareSync(password, hash);
-}
-
-export function generateToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
-}
-
-export function verifyToken(token: string): TokenPayload | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
-  } catch {
-    return null;
-  }
-}
-
-// Authentication is backed by Supabase Auth. Since supabase-js keeps its
-// session client-side (not as an httpOnly cookie), AuthContext mirrors the
-// current access token into a plain "sb-access-token" cookie so same-origin
-// fetch() calls from the admin dashboard keep working without every call
-// site having to attach an Authorization header.
 function parseCookies(req: Request): Record<string, string> {
   const cookieHeader = req.headers.get("cookie");
   if (!cookieHeader) return {};
   return Object.fromEntries(
-    cookieHeader.split("; ").map((c) => {
-      const [k, ...v] = c.split("=");
-      return [k, decodeURIComponent(v.join("="))];
+    cookieHeader.split(";").map((cookie) => {
+      const [key, ...value] = cookie.trim().split("=");
+      try {
+        return [key, decodeURIComponent(value.join("="))];
+      } catch {
+        return [key, value.join("=")];
+      }
     })
   );
 }
 
 export async function getAuthFromReq(req: Request): Promise<TokenPayload | null> {
-  // Fast path: the demo "Quick Admin Login" JWT session cookie (see
-  // /api/auth/admin-session). That login never creates a Supabase session,
-  // so without this check every admin-only write route would 403 it.
   const cookies = parseCookies(req);
-  if (cookies[TOKEN_NAME]) {
-    const payload = verifyToken(cookies[TOKEN_NAME]);
-    if (payload) return payload;
-  }
+  const bearer = req.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const sessionCookie = cookies[SESSION_COOKIE_NAME];
+  if (!sessionCookie && !bearer) return null;
 
-  const baseEnv = resolveSupabaseEnv();
-  if (!baseEnv.url) return null;
-
-  let creds = extractCredentials(req);
-
-  if (!creds.token) {
-    if (cookies["sb-access-token"]) {
-      creds = { token: cookies["sb-access-token"], apikey: null };
-    }
-  }
-
-  const jwks = await getSupabaseJwks(baseEnv.url);
-  const env = { ...baseEnv, jwks };
-
-  const { data: auth, error } = await verifyCredentials(creds, { auth: "user", env });
-  if (error || !auth?.userClaims) return null;
-
-  // Role lookup is best-effort: a misconfigured/missing secret key must never
-  // crash the request, and must never fail open to ADMIN — default CUSTOMER.
   try {
-    const supabaseAdmin = createAdminClient<Database>({ env });
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("name, email, role")
-      .eq("id", auth.userClaims.id)
-      .single();
+    const adminAuth = getFirebaseAdminAuth();
+    const decoded = sessionCookie
+      ? await adminAuth.verifySessionCookie(sessionCookie, true)
+      : await adminAuth.verifyIdToken(bearer!, true);
+    const email = decoded.email?.toLowerCase() || "";
+    const configuredAdminEmail = (process.env.ADMIN_EMAIL || "").toLowerCase();
+    const profile = await getStoreRecord<{ id: string; name?: string; status?: string }>(
+      "Users",
+      decoded.uid
+    );
+
+    if (profile?.status === "Blocked" || profile?.status === "Inactive") return null;
 
     return {
-      userId: auth.userClaims.id,
-      email: profile?.email || auth.userClaims.email || "",
-      name: profile?.name || "",
-      role: (profile?.role as "ADMIN" | "CUSTOMER") || "CUSTOMER",
+      userId: decoded.uid,
+      email,
+      role:
+        email &&
+        email === configuredAdminEmail &&
+        decoded.email_verified === true
+          ? "ADMIN"
+          : "CUSTOMER",
+      name: profile?.name || decoded.name || "",
     };
-  } catch (err) {
-    console.error("Failed to resolve Supabase profile/role:", err);
-    return {
-      userId: auth.userClaims.id,
-      email: auth.userClaims.email || "",
-      name: "",
-      role: "CUSTOMER",
-    };
+  } catch {
+    return null;
   }
 }
 
-export function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  };
+export function isAdminEmail(email: string, emailVerified = false) {
+  const configuredAdminEmail = (process.env.ADMIN_EMAIL || "").toLowerCase();
+  return (
+    emailVerified &&
+    Boolean(configuredAdminEmail) &&
+    email.trim().toLowerCase() === configuredAdminEmail
+  );
 }
 
-export function jsonResponse(data: unknown, status = 200, headers = {}) {
-  return NextResponse.json(data, {
-    status,
-    headers: {
-      ...corsHeaders(),
-      ...headers,
-    },
-  });
-}
-
-export { TOKEN_NAME };
+export { jsonResponse, SESSION_COOKIE_NAME };

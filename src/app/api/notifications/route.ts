@@ -1,64 +1,86 @@
-import { connectToDatabase } from "@/lib/db";
-import { NotificationModel } from "@/models/Notification";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore, initialNotifications } from "@/lib/inMemoryStore";
+import {
+  deleteStoreRecord,
+  listOrSeedStoreRecords,
+  listStoreRecords,
+  patchStoreRecord,
+} from "@/lib/firebaseStore";
 
-export async function GET(req: Request) {
+type SheetNotification = { id: string | number; [key: string]: unknown };
+
+async function requireAdmin(req: Request) {
   const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
-  }
-
-  const db = await connectToDatabase();
-  if (db) {
-    const count = await NotificationModel.countDocuments();
-    if (count === 0) {
-      await NotificationModel.insertMany(initialNotifications);
-    }
-    const notifications = await NotificationModel.find().sort({ createdAt: -1 });
-    return jsonResponse(notifications);
-  }
-
-  return jsonResponse(inMemoryStore.notifications);
+  return auth?.role === "ADMIN";
 }
 
-export async function PUT(req: Request) {
-  const auth = await getAuthFromReq(req);
-  if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+export async function GET(req: Request) {
+  if (!(await requireAdmin(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
-    const body = await req.json();
-    const { id, isRead } = body;
+    const notifications = await listOrSeedStoreRecords<SheetNotification>(
+      "Notifications",
+      [...inMemoryStore.notifications, ...initialNotifications]
+    );
+    return jsonResponse(notifications.sort((a, b) =>
+      String(b.timestamp || "").localeCompare(String(a.timestamp || ""))
+    ));
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load notifications" },
+      503
+    );
+  }
+}
 
-    const db = await connectToDatabase();
-    if (db) {
-      if (id) {
-        await NotificationModel.updateOne({ id }, { $set: { isRead } });
-      } else {
-        await NotificationModel.updateMany({}, { $set: { isRead: true } });
-      }
-      return jsonResponse({ success: true });
-    }
+export async function PUT(req: Request) {
+  if (!(await requireAdmin(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+  }
 
-    if (id) {
-      const target = inMemoryStore.notifications.find((n) => n.id === id);
-      if (target) target.isRead = isRead;
-    } else {
-      inMemoryStore.notifications.forEach((n) => (n.isRead = true));
-    }
+  try {
+    const { id, isRead } = await req.json();
+    const notifications = await listStoreRecords<SheetNotification>("Notifications");
+    const targets = id
+      ? notifications.filter((notification) => String(notification.id) === String(id))
+      : notifications;
 
+    await Promise.all(
+      targets.map((notification) =>
+        patchStoreRecord<SheetNotification>("Notifications", notification.id, {
+          isRead: id ? Boolean(isRead) : true,
+        })
+      )
+    );
     return jsonResponse({ success: true });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to update notifications" }, 500);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to update notifications" },
+      503
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  if (!(await requireAdmin(req))) {
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
+  }
+
+  try {
+    const notifications = await listStoreRecords<SheetNotification>("Notifications");
+    await Promise.all(
+      notifications.map((notification) =>
+        deleteStoreRecord("Notifications", notification.id)
+      )
+    );
+    return jsonResponse({ success: true, deletedCount: notifications.length });
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to delete notifications" },
+      503
+    );
   }
 }
 

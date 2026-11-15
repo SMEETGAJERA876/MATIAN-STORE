@@ -1,29 +1,29 @@
-import { connectToDatabase } from "@/lib/db";
-import { CouponModel } from "@/models/Coupon";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
 import { inMemoryStore, initialCoupons } from "@/lib/inMemoryStore";
+import { listOrSeedStoreRecords, upsertStoreRecord } from "@/lib/firebaseStore";
 
 export async function GET() {
-  const db = await connectToDatabase();
-  if (db) {
-    const count = await CouponModel.countDocuments();
-    if (count === 0) {
-      await CouponModel.insertMany(initialCoupons);
-    }
-    const coupons = await CouponModel.find().sort({ createdAt: -1 });
-    return jsonResponse(coupons);
+  try {
+    return jsonResponse(
+      await listOrSeedStoreRecords("Coupons", [
+        ...inMemoryStore.coupons,
+        ...initialCoupons.filter(
+          (initial) => !inMemoryStore.coupons.some((coupon) => coupon.id === initial.id)
+        ),
+      ])
+    );
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load coupons" },
+      503
+    );
   }
-
-  return jsonResponse(inMemoryStore.coupons);
 }
 
 export async function POST(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
   try {
@@ -42,18 +42,13 @@ export async function POST(req: Request) {
       validUntil: body.validUntil || "2026-12-31",
       isActive: body.isActive !== undefined ? body.isActive : true,
     };
-
-    const db = await connectToDatabase();
-    if (db) {
-      const created = await CouponModel.create(couponData);
-      return jsonResponse({ success: true, coupon: created }, 201);
-    }
-
-    inMemoryStore.coupons.unshift(couponData as unknown as (typeof inMemoryStore.coupons)[0]);
-    return jsonResponse({ success: true, coupon: couponData }, 201);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to create coupon" }, 500);
+    const created = await upsertStoreRecord("Coupons", couponData);
+    return jsonResponse({ success: true, coupon: created }, 201);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to create coupon" },
+      503
+    );
   }
 }
 

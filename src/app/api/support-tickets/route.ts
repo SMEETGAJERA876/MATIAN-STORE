@@ -1,32 +1,36 @@
-import { connectToDatabase } from "@/lib/db";
-import { SupportTicketModel } from "@/models/SupportTicket";
 import { getAuthFromReq, jsonResponse } from "@/lib/auth";
-import { inMemoryStore } from "@/lib/inMemoryStore";
+import { inMemoryStore, initialSupportTickets } from "@/lib/inMemoryStore";
+import {
+  listOrSeedStoreRecords,
+  upsertStoreRecord,
+} from "@/lib/firebaseStore";
 
-// Admin-only: these records hold customer PII (email, phone, message), unlike
-// the public product/review endpoints.
+type SheetTicket = { id: string | number; [key: string]: unknown };
+
 export async function GET(req: Request) {
   const auth = await getAuthFromReq(req);
   if (!auth || auth.role !== "ADMIN") {
-    const referer = req.headers.get("referer") || "";
-    if (!referer.includes("/admin")) {
-      return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
-    }
+    return jsonResponse({ error: "Forbidden: Admin privileges required" }, 403);
   }
 
-  const db = await connectToDatabase();
-  if (db) {
-    const tickets = await SupportTicketModel.find().sort({ createdAt: -1 });
-    return jsonResponse(tickets);
+  try {
+    const tickets = await listOrSeedStoreRecords<SheetTicket>(
+      "SupportTickets",
+      [...inMemoryStore.supportTickets, ...initialSupportTickets]
+    );
+    return jsonResponse(tickets.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""))));
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to load support tickets" },
+      503
+    );
   }
-
-  return jsonResponse(inMemoryStore.supportTickets);
 }
 
-// Public: the storefront Contact Us form submits here without being logged in.
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const isAdmin = (await getAuthFromReq(req))?.role === "ADMIN";
     const customerName = (body.customerName || "").trim();
     const customerEmail = (body.customerEmail || "").trim();
     const message = (body.message || "").trim();
@@ -37,30 +41,28 @@ export async function POST(req: Request) {
     }
 
     const ticketData = {
-      id: body.id || `ticket_${Date.now()}`,
-      ticketNumber: body.ticketNumber || ("#TICK-" + Math.floor(1000 + Math.random() * 9000)),
+      id: isAdmin && body.id ? body.id : `ticket_${Date.now()}`,
+      ticketNumber: isAdmin && body.ticketNumber
+        ? body.ticketNumber
+        : `#TICK-${Math.floor(1000 + Math.random() * 9000)}`,
       subject,
       customerName,
       customerEmail,
       customerPhone: (body.customerPhone || "").trim() || undefined,
       message,
-      priority: "Medium" as const,
-      status: "Open" as const,
-      category: "General" as const,
+      priority: isAdmin ? body.priority || "Medium" : "Medium",
+      status: isAdmin ? body.status || "Open" : "Open",
+      category: isAdmin ? body.category || "General" : "General",
       createdAt: new Date().toISOString(),
     };
 
-    const db = await connectToDatabase();
-    if (db) {
-      const created = await SupportTicketModel.create(ticketData);
-      return jsonResponse({ success: true, ticket: created }, 201);
-    }
-
-    inMemoryStore.supportTickets.unshift(ticketData as unknown as (typeof inMemoryStore.supportTickets)[0]);
-    return jsonResponse({ success: true, ticket: ticketData }, 201);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return jsonResponse({ error: error.message || "Failed to submit message" }, 500);
+    const created = await upsertStoreRecord("SupportTickets", ticketData);
+    return jsonResponse({ success: true, ticket: created }, 201);
+  } catch (err) {
+    return jsonResponse(
+      { error: err instanceof Error ? err.message : "Failed to submit message" },
+      503
+    );
   }
 }
 

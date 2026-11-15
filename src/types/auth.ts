@@ -28,11 +28,14 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoaded: boolean;
   isAuthModalOpen: boolean;
+  googleLinkPending: boolean;
   openAuthModal: (initialTab?: "login" | "register") => void;
   closeAuthModal: () => void;
   login: (email: string, password: string, expectedRole: "ADMIN" | "CUSTOMER" | "AUTO") => Promise<boolean> | boolean;
-  quickUserLogin: () => void;
-  quickAdminLogin?: () => void;
+  loginWithGoogle: () => Promise<boolean>;
+  completeGoogleLink: (email: string, password: string) => Promise<boolean>;
+  cancelGoogleLink: () => void;
   register: (name: string, email: string, password: string) => Promise<boolean> | boolean;
+  resetPassword: (email: string) => Promise<boolean>;
   logout: (redirectTo?: string) => Promise<void> | void;
 }
