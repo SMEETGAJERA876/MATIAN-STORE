@@ -136,8 +136,8 @@ export default function ContactPage() {
             <div className="lg:col-span-6 flex justify-center">
               <div className="relative w-full max-w-lg">
                 <img
-                  src="/images/matrin-hero-lineup.png"
-                  alt="Matrin Products"
+                  src="/images/matrin-brand-ad.png"
+                  alt="Matrin home cleaning products and brand benefits"
                   className="h-auto w-full object-contain drop-shadow-2xl"
                 />
               </div>

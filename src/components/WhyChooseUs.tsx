@@ -89,9 +89,9 @@ export default function WhyChooseUs() {
           <div className="lg:col-span-4">
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#EAF5FF] to-white aspect-4/3 lg:aspect-square border border-[#DCE8F5] shadow-md p-2 flex items-center justify-center">
               <img
-                src="/images/matrin-lifestyle-clean.png"
-                alt="Matrin Product Lineup Lifestyle"
-                className="h-full w-full object-cover rounded-2xl transition-transform duration-700 hover:scale-105 drop-shadow-md"
+                src="/images/matrin-brand-ad.png"
+                alt="Matrin home cleaning products and family-friendly benefits"
+                className="h-full w-full object-contain rounded-2xl transition-transform duration-700 hover:scale-105 drop-shadow-md"
               />
             </div>
           </div>
